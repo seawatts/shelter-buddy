@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -102,7 +103,7 @@ export function SiteHeaderNavigationMenu() {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <Link href="/docs" legacyBehavior passHref>
+          <Link href={"/docs" as Route} legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Fundraising Basics
             </NavigationMenuLink>

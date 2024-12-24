@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   BookOpen,
   Bot,
@@ -9,17 +9,11 @@ import {
   Code,
   ExternalLink,
   LayoutDashboard,
-  Logs,
-  PlayCircle,
-  ShieldCheck,
   Sparkles,
-  SquareFunction,
-  TestTube2,
   User2,
-  Users,
-  Workflow,
 } from "lucide-react";
 
+import type { ShelterType } from "@acme/db/schema";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
 import { Icons } from "@acme/ui/icons";
+import { ShelterThemeToggle } from "@acme/ui/shelter-theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -38,83 +33,42 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
   SidebarSeparator,
   SidebarTrigger,
 } from "@acme/ui/sidebar";
 
-export function AppSidebar() {
-  const params = useParams();
+import { updateShelterTheme } from "~/lib/shelter";
+
+interface AppSidebarProps {
+  shelter: ShelterType | null;
+}
+
+export function AppSidebar({ shelter }: AppSidebarProps) {
   const pathname = usePathname();
 
-  const projectId = params.projectId as string;
-  const environmentId = params.environmentId as string;
+  const handleThemeChange = async (themeConfig: ShelterType["themeConfig"]) => {
+    if (!shelter) return;
+    await updateShelterTheme(shelter.id, themeConfig);
+  };
 
-  if (!projectId || !environmentId) {
-    return (
-      <SidebarMenu>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <SidebarMenuItem key={index}>
-            <SidebarMenuSkeleton />
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    );
-  }
-
-  // Menu items.
   const monitoringItems = [
     {
       icon: LayoutDashboard,
       title: "Dashboard",
-      url: `/projects/${projectId}/environments/${environmentId}/dashboard`,
-    },
-    {
-      icon: Logs,
-      title: "Logs",
-      url: `/projects/${projectId}/environments/${environmentId}/logs`,
-    },
-    {
-      icon: Users,
-      title: "Users",
-      url: `/projects/${projectId}/environments/${environmentId}/users`,
+      url: `/shelters`,
     },
   ];
+
   const developmentItems = [
     {
       icon: Sparkles,
-      title: "Prompts",
-      url: `/projects/${projectId}/environments/${environmentId}/prompts`,
+      title: "Volunteers",
+      url: `/volunteers`,
     },
     {
       icon: Bot,
-      title: "Agents",
-      url: `/projects/${projectId}/environments/${environmentId}/agents`,
-    },
-    {
-      icon: Workflow,
-      title: "Workflows",
-      url: `/projects/${projectId}/environments/${environmentId}/workflows`,
-    },
-    {
-      icon: SquareFunction,
-      title: "Tools",
-      url: `/projects/${projectId}/environments/${environmentId}/tools`,
-    },
-    {
-      icon: ShieldCheck,
-      title: "Guardrails",
-      url: `/projects/${projectId}/environments/${environmentId}/guardrails`,
-    },
-    {
-      icon: TestTube2,
-      title: "Tests",
-      url: `/projects/${projectId}/environments/${environmentId}/tests`,
-    },
-    {
-      icon: PlayCircle,
-      title: "Playground",
-      url: `/projects/${projectId}/environments/${environmentId}/playground`,
+      title: "Animals",
+      url: `/animals`,
     },
   ];
 
@@ -127,7 +81,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  BoundaryML
+                  {shelter?.name ?? "ShelterBuddy"}
                   <ChevronDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -252,6 +206,24 @@ export function AppSidebar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <ShelterThemeToggle
+              currentTheme={
+                shelter?.themeConfig ?? {
+                  colors: {
+                    accent: "220 90% 75%",
+                    background: "0 0% 100%",
+                    border: "220 13% 91%",
+                    foreground: "224 71.4% 4.1%",
+                    muted: "220 14.3% 95.9%",
+                    primary: "220 90% 45%",
+                    secondary: "220 20% 92%",
+                  },
+                }
+              }
+              onThemeChange={handleThemeChange}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

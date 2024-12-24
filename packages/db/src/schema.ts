@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  json,
   pgEnum,
   pgTable,
   text,
@@ -16,6 +17,32 @@ import { createId } from "@acme/id";
 export const userRoleEnum = pgEnum("userRole", ["admin", "superAdmin", "user"]);
 
 export const UserRoleType = z.enum(userRoleEnum.enumValues).Enum;
+
+// Define the theme configuration type
+export const ThemeConfigSchema = z.object({
+  colors: z.object({
+    accent: z.string(),
+    background: z.string().optional(),
+    border: z.string().optional(),
+    foreground: z.string().optional(),
+    muted: z.string().optional(),
+    primary: z.string(),
+    secondary: z.string(),
+  }),
+  darkMode: z
+    .object({
+      accent: z.string(),
+      background: z.string().optional(),
+      border: z.string().optional(),
+      foreground: z.string().optional(),
+      muted: z.string().optional(),
+      primary: z.string(),
+      secondary: z.string(),
+    })
+    .optional(),
+});
+
+export type ThemeConfig = z.infer<typeof ThemeConfigSchema>;
 
 export const Users = pgTable("user", {
   avatarUrl: text("avatarUrl"),
@@ -33,7 +60,7 @@ export const Users = pgTable("user", {
 });
 
 export const UsersRelations = relations(Users, ({ many }) => ({
-  orgMembers: many(OrgMembers, {
+  shelterMembers: many(ShelterMembers, {
     relationName: "user",
   }),
 }));
@@ -51,8 +78,7 @@ export const CreateUserSchema = createInsertSchema(Users, {
   updatedAt: true,
 });
 
-export const Orgs = pgTable("orgs", {
-  // batch: varchar("batch", { length: 50 }),
+export const Shelters = pgTable("shelter", {
   clerkOrgId: text("clerkOrgId"),
   createdAt: timestamp("createdAt", {
     mode: "date",
@@ -64,35 +90,46 @@ export const Orgs = pgTable("orgs", {
     })
     .notNull(),
   id: varchar("id", { length: 128 })
-    .$defaultFn(() => createId({ prefix: "org" }))
+    .$defaultFn(() => createId({ prefix: "shelter" }))
     .notNull()
     .primaryKey(),
+  name: text("name").notNull(),
+  themeConfig: json("themeConfig")
+    .$type<ThemeConfig>()
+    .notNull()
+    .$default(() => ({
+      colors: {
+        accent: "220 90% 75%",
+        primary: "220 90% 45%",
+        secondary: "220 20% 92%",
+      },
+    })),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
 });
 
-export type OrgType = typeof Orgs.$inferSelect;
+export type ShelterType = typeof Shelters.$inferSelect;
 
-export const updateOrgSchema = createInsertSchema(Orgs, {}).omit({
+export const SheltersRelations = relations(Shelters, ({ one, many }) => ({
+  createdByUser: one(Users, {
+    fields: [Shelters.createdByUserId],
+    references: [Users.id],
+  }),
+  shelterMembers: many(ShelterMembers),
+}));
+
+export const updateShelterSchema = createInsertSchema(Shelters, {}).omit({
   createdAt: true,
   createdByUserId: true,
   id: true,
   updatedAt: true,
 });
 
-export const OrgsRelations = relations(Orgs, ({ one, many }) => ({
-  createdByUser: one(Users, {
-    fields: [Orgs.createdByUserId],
-    references: [Users.id],
-  }),
-  orgMembers: many(OrgMembers),
-}));
-
-// Company Members Table
-export const OrgMembers = pgTable(
-  "orgMembers",
+// Shelter Members Table
+export const ShelterMembers = pgTable(
+  "shelterMembers",
   {
     createdAt: timestamp("createdAt", {
       mode: "date",
@@ -107,12 +144,12 @@ export const OrgMembers = pgTable(
       .$defaultFn(() => createId({ prefix: "member" }))
       .notNull()
       .primaryKey(),
-    orgId: varchar("orgId")
-      .references(() => Orgs.id, {
+    role: userRoleEnum("role").default("user").notNull(),
+    shelterId: varchar("shelterId")
+      .references(() => Shelters.id, {
         onDelete: "cascade",
       })
       .notNull(),
-    role: userRoleEnum("role").default("user").notNull(),
     updatedAt: timestamp("updatedAt", {
       mode: "date",
       withTimezone: true,
@@ -124,27 +161,27 @@ export const OrgMembers = pgTable(
       .notNull(),
   },
   (table) => ({
-    orgUserUnique: unique().on(table.orgId, table.userId),
+    shelterUserUnique: unique().on(table.shelterId, table.userId),
   }),
 );
 
-export type OrgMembersType = typeof OrgMembers.$inferSelect & {
+export type ShelterMembersType = typeof ShelterMembers.$inferSelect & {
   user?: UserType;
-  org?: OrgType;
+  shelter?: ShelterType;
 };
 
-export const OrgMembersRelations = relations(OrgMembers, ({ one }) => ({
+export const ShelterMembersRelations = relations(ShelterMembers, ({ one }) => ({
   createdByUser: one(Users, {
-    fields: [OrgMembers.createdByUserId],
+    fields: [ShelterMembers.createdByUserId],
     references: [Users.id],
     relationName: "createdByUser",
   }),
-  org: one(Orgs, {
-    fields: [OrgMembers.orgId],
-    references: [Orgs.id],
+  shelter: one(Shelters, {
+    fields: [ShelterMembers.shelterId],
+    references: [Shelters.id],
   }),
   user: one(Users, {
-    fields: [OrgMembers.userId],
+    fields: [ShelterMembers.userId],
     references: [Users.id],
     relationName: "user",
   }),

@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,19 +14,25 @@ import { ThemeToggle } from "@acme/ui/theme";
 
 import { SiteHeaderNavigationMenu } from "./site-header-nav-menu";
 
-const menuItem = [
+interface MenuItem {
+  href: Route;
+  id: number;
+  label: string;
+}
+
+const menuItem: MenuItem[] = [
   {
-    href: "/features",
+    href: "/features" as Route,
     id: 1,
     label: "Features",
   },
   {
-    href: "#",
+    href: "#" as Route,
     id: 2,
     label: "Pricing",
   },
   {
-    href: "#",
+    href: "#" as Route,
     id: 4,
     label: "Contact Us",
   },
@@ -87,11 +94,14 @@ export function SiteHeader() {
 
   useEffect(() => {
     const closeHamburgerNavigation = () => setHamburgerMenuIsOpen(false);
-    window.addEventListener("orientationchange", closeHamburgerNavigation);
+    globalThis.addEventListener("orientationchange", closeHamburgerNavigation);
     window.addEventListener("resize", closeHamburgerNavigation);
 
     return () => {
-      window.removeEventListener("orientationchange", closeHamburgerNavigation);
+      globalThis.removeEventListener(
+        "orientationchange",
+        closeHamburgerNavigation,
+      );
       window.removeEventListener("resize", closeHamburgerNavigation);
     };
   }, [setHamburgerMenuIsOpen]);
@@ -123,10 +133,10 @@ export function SiteHeader() {
               <SiteHeaderNavigationMenu />
             </div>
             <Button asChild variant={"ghost"} className="hidden md:block">
-              <Link href="/signin">Log in</Link>
+              <Link href={"/signin" as Route}>Log in</Link>
             </Button>
             <Button asChild>
-              <Link href="/signup">Sign up</Link>
+              <Link href={"/signup" as Route}>Sign up</Link>
             </Button>
             <div className="hidden md:block">
               <ThemeToggle />
