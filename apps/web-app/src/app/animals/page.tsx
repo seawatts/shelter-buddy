@@ -2,7 +2,6 @@ import { Badge } from "@acme/ui/badge";
 import { Separator } from "@acme/ui/separator";
 
 import { ScrollToBottom } from "./_components/scroll-to-bottom";
-import { TagFilter } from "./_components/tag-filter";
 import { AnimalsView } from "./_components/view";
 import { ViewModeToggle } from "./_components/view-mode-toggle";
 import { WalkProgress } from "./_components/walk-progress";
@@ -88,8 +87,10 @@ export default async function AnimalsPage(props: {
             </div>
           </div>
           <WalkProgress data={mockAnimals} />
-          <TagFilter data={mockAnimals} />
+          {/* <TagFilter data={mockAnimals} /> */}
           <Separator />
+        </div>
+        <div className="p-6 sm:p-8">
           <AnimalsView kennels={mockKennels} animals={mockAnimals} />
         </div>
       </div>

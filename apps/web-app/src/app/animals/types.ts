@@ -103,11 +103,11 @@ export interface Kennel {
 export type DifficultyLevel = "Yellow" | "Purple" | "Red";
 
 export interface WalkSession {
-  completed: boolean;
+  status: "completed" | "in_progress";
   duration?: number;
   notes?: string;
-  time: string;
-  elapsedTime?: string;
+  startedAt: Date;
+  endedAt?: Date;
   walkDifficulty?: 1 | 2 | 3 | 4 | 5;
   activities?: {
     // Bathroom activities
@@ -181,31 +181,43 @@ export interface WalkSession {
   };
 }
 
+export interface MediaMetadata {
+  uploadedBy: {
+    name: string;
+    avatarUrl?: string;
+  };
+  uploadedAt: Date | string;
+}
+
+export interface BaseMedia {
+  url: string;
+  metadata?: MediaMetadata;
+}
+
+export interface ImageMedia extends BaseMedia {
+  type: "image";
+}
+
+export interface VideoMedia extends BaseMedia {
+  type: "video";
+  thumbnailUrl?: string;
+}
+
+export type AnimalMedia = ImageMedia | VideoMedia;
+
 export interface Animal {
   id: string;
-  kennelNumber: string;
   name: string;
-  species: string;
-  breed: string;
-  age: number;
-  weight: number;
-  notes: string;
+  kennelId: string;
+  difficultyLevel: "Yellow" | "Purple" | "Red";
+  isOutOfKennel: boolean;
+  isFido: boolean;
   medicalNotes?: string;
   behavioralNotes?: string;
-  difficultyLevel: DifficultyLevel;
-  assignedVolunteer?: {
-    id: string;
-    name: string;
-    imageUrl?: string;
-  };
-  walks: Record<string, WalkSession>;
-  isFido: boolean;
-  isOutOfKennel: boolean;
-  availableDate: string;
-  approvedActivities: string[];
   generalNotes?: string;
   inKennelNotes?: string;
-  outKennelNotes?: string;
-  kennel: string;
   tags?: string[];
+  imageUrl?: string;
+  media?: AnimalMedia[];
+  walks?: WalkSession[];
 }

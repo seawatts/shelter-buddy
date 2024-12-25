@@ -2,129 +2,78 @@ import type { Animal } from "../types";
 
 export const mockAnimals: Animal[] = [
   {
-    age: 3,
-    approvedActivities: [
-      "FIDO, long walks, hikes, extensive field trips",
-      "Dog Playgroups",
-      "Conference room play, quiet time",
-    ],
-    assignedVolunteer: {
-      id: "v1",
-      imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
-      name: "Sarah Johnson",
-    },
-    availableDate: "2/18 AM",
-    behavioralNotes: "",
-    breed: "Pit Mix",
     difficultyLevel: "Yellow",
-    generalNotes:
-      "Super sweet, pulls off leash/scans, he pulls when he finds a smell he likes. Do NOT hand toss on ground, is not gentle with hand feeding. Figure-8 on return, will be resistance on going back to kennel",
     id: "1",
-    inKennelNotes: "",
-    isFido: true,
+    isFido: false,
     isOutOfKennel: false,
-    kennel: "K1",
-    kennelNumber: "K1",
-    medicalNotes: "",
+    kennelId: "K1",
+    media: [
+      {
+        metadata: {
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+          uploadedBy: {
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Smith",
+            name: "John Smith",
+          }, // 2 hours ago
+        },
+        type: "image",
+        url: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
+      },
+      {
+        metadata: {
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+          uploadedBy: {
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane%20Doe",
+            name: "Jane Doe",
+          }, // 30 minutes ago
+        },
+        thumbnailUrl:
+          "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+        type: "video",
+        url: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+      },
+    ],
     name: "Max",
-    notes: "Friendly, needs extra exercise",
-    outKennelNotes: "On leash walks with friend Angela",
-    species: "Dog",
-    tags: ["first"],
-    walks: {
-      am: {
-        activities: {
-          dogReactive: false,
-          goodBehavior: true,
-          pee: true,
-          playedBall: true,
-          playedFetch: true,
-          poop: true,
-          treats: true,
-        },
-        completed: true,
-        duration: 25,
-        notes:
-          "Great walk! Very energetic today, played fetch and met some friendly dogs.",
-        time: new Date().toISOString().split("T")[0] + "T08:30:00",
-        walkedBy: {
-          id: "v1",
-          name: "Sarah Johnson",
-        },
+    walks: [
+      {
+        date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+        duration: 15,
+        id: "1",
+        status: "completed",
       },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T12:30:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:30:00",
-      },
-    },
-    weight: 65,
+    ],
   },
   {
-    age: 2,
-    approvedActivities: ["Dog Playgroups", "Conference room play"],
-    assignedVolunteer: {
-      id: "v2",
-      imageUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mike",
-      name: "Mike Chen",
-    },
-    availableDate: "2/19 AM",
-    behavioralNotes: "",
-    breed: "Lab Mix",
-    difficultyLevel: "Yellow",
-    generalNotes: "Gentle walker, good with other dogs",
+    difficultyLevel: "Purple",
     id: "2",
-    inKennelNotes: "",
-    isFido: false,
+    isFido: true,
     isOutOfKennel: true,
-    kennel: "K2",
-    kennelNumber: "K2",
-    medicalNotes: "",
+    kennelId: "K2",
+    media: [
+      {
+        metadata: {
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+          uploadedBy: {
+            avatarUrl:
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah%20Johnson",
+            name: "Sarah Johnson",
+          }, // 30 minutes ago
+        },
+        type: "image",
+        url: "https://images.unsplash.com/photo-1552053831-71594a27632d",
+      },
+    ],
     name: "Luna",
-    notes: "Gentle walker, good with other dogs",
-    outKennelNotes: "At foster home for the weekend",
-    species: "Dog",
-    tags: ["last"],
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          pee: true,
-          poop: true,
-          trained: true,
-          treats: true,
-        },
-        completed: true,
+    walks: [
+      {
+        date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
         duration: 20,
-        notes: "Worked on sit-stay commands, did very well!",
-        time: new Date().toISOString().split("T")[0] + "T09:00:00",
-        walkedBy: {
-          id: "v2",
-          name: "Mike Chen",
-        },
+        id: "2",
+        status: "in_progress",
       },
-      midday: {
-        activities: {
-          goodBehavior: true,
-          pee: true,
-        },
-        completed: false,
-        elapsedTime: "10:30",
-        time: new Date().toISOString().split("T")[0] + "T13:00:00",
-        walkedBy: {
-          id: "v2",
-          name: "Mike Chen",
-        },
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T17:00:00",
-      },
-    },
-    weight: 55,
+    ],
   },
   {
     age: 4,
