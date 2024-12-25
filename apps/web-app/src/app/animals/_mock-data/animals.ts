@@ -22,6 +22,7 @@ export const mockAnimals: Animal[] = [
     id: "1",
     inKennelNotes: "",
     isFido: true,
+    isOutOfKennel: false,
     kennel: "K1",
     kennelNumber: "K1",
     medicalNotes: "",
@@ -29,6 +30,7 @@ export const mockAnimals: Animal[] = [
     notes: "Friendly, needs extra exercise",
     outKennelNotes: "On leash walks with friend Angela",
     species: "Dog",
+    tags: ["first"],
     walks: {
       am: {
         activities: {
@@ -77,13 +79,15 @@ export const mockAnimals: Animal[] = [
     id: "2",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: true,
     kennel: "K2",
     kennelNumber: "K2",
     medicalNotes: "",
     name: "Luna",
     notes: "Gentle walker, good with other dogs",
-    outKennelNotes: "",
+    outKennelNotes: "At foster home for the weekend",
     species: "Dog",
+    tags: ["last"],
     walks: {
       am: {
         activities: {
@@ -133,6 +137,7 @@ export const mockAnimals: Animal[] = [
     id: "3",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K3",
     kennelNumber: "K3",
     medicalNotes: "",
@@ -198,6 +203,7 @@ export const mockAnimals: Animal[] = [
     id: "4",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K4",
     kennelNumber: "K4",
     medicalNotes: "",
@@ -250,6 +256,7 @@ export const mockAnimals: Animal[] = [
     id: "5",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K5",
     kennelNumber: "K5",
     medicalNotes: "",
@@ -257,6 +264,7 @@ export const mockAnimals: Animal[] = [
     notes: "Loves attention, walks well on leash",
     outKennelNotes: "",
     species: "Dog",
+    tags: ["first"],
     walks: {
       am: {
         completed: false,
@@ -284,6 +292,7 @@ export const mockAnimals: Animal[] = [
     id: "6",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K6",
     kennelNumber: "K6",
     medicalNotes: "",
@@ -330,6 +339,7 @@ export const mockAnimals: Animal[] = [
     id: "7",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K7",
     kennelNumber: "K7",
     medicalNotes: "",
@@ -337,6 +347,7 @@ export const mockAnimals: Animal[] = [
     notes: "Can be nervous with new people",
     outKennelNotes: "",
     species: "Dog",
+    tags: ["last"],
     walks: {
       am: {
         completed: false,
@@ -364,6 +375,7 @@ export const mockAnimals: Animal[] = [
     id: "8",
     inKennelNotes: "",
     isFido: true,
+    isOutOfKennel: false,
     kennel: "K8",
     kennelNumber: "K8",
     medicalNotes: "",
@@ -371,6 +383,7 @@ export const mockAnimals: Animal[] = [
     notes: "Loves training sessions and puzzle toys",
     outKennelNotes: "",
     species: "Dog",
+    tags: ["last"],
     walks: {
       am: {
         activities: {
@@ -411,6 +424,7 @@ export const mockAnimals: Animal[] = [
     id: "9",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K9",
     kennelNumber: "K9",
     medicalNotes: "Breathing issues in hot weather",
@@ -456,6 +470,7 @@ export const mockAnimals: Animal[] = [
     id: "10",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K10",
     kennelNumber: "K10",
     medicalNotes: "",
@@ -513,6 +528,7 @@ export const mockAnimals: Animal[] = [
     id: "11",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K11",
     kennelNumber: "K11",
     medicalNotes: "",
@@ -547,6 +563,7 @@ export const mockAnimals: Animal[] = [
     id: "12",
     inKennelNotes: "",
     isFido: true,
+    isOutOfKennel: false,
     kennel: "K12",
     kennelNumber: "K12",
     medicalNotes: "",
@@ -593,6 +610,7 @@ export const mockAnimals: Animal[] = [
     id: "13",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K13",
     kennelNumber: "K13",
     medicalNotes: "",
@@ -639,6 +657,7 @@ export const mockAnimals: Animal[] = [
     id: "14",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: true,
     kennel: "K14",
     kennelNumber: "K14",
     medicalNotes: "",
@@ -646,6 +665,7 @@ export const mockAnimals: Animal[] = [
     notes: "Very gentle but strong due to size",
     outKennelNotes: "",
     species: "Dog",
+    tags: ["last"],
     walks: {
       am: {
         completed: false,
@@ -673,6 +693,7 @@ export const mockAnimals: Animal[] = [
     id: "15",
     inKennelNotes: "",
     isFido: false,
+    isOutOfKennel: false,
     kennel: "K15",
     kennelNumber: "K15",
     medicalNotes: "Monitor breathing in hot weather",

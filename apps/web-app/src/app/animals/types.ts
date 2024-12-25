@@ -200,10 +200,12 @@ export interface Animal {
   };
   walks: Record<string, WalkSession>;
   isFido: boolean;
+  isOutOfKennel: boolean;
   availableDate: string;
   approvedActivities: string[];
   generalNotes?: string;
   inKennelNotes?: string;
   outKennelNotes?: string;
   kennel: string;
+  tags?: string[];
 }

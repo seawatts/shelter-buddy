@@ -33,10 +33,11 @@ UI and Styling
 - Use Shadcn UI, Radix, and Tailwind for components and styling.
 - Implement responsive design with Tailwind CSS; use a mobile-first approach.
 - All ui components can be found in packages/ui and imported as @acme/ui/{componentName}
-- Use grid over flexbox for layout.
-- Use gap over margin for spacing.
-- Use gap over space-\* classes for spacing.
-- Make sure to use use packages/ui/src/styles/globals.css for css variables and colors. example: text-primary-foreground
+- Use 'grid' over 'flexbox' for layout.
+- Use gap-1 over m-1 for spacing.
+- Use gap-1 over space-1 classes for spacing or gap-x-1 over space-x-1. It can be gap-\*
+- Make sure to use use packages/ui/src/styles/globals.css for css variables and colors. example: text-primary-foreground and bg-primary
+- Use size-4 instead of h-4 w-4 when adding height or width to elements. It can be size-\*
 
 Performance Optimization
 
@@ -49,6 +50,7 @@ Performance Optimization
 Key Conventions
 
 - Use vitest for testing not jest.
+- Use date-fns for date formatting.
 - Use 'nuqs' for URL search parameter state management.
 - Use 'plasmo' for chrome extension development.
 - Use 'supabase' for database.

@@ -308,9 +308,6 @@ export const Icons = {
   Info: twx(Info).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
-  User: twx(User).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
   LinkedIn: twx(SiLinkedin).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -343,6 +340,9 @@ export const Icons = {
     "size",
     "variant",
   ])<IconProps>(({ size, variant }) => iconVariants({ size, variant })),
+  User: twx(User).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   Moon: twx(Moon).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),

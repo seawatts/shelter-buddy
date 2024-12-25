@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Circle } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -154,9 +155,18 @@ export function WalkProgress({ data }: WalkProgressProps) {
                     />
                     <div className="absolute inset-0 flex items-center justify-between px-6 text-base font-medium text-primary">
                       <span>{level}</span>
-                      <span>
-                        {stats.completed + stats.inProgress}/{stats.total} walks
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span>
+                          {stats.completed + stats.inProgress}/{stats.total}{" "}
+                          walks
+                        </span>
+                        {stats.inProgress > 0 && (
+                          <Circle className="size-4 animate-pulse fill-green-500 text-green-500" />
+                        )}
+                        {stats.completed === stats.total && stats.total > 0 && (
+                          <Check className="size-5 stroke-[4px] text-green-500" />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
