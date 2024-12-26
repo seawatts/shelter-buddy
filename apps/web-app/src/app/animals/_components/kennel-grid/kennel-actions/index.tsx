@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { useIsMobile } from "@acme/ui/hooks/use-mobile";
 
 import type { Animal, Kennel } from "../../../types";
@@ -15,8 +13,6 @@ interface KennelActionsProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const snapPoints = ["148px", "355px", 1] satisfies (string | number)[];
-
 export function KennelActions({
   animal,
   kennel,
@@ -24,9 +20,6 @@ export function KennelActions({
   onOpenChange,
 }: KennelActionsProps) {
   const isMobile = useIsMobile();
-  const [activeSnapPoint, setActiveSnapPoint] = useState<
-    string | number | null
-  >(snapPoints[0] as string);
 
   if (isMobile) {
     return (
@@ -35,9 +28,6 @@ export function KennelActions({
         kennel={kennel}
         open={open}
         onOpenChange={onOpenChange}
-        snapPoints={snapPoints}
-        activeSnapPoint={activeSnapPoint}
-        setActiveSnapPoint={setActiveSnapPoint}
       />
     );
   }

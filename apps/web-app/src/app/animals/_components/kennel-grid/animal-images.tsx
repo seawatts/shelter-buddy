@@ -8,13 +8,7 @@ import { Camera, Pause, Play, Volume2, VolumeX } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@acme/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@acme/ui/carousel";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnimalMedia, MediaMetadata } from "../../types";
@@ -260,8 +254,6 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
           </Carousel>
           <CarouselDots api={carouselApi} />
         </div>

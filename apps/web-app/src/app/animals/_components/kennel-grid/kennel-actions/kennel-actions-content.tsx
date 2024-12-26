@@ -8,6 +8,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { Animal } from "../../../types";
 import { AddAnimalForm } from "../add-animal-form";
+import { AnimalImages } from "../animal-images";
 import { hasWalkInProgress } from "../utils";
 
 interface KennelActionsContentProps {
@@ -136,7 +137,7 @@ export function KennelActionsContent({
           )}
         </div>
       </div>
-
+      <AnimalImages name={animal.name} media={animal.media} isMobile />
       {/* Additional Details */}
       <div className="grid gap-4">
         {/* Basic Info */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRight, Timer } from "lucide-react";
@@ -14,7 +15,6 @@ import {
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Animal, Kennel } from "../../../types";
-import { AnimalImages } from "../animal-images";
 import { formatDuration, getLastCompletedWalk } from "../utils";
 import { WalkStatus } from "../walk-status";
 import { KennelActionsContent } from "./kennel-actions-content";
@@ -24,9 +24,6 @@ interface KennelActionsDrawerProps {
   kennel: Kennel;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  snapPoints: (string | number)[];
-  activeSnapPoint: string | number | null;
-  setActiveSnapPoint: (snapPoint: string | number | null) => void;
 }
 
 export function KennelActionsDrawer({
@@ -34,29 +31,30 @@ export function KennelActionsDrawer({
   kennel,
   open,
   onOpenChange,
-  snapPoints,
-  activeSnapPoint,
-  setActiveSnapPoint,
 }: KennelActionsDrawerProps) {
+  const snapPoints = useMemo(() => [0.5, 1], []);
+  const [activeSnapPoint, setActiveSnapPoint] = useState<number | null>(
+    snapPoints[0] ?? null,
+  );
+
   return (
     <Drawer
       open={open}
       onOpenChange={onOpenChange}
       snapPoints={snapPoints}
       activeSnapPoint={activeSnapPoint}
-      setActiveSnapPoint={setActiveSnapPoint}
+      setActiveSnapPoint={(point: string | number | null) =>
+        setActiveSnapPoint(typeof point === "number" ? point : null)
+      }
     >
       <DrawerContent
-        className={cn("overflow-y-auto", {
+        className={cn({
           "border-t-purple border-t-4": animal?.difficultyLevel === "Purple",
           "border-t-red border-t-4": animal?.difficultyLevel === "Red",
           "border-t-yellow border-t-4": animal?.difficultyLevel === "Yellow",
         })}
       >
         <div className="mx-auto w-full max-w-sm">
-          {animal && (
-            <AnimalImages name={animal.name} media={animal.media} isMobile />
-          )}
           <DrawerHeader>
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-1">
@@ -120,6 +118,7 @@ export function KennelActionsDrawer({
               {animal && <WalkStatus animal={animal} />}
             </div>
           </DrawerHeader>
+
           <div className="p-4">
             <KennelActionsContent animal={animal} onOpenChange={onOpenChange} />
           </div>

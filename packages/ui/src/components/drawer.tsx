@@ -1,11 +1,14 @@
 "use client";
 
+import type { DialogProps } from "vaul";
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@acme/ui/lib/utils";
 
-type BaseDrawerProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
+type BaseDrawerProps = DialogProps & {
+  shouldScaleBackground?: boolean;
+};
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -38,23 +41,37 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DrawerPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
-        className,
-      )}
-      {...props}
-    >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-      {children}
-    </DrawerPrimitive.Content>
-  </DrawerPortal>
-));
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> & {
+    activeSnapPoint?: number | string | null;
+    snapPoints?: (number | string)[];
+  }
+>(({ className, children, activeSnapPoint, snapPoints, ...props }, ref) => {
+  const isFullHeight = activeSnapPoint === snapPoints?.[snapPoints.length - 1];
+
+  return (
+    <DrawerPortal>
+      <DrawerOverlay />
+      <DrawerPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 mx-[-1px] flex h-full max-h-[97%] flex-col rounded-t-[10px] border border-b-0 bg-background",
+          className,
+        )}
+        {...props}
+      >
+        <div className="mx-auto mb-4 mt-4 h-2 w-[100px] rounded-full bg-muted" />
+        <div
+          className={cn("relative flex flex-col", {
+            "overflow-y-auto overscroll-contain": isFullHeight,
+            "overflow-y-hidden": !isFullHeight,
+          })}
+        >
+          {children}
+        </div>
+      </DrawerPrimitive.Content>
+    </DrawerPortal>
+  );
+});
 DrawerContent.displayName = "DrawerContent";
 
 const DrawerHeader = ({
