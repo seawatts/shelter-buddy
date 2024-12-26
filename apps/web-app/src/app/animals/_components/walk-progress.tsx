@@ -1,5 +1,6 @@
 "use client";
 
+import { isToday } from "date-fns";
 import { Check, Circle } from "lucide-react";
 import { useQueryState } from "nuqs";
 
@@ -11,15 +12,6 @@ import { DIFFICULTY_CONFIG } from "../difficulty-config";
 
 interface WalkProgressProps {
   data: Animal[];
-}
-
-function isWalkInProgress(walk: Animal["walks"][keyof Animal["walks"]]) {
-  if (!walk.time) return false;
-  if (walk.completed) return false;
-  if (!walk.activities) return false;
-  const walkDate = new Date(walk.time).toISOString().split("T")[0];
-  const today = new Date().toISOString().split("T")[0];
-  return walkDate === today;
 }
 
 export function WalkProgress({ data }: WalkProgressProps) {
@@ -50,24 +42,26 @@ export function WalkProgress({ data }: WalkProgressProps) {
     dogsByDifficulty[animal.difficultyLevel]++;
   }
 
-  // Set total possible walks (3 per dog)
-  for (const [difficulty, count] of Object.entries(dogsByDifficulty)) {
-    difficultyStats[difficulty as DifficultyLevel].total = count * 3;
+  // Initialize stats with the total number of walks needed (3 per dog)
+  for (const [difficulty] of Object.entries(dogsByDifficulty)) {
+    difficultyStats[difficulty as DifficultyLevel] = {
+      completed: 0,
+      inProgress: 0,
+      total: dogsByDifficulty[difficulty as DifficultyLevel],
+    };
   }
-
-  const today = new Date().toISOString().split("T")[0];
 
   // Count completed and in-progress walks
   for (const animal of data) {
     const level = animal.difficultyLevel;
-    const walks = Object.values(animal.walks).filter((walk) => {
-      const walkDate = new Date(walk.time).toISOString().split("T")[0];
-      return walkDate === today;
-    });
+    const todayWalks =
+      animal.walks?.filter((walk) => isToday(walk.startedAt)) ?? [];
 
-    const completedCount = walks.filter((walk) => walk.completed).length;
-    const inProgressCount = walks.filter((walk) =>
-      isWalkInProgress(walk),
+    const completedCount = todayWalks.filter(
+      (walk) => walk.status === "completed",
+    ).length;
+    const inProgressCount = todayWalks.filter(
+      (walk) => walk.status === "in_progress",
     ).length;
 
     difficultyStats[level].completed += completedCount;
@@ -89,7 +83,7 @@ export function WalkProgress({ data }: WalkProgressProps) {
 
   return (
     <div className="flex w-full justify-center">
-      <div className="grid w-full grid-cols-1 gap-4 sm:min-w-[640px] sm:max-w-[800px] md:grid-cols-2">
+      <div className="grid w-full grid-cols-2 gap-4 sm:min-w-[640px] sm:max-w-[800px] sm:grid-cols-1 md:grid-cols-2">
         {(
           Object.entries(DIFFICULTY_CONFIG) as [
             DifficultyLevel,
@@ -153,19 +147,36 @@ export function WalkProgress({ data }: WalkProgressProps) {
                         width: `${inProgressPercentage}%`,
                       }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-between px-6 text-base font-medium text-primary">
-                      <span>{level}</span>
-                      <div className="flex items-center gap-2">
-                        <span>
-                          {stats.completed + stats.inProgress}/{stats.total}{" "}
-                          walks
-                        </span>
-                        {stats.inProgress > 0 && (
-                          <Circle className="size-4 animate-pulse fill-green-500 text-green-500" />
-                        )}
-                        {stats.completed === stats.total && stats.total > 0 && (
-                          <Check className="size-5 stroke-[4px] text-green-500" />
-                        )}
+                    <div className="absolute inset-0 flex items-center justify-center px-6 text-base">
+                      <span className="absolute left-6 hidden font-medium text-primary sm:inline">
+                        {level}
+                      </span>
+                      <div className="flex items-center justify-center gap-6 text-sm font-semibold">
+                        <div className="flex items-center gap-1.5">
+                          <Check
+                            className={cn(
+                              "size-5 stroke-[3px]",
+                              stats.completed > 0
+                                ? "text-green-500"
+                                : "text-muted-foreground",
+                            )}
+                          />
+                          <span className="text-primary">
+                            {stats.completed}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Circle className="size-5 animate-pulse fill-green-500 text-green-500" />
+                          <span className="text-primary">
+                            {stats.inProgress}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Circle className="size-5 text-muted-foreground" />
+                          <span className="text-primary">
+                            {stats.total - (stats.completed + stats.inProgress)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>

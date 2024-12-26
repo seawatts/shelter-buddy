@@ -10,24 +10,16 @@ export const mockAnimals: Animal[] = [
     media: [
       {
         metadata: {
-          uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-          uploadedBy: {
-            avatarUrl:
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Smith",
-            name: "John Smith",
-          }, // 2 hours ago
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+          uploadedById: "user1",
         },
         type: "image",
         url: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
       },
       {
         metadata: {
-          uploadedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          uploadedBy: {
-            avatarUrl:
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=Jane%20Doe",
-            name: "Jane Doe",
-          }, // 30 minutes ago
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 30),
+          uploadedById: "user2",
         },
         thumbnailUrl:
           "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
@@ -38,10 +30,14 @@ export const mockAnimals: Animal[] = [
     name: "Max",
     walks: [
       {
-        date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-        duration: 15,
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.75),
+        goodBehavior: true,
         id: "1",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
         status: "completed",
+        walkDifficulty: 2,
       },
     ],
   },
@@ -54,627 +50,736 @@ export const mockAnimals: Animal[] = [
     media: [
       {
         metadata: {
-          uploadedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          uploadedBy: {
-            avatarUrl:
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah%20Johnson",
-            name: "Sarah Johnson",
-          }, // 30 minutes ago
+          uploadedAt: new Date(Date.now() - 1000 * 60 * 30),
+          uploadedById: "user3",
         },
         type: "image",
         url: "https://images.unsplash.com/photo-1552053831-71594a27632d",
       },
     ],
     name: "Luna",
+    walks: [],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "High energy, needs experienced handler",
+      },
+    ],
+    difficultyLevel: "Purple",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "High energy, needs experienced handler",
+      },
+    ],
+    id: "3",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K3",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Charlie",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
     walks: [
       {
-        date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-        duration: 20,
-        id: "2",
+        aggressive: true,
+        dogReactive: true,
+        endedAt: new Date(Date.now() - 1000 * 60 * 20),
+        humanReactive: true,
+        id: "3",
+        notes: "Reactive to other dogs, had to cut walk short",
+        pee: 1,
+        pullsHard: true,
+        startedAt: new Date(Date.now() - 1000 * 60 * 30),
+        status: "completed",
+        walkDifficulty: 4,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Sweet and gentle, good with all handlers",
+      },
+    ],
+    id: "4",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K4",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Bella",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.75),
+        goodBehavior: true,
+        id: "4",
+        leashTrained: true,
+        likesPets: true,
+        notes: "Perfect walk! Very well behaved and gentle on leash.",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        status: "completed",
+        treats: true,
+        walkDifficulty: 1,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Friendly and calm, good with all handlers",
+      },
+    ],
+    id: "5",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K5",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Cooper",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    tags: ["first"],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Red",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "High energy, needs experienced handler",
+      },
+    ],
+    id: "6",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K6",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Storm",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 3.75),
+        id: "6",
+        notes: "Worked on heel command, showing improvement",
+        pee: 1,
+        poop: 1,
+        pullsHard: true,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 4),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 5,
+      },
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.75),
+        id: "6.1",
+        notes: "Better leash manners today",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 4,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Small but mighty, good with experienced handlers",
+      },
+    ],
+    id: "7",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K7",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Pixie",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    tags: ["last"],
+    walks: [],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Very intelligent, needs mental stimulation",
+      },
+    ],
+    id: "8",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: true,
+    isOutOfKennel: false,
+    kennelId: "K8",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Einstein",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    tags: ["last"],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 2.5),
+        goodBehavior: true,
+        id: "8",
+        leashTrained: true,
+        notes: "Excellent walk, practiced advanced commands",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 3,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Sweet and social, watch breathing in heat",
+      },
+    ],
+    id: "9",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K9",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Breathing issues in hot weather",
+      },
+    ],
+    name: "Winston",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 3.75),
+        goodBehavior: true,
+        id: "9",
+        notes: "Short but sweet walk, no breathing issues",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 4),
+        status: "completed",
+        walkDifficulty: 1,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Red",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "High energy, needs experienced handler",
+      },
+    ],
+    id: "10",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K10",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Shadow",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 3.5),
+        id: "10",
+        notes: "Energetic walk, worked on loose leash walking",
+        pee: 1,
+        poop: 1,
+        pullsHard: true,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 4),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 4,
+      },
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 1.75),
+        id: "10.1",
+        notes: "Better leash manners today",
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 3,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Sweet and gentle, good with all handlers",
+      },
+    ],
+    id: "11",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K11",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Mochi",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Purple",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Strong but friendly, needs experienced handler",
+      },
+    ],
+    id: "12",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: true,
+    isOutOfKennel: false,
+    kennelId: "K12",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Rocky",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 3.5),
+        id: "12",
+        notes: "Good walk, working on heel command",
+        pee: 1,
+        poop: 1,
+        pullsHard: true,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 4),
+        status: "completed",
+        trained: true,
+        walkDifficulty: 4,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Yellow",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Friendly and energetic",
+      },
+    ],
+    id: "13",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: false,
+    kennelId: "K13",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Waffles",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 2.75),
+        goodBehavior: true,
+        id: "13",
+        notes: "Great walk and playtime",
+        pee: 1,
+        playedBall: true,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        status: "completed",
+        walkDifficulty: 2,
+      },
+    ],
+  },
+  {
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    difficultyLevel: "Purple",
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Gentle giant, needs experienced handler due to size",
+      },
+    ],
+    id: "14",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    isFido: false,
+    isOutOfKennel: true,
+    kennelId: "K14",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    name: "Atlas",
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    tags: ["last"],
+    walks: [
+      {
+        id: "14",
+        startedAt: new Date(),
         status: "in_progress",
       },
     ],
   },
   {
-    age: 4,
-    approvedActivities: ["Short walks only", "Conference room quiet time"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "German Shepherd Mix",
-    difficultyLevel: "Purple",
-    generalNotes: "High energy, needs experienced handler",
-    id: "3",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K3",
-    kennelNumber: "K3",
-    medicalNotes: "",
-    name: "Charlie",
-    notes: "High energy, needs experienced handler",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          aggressive: true,
-          dogReactive: true,
-          humanReactive: true,
-          pee: true,
-          pullsHard: true,
-        },
-        completed: true,
-        duration: 10,
-        notes: "Reactive to other dogs, had to cut walk short",
-        time: new Date().toISOString().split("T")[0] + "T09:30:00",
-        walkedBy: {
-          id: "v3",
-          name: "Alex Thompson",
-        },
+    behavioralNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
       },
-      midday: {
-        activities: {
-          dogReactive: false,
-          humanReactive: false,
-          pee: true,
-          poop: true,
-          pullsHard: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 15,
-        notes: "Much better behavior today! Worked on leash training.",
-        time: new Date().toISOString().split("T")[0] + "T13:30:00",
-        walkedBy: {
-          id: "v3",
-          name: "Alex Thompson",
-        },
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T17:30:00",
-      },
-    },
-    weight: 75,
-  },
-  {
-    age: 1,
-    approvedActivities: [
-      "Short walks",
-      "Gentle play",
-      "Conference room quiet time",
     ],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Beagle Mix",
     difficultyLevel: "Yellow",
-    generalNotes: "Sweet and gentle, good with all handlers",
-    id: "4",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K4",
-    kennelNumber: "K4",
-    medicalNotes: "",
-    name: "Bella",
-    notes: "Gentle and friendly, loves treats",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          leashTrained: true,
-          likesPets: true,
-          pee: true,
-          poop: true,
-          treats: true,
-        },
-        completed: true,
-        duration: 15,
-        notes: "Perfect walk! Very well behaved and gentle on leash.",
-        time: new Date().toISOString().split("T")[0] + "T10:30:00",
-        walkedBy: {
-          id: "v4",
-          name: "Emily Parker",
-        },
+    generalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Playful and friendly, watch breathing in heat",
       },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T14:00:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:00:00",
-      },
-    },
-    weight: 35,
-  },
-  {
-    age: 2,
-    approvedActivities: [
-      "Short walks",
-      "Conference room play",
-      "Dog Playgroups",
     ],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Golden Retriever",
-    difficultyLevel: "Yellow",
-    generalNotes: "Friendly and calm, good with all handlers",
-    id: "5",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K5",
-    kennelNumber: "K5",
-    medicalNotes: "",
-    name: "Cooper",
-    notes: "Loves attention, walks well on leash",
-    outKennelNotes: "",
-    species: "Dog",
-    tags: ["first"],
-    walks: {
-      am: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T10:00:00",
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T14:00:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:30:00",
-      },
-    },
-    weight: 70,
-  },
-  {
-    age: 3,
-    approvedActivities: ["Short walks", "Conference room play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Husky Mix",
-    difficultyLevel: "Red",
-    generalNotes: "High energy, needs experienced handler",
-    id: "6",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K6",
-    kennelNumber: "K6",
-    medicalNotes: "",
-    name: "Storm",
-    notes: "Strong puller, working on leash training",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          pee: true,
-          poop: true,
-          pullsHard: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 20,
-        notes: "Worked on heel command, showing improvement",
-        time: new Date().toISOString().split("T")[0] + "T08:00:00",
-        walkedBy: {
-          id: "v5",
-          name: "David Wilson",
-        },
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:00:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:00:00",
-      },
-    },
-    weight: 55,
-  },
-  {
-    age: 1,
-    approvedActivities: ["Short walks", "Gentle play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Chihuahua",
-    difficultyLevel: "Yellow",
-    generalNotes: "Small but mighty, good with experienced handlers",
-    id: "7",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K7",
-    kennelNumber: "K7",
-    medicalNotes: "",
-    name: "Pixie",
-    notes: "Can be nervous with new people",
-    outKennelNotes: "",
-    species: "Dog",
-    tags: ["last"],
-    walks: {
-      am: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T09:30:00",
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:30:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:30:00",
-      },
-    },
-    weight: 6,
-  },
-  {
-    age: 4,
-    approvedActivities: ["FIDO walks", "Dog Playgroups"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Border Collie",
-    difficultyLevel: "Yellow",
-    generalNotes: "Very intelligent, needs mental stimulation",
-    id: "8",
-    inKennelNotes: "",
-    isFido: true,
-    isOutOfKennel: false,
-    kennel: "K8",
-    kennelNumber: "K8",
-    medicalNotes: "",
-    name: "Einstein",
-    notes: "Loves training sessions and puzzle toys",
-    outKennelNotes: "",
-    species: "Dog",
-    tags: ["last"],
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          leashTrained: true,
-          pee: true,
-          poop: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 30,
-        notes: "Excellent walk, practiced advanced commands",
-        time: new Date().toISOString().split("T")[0] + "T09:00:00",
-        walkedBy: {
-          id: "v6",
-          name: "Lisa Chen",
-        },
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:00:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:00:00",
-      },
-    },
-    weight: 45,
-  },
-  {
-    age: 2,
-    approvedActivities: ["Short walks", "Conference room quiet time"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Pug",
-    difficultyLevel: "Yellow",
-    generalNotes: "Sweet and social, watch breathing in heat",
-    id: "9",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K9",
-    kennelNumber: "K9",
-    medicalNotes: "Breathing issues in hot weather",
-    name: "Winston",
-    notes: "Needs short walks due to breathing",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          pee: true,
-          poop: true,
-        },
-        completed: true,
-        duration: 10,
-        notes: "Short but sweet walk, no breathing issues",
-        time: new Date().toISOString().split("T")[0] + "T08:30:00",
-        walkedBy: {
-          id: "v7",
-          name: "Tom Baker",
-        },
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T12:30:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T15:30:00",
-      },
-    },
-    weight: 18,
-  },
-  {
-    age: 5,
-    approvedActivities: ["Short walks", "Conference room play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Australian Shepherd",
-    difficultyLevel: "Red",
-    generalNotes: "High energy, needs experienced handler",
-    id: "10",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K10",
-    kennelNumber: "K10",
-    medicalNotes: "",
-    name: "Shadow",
-    notes: "Very active, needs lots of exercise",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          pee: true,
-          poop: true,
-          pullsHard: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 25,
-        notes: "Energetic walk, worked on loose leash walking",
-        time: new Date().toISOString().split("T")[0] + "T08:45:00",
-        walkedBy: {
-          id: "v8",
-          name: "Rachel Green",
-        },
-      },
-      midday: {
-        activities: {
-          pee: true,
-          poop: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 20,
-        notes: "Better leash manners today",
-        time: new Date().toISOString().split("T")[0] + "T12:45:00",
-        walkedBy: {
-          id: "v8",
-          name: "Rachel Green",
-        },
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:45:00",
-      },
-    },
-    weight: 50,
-  },
-  {
-    age: 1,
-    approvedActivities: ["Short walks", "Gentle play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Shih Tzu",
-    difficultyLevel: "Yellow",
-    generalNotes: "Sweet and gentle, good with all handlers",
-    id: "11",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K11",
-    kennelNumber: "K11",
-    medicalNotes: "",
-    name: "Mochi",
-    notes: "Loves attention and short walks",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T09:15:00",
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:15:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:15:00",
-      },
-    },
-    weight: 12,
-  },
-  {
-    age: 3,
-    approvedActivities: ["FIDO walks", "Dog Playgroups"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Boxer Mix",
-    difficultyLevel: "Purple",
-    generalNotes: "Strong but friendly, needs experienced handler",
-    id: "12",
-    inKennelNotes: "",
-    isFido: true,
-    isOutOfKennel: false,
-    kennel: "K12",
-    kennelNumber: "K12",
-    medicalNotes: "",
-    name: "Rocky",
-    notes: "Strong puller but responds well to training",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          pee: true,
-          poop: true,
-          pullsHard: true,
-          trained: true,
-        },
-        completed: true,
-        duration: 30,
-        notes: "Good walk, working on heel command",
-        time: new Date().toISOString().split("T")[0] + "T08:15:00",
-        walkedBy: {
-          id: "v9",
-          name: "Chris Evans",
-        },
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T12:15:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:15:00",
-      },
-    },
-    weight: 65,
-  },
-  {
-    age: 2,
-    approvedActivities: ["Short walks", "Conference room play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Corgi",
-    difficultyLevel: "Yellow",
-    generalNotes: "Friendly and energetic",
-    id: "13",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: false,
-    kennel: "K13",
-    kennelNumber: "K13",
-    medicalNotes: "",
-    name: "Waffles",
-    notes: "Loves to play fetch",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          pee: true,
-          playedBall: true,
-          poop: true,
-        },
-        completed: true,
-        duration: 20,
-        notes: "Great walk and playtime",
-        time: new Date().toISOString().split("T")[0] + "T09:45:00",
-        walkedBy: {
-          id: "v10",
-          name: "Emma Watson",
-        },
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:45:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:45:00",
-      },
-    },
-    weight: 25,
-  },
-  {
-    age: 4,
-    approvedActivities: ["Short walks", "Conference room quiet time"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "Great Dane",
-    difficultyLevel: "Purple",
-    generalNotes: "Gentle giant, needs experienced handler due to size",
-    id: "14",
-    inKennelNotes: "",
-    isFido: false,
-    isOutOfKennel: true,
-    kennel: "K14",
-    kennelNumber: "K14",
-    medicalNotes: "",
-    name: "Atlas",
-    notes: "Very gentle but strong due to size",
-    outKennelNotes: "",
-    species: "Dog",
-    tags: ["last"],
-    walks: {
-      am: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T10:00:00",
-      },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T14:00:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T17:00:00",
-      },
-    },
-    weight: 140,
-  },
-  {
-    age: 1,
-    approvedActivities: ["Short walks", "Gentle play"],
-    availableDate: "2/20 AM",
-    behavioralNotes: "",
-    breed: "French Bulldog",
-    difficultyLevel: "Yellow",
-    generalNotes: "Playful and friendly, watch breathing in heat",
     id: "15",
-    inKennelNotes: "",
+    inKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
     isFido: false,
     isOutOfKennel: false,
-    kennel: "K15",
-    kennelNumber: "K15",
-    medicalNotes: "Monitor breathing in hot weather",
+    kennelId: "K15",
+    medicalNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "Monitor breathing in hot weather",
+      },
+    ],
     name: "Biscuit",
-    notes: "Loves short walks and playtime",
-    outKennelNotes: "",
-    species: "Dog",
-    walks: {
-      am: {
-        activities: {
-          goodBehavior: true,
-          pee: true,
-          poop: true,
-        },
-        completed: true,
-        duration: 15,
+    outKennelNotes: [
+      {
+        createdAt: new Date(),
+        isActive: true,
+        notes: "",
+      },
+    ],
+    walks: [
+      {
+        endedAt: new Date(Date.now() - 1000 * 60 * 60 * 2.75),
+        goodBehavior: true,
+        id: "15",
         notes: "Nice morning walk, good energy",
-        time: new Date().toISOString().split("T")[0] + "T09:15:00",
-        walkedBy: {
-          id: "v11",
-          name: "James Bond",
-        },
+        pee: 1,
+        poop: 1,
+        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+        status: "completed",
+        walkDifficulty: 1,
       },
-      midday: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T13:15:00",
-      },
-      pm: {
-        completed: false,
-        time: new Date().toISOString().split("T")[0] + "T16:15:00",
-      },
-    },
-    weight: 22,
+    ],
   },
 ];

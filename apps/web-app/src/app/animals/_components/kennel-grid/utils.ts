@@ -1,6 +1,6 @@
-import { intervalToDuration } from "date-fns";
+import { differenceInMinutes, intervalToDuration, isToday } from "date-fns";
 
-import type { Animal, Kennel } from "../../types";
+import type { Animal, Kennel, WalkSession } from "../../types";
 
 export function matchesFilters(
   animal: Animal,
@@ -32,22 +32,15 @@ export function matchesFilters(
   return true;
 }
 
-export function hasBeenWalkedToday(animal: Animal) {
-  const today = new Date().toISOString().split("T")[0];
-  return Object.values(animal.walks).some((walk) => {
-    if (walk.status !== "completed") return false;
-    const walkDate = new Date(walk.date).toISOString().split("T")[0];
-    return walkDate === today;
-  });
+export function hasBeenWalkedToday(animal: Animal): boolean {
+  return animal.walks?.some((walk) => isToday(walk.startedAt)) ?? false;
 }
 
-export function hasWalkInProgress(animal: Animal) {
-  const today = new Date().toISOString().split("T")[0];
-  return Object.values(animal.walks).some((walk) => {
-    if (walk.status !== "in_progress") return false;
-    const walkDate = new Date(walk.date).toISOString().split("T")[0];
-    return walkDate === today;
-  });
+export function hasWalkInProgress(animal: Animal): WalkSession | undefined {
+  const walk = animal.walks?.find((walk) => !walk.endedAt);
+  if (!walk) return undefined;
+
+  return walk;
 }
 
 export function sortKennels(kennels: Kennel[]): Kennel[] {
@@ -71,14 +64,16 @@ export function arrangeKennels(kennels: Kennel[]): [Kennel[], Kennel[]] {
 }
 
 export function getActiveWalkStartTime(animal: Animal): Date | null {
+  if (!animal.walks) return null;
+
   const today = new Date().toISOString().split("T")[0];
-  const activeWalk = Object.values(animal.walks).find((walk) => {
+  const activeWalk = animal.walks.find((walk) => {
     if (walk.status !== "in_progress") return false;
-    const walkDate = new Date(walk.date).toISOString().split("T")[0];
+    const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
     return walkDate === today;
   });
 
-  return activeWalk ? new Date(activeWalk.date) : null;
+  return activeWalk ? activeWalk.startedAt : null;
 }
 
 export function formatElapsedTime(startTime: Date): string {
@@ -91,38 +86,61 @@ export function formatElapsedTime(startTime: Date): string {
 
 export function getCompletedWalkInfo(
   animal: Animal,
-): { completedTime: string; duration: number } | null {
+): { completedTime: Date; duration: number } | null {
+  if (!animal.walks) return null;
+
   const today = new Date().toISOString().split("T")[0];
-  const completedWalk = Object.values(animal.walks).find((walk) => {
-    if (walk.status !== "completed") return false;
-    const walkDate = new Date(walk.date).toISOString().split("T")[0];
+  const completedWalk = animal.walks.find((walk) => {
+    if (walk.status !== "completed" || !walk.endedAt) return false;
+    const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
     return walkDate === today;
   });
 
-  if (!completedWalk?.duration) return null;
+  if (!completedWalk?.endedAt) return null;
+
+  const durationInMinutes = Math.floor(
+    (completedWalk.endedAt.getTime() - completedWalk.startedAt.getTime()) /
+      (1000 * 60),
+  );
 
   return {
-    completedTime: completedWalk.date,
-    duration: completedWalk.duration, // Convert minutes to seconds
+    completedTime: completedWalk.endedAt,
+    duration: durationInMinutes,
   };
 }
 
-export function formatDuration(durationInSeconds: number): string {
-  const minutes = Math.floor(durationInSeconds / 60);
-  const seconds = Math.floor(durationInSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+export function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (hours === 0) {
+    return `${remainingMinutes}m`;
+  }
+
+  return `${hours}h ${remainingMinutes}m`;
 }
 
-export function getLastCompletedWalk(animal: Animal) {
-  const completedWalks = Object.values(animal.walks)
-    .filter((walk) => walk.status === "completed")
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+export function getLastCompletedWalk(
+  animal: Animal,
+): { date: Date; duration: number } | undefined {
+  const completedWalks = animal.walks?.filter((walk) => walk.endedAt);
+  if (!completedWalks?.length) return undefined;
 
-  if (completedWalks.length === 0) return null;
+  const sortedWalks = [...completedWalks].sort((a, b) => {
+    if (!a.endedAt || !b.endedAt) return 0;
+    return b.endedAt.getTime() - a.endedAt.getTime();
+  });
 
-  const lastWalk = completedWalks[0];
+  const lastWalk = sortedWalks[0];
+  if (!lastWalk?.endedAt) return undefined;
+
+  const durationInMinutes = differenceInMinutes(
+    lastWalk.endedAt,
+    lastWalk.startedAt,
+  );
+
   return {
-    date: lastWalk?.date,
-    duration: lastWalk?.duration ?? 0,
+    date: lastWalk.endedAt,
+    duration: durationInMinutes,
   };
 }

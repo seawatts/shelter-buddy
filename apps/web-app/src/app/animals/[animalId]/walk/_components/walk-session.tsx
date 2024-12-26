@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Camera } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea } from "@acme/ui/textarea";
 
 import type { Animal, WalkSession } from "../../../types";
+import { formatDuration } from "../../../_components/kennel-grid/utils";
 import { DIFFICULTY_CONFIG } from "../../../difficulty-config";
 import {
   BackIcon,
@@ -26,7 +28,43 @@ import {
 } from "./icons";
 import { useAudioRecorder } from "./use-audio-recorder";
 
-type ActivityKey = keyof NonNullable<WalkSession["activities"]>;
+type ActivityKey = keyof Pick<
+  WalkSession,
+  | "pee"
+  | "poop"
+  | "playedBall"
+  | "playedFetch"
+  | "dogReactive"
+  | "humanReactive"
+  | "likesSniffing"
+  | "likesPets"
+  | "leashTrained"
+  | "checksIn"
+  | "easyOut"
+  | "easyIn"
+  | "takesTreetsGently"
+  | "knowsSit"
+  | "knows123Treat"
+  | "calmInNewPlaces"
+  | "eatsEverything"
+  | "pullsHard"
+  | "jumpy"
+  | "mouthy"
+  | "boltingTendency"
+  | "resourceGuarding"
+  | "noTouches"
+  | "limping"
+  | "frequentUrination"
+  | "looseStool"
+  | "bloodyStool"
+  | "scratching"
+  | "hotSpots"
+  | "shakingHead"
+  | "eyeDischarge"
+  | "noseDischarge"
+  | "coughing"
+  | "sneezing"
+>;
 
 interface ActivityButton {
   key: ActivityKey;
@@ -108,37 +146,37 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   {
     buttons: [
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "eatsEverything",
         label: "Eats Everything",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "pullsHard",
         label: "Pulls Hard",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "jumpy",
         label: "Jumpy",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "mouthy",
         label: "Mouthy",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "boltingTendency",
         label: "Bolting",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "resourceGuarding",
         label: "Guards Items",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "noTouches",
         label: "No Touches",
       },
@@ -154,17 +192,17 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   {
     buttons: [
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "frequentUrination",
         label: "Frequent Urination",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "looseStool",
         label: "Loose Stool",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "bloodyStool",
         label: "Bloody Stool",
       },
@@ -175,27 +213,27 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   {
     buttons: [
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "scratching",
         label: "Scratching",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "hotSpots",
         label: "Hot Spots",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "shakingHead",
         label: "Shaking Head",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "eyeDischarge",
         label: "Eye Discharge",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "noseDischarge",
         label: "Nose Discharge",
       },
@@ -206,12 +244,12 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   {
     buttons: [
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "coughing",
         label: "Coughing",
       },
       {
-        icon: <AlertTriangle className="h-5 w-5" />,
+        icon: <AlertTriangle className="size-4" />,
         key: "sneezing",
         label: "Sneezing",
       },
@@ -223,20 +261,35 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
 
 const DIFFICULTY_SCORES = [1, 2, 3, 4, 5] as const;
 
+interface WalkPhoto {
+  id: string;
+  url: string;
+  createdAt: Date;
+}
+
+interface WalkSessionWithPhotos extends WalkSession {
+  photos: WalkPhoto[];
+}
+
 interface WalkSessionProps {
   animal: Animal;
-  initialData?: Partial<WalkSession>;
+  initialData?: Partial<WalkSessionWithPhotos>;
 }
 
 export function WalkSession({ animal, initialData }: WalkSessionProps) {
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [walkData, setWalkData] = useState<Partial<WalkSession>>({
-    activities: {},
-    completed: false,
-    time: new Date().toISOString(),
+  const [walkData, setWalkData] = useState<Partial<WalkSessionWithPhotos>>({
+    notes: "",
+    photos: [],
+    startedAt: new Date(initialData?.startedAt ?? new Date()),
+    status: "in_progress",
     ...initialData,
   });
+
+  const elapsedTime = walkData.startedAt
+    ? Math.floor((Date.now() - walkData.startedAt.getTime()) / (1000 * 60))
+    : 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -262,10 +315,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
   const toggleActivity = (activity: ActivityKey) => {
     setWalkData((previous) => ({
       ...previous,
-      activities: {
-        ...previous.activities,
-        [activity]: !previous.activities?.[activity],
-      },
+      [activity]: !previous[activity],
     }));
   };
 
@@ -283,22 +333,15 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
           {section.buttons.map((button) => (
             <div key={button.key} className="flex flex-col items-center gap-1">
               <Button
-                variant={
-                  walkData.activities?.[button.key] ? "default" : "outline"
-                }
+                variant={walkData[button.key] ? "default" : "outline"}
                 className="h-16 w-full sm:h-20"
                 onClick={() => toggleActivity(button.key)}
               >
                 <div className="flex flex-col items-center gap-2 sm:flex-row">
                   {button.icon}
-                  <span className="hidden text-sm sm:inline">
-                    {button.label}
-                  </span>
+                  <span className="text-sm">{button.label}</span>
                 </div>
               </Button>
-              <span className="text-[10px] text-muted-foreground sm:hidden">
-                {button.label}
-              </span>
             </div>
           ))}
         </div>
@@ -356,7 +399,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
                 </h1>
                 {!isScrolled && (
                   <p className="text-sm text-muted-foreground">
-                    {walkData.elapsedTime ?? "Walk finished"}
+                    {formatDuration(elapsedTime)}
                   </p>
                 )}
               </div>
@@ -369,7 +412,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
                 )}
               >
                 <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
-                  {animal.kennelNumber}
+                  {animal.kennelId}
                 </div>
                 <div
                   className="rounded-full px-3 py-1 text-center text-sm font-medium"
@@ -387,6 +430,40 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
       </div>
 
       <div className="container flex max-w-3xl flex-col gap-8 pb-24 pt-4">
+        {/* Walk Photos Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-medium">Walk Photos</h2>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Camera className="size-4" />
+              <span>Add Photo</span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {walkData.photos?.length === 0 ? (
+              <div className="col-span-full flex h-24 items-center justify-center rounded-md border text-sm text-muted-foreground">
+                No photos added yet
+              </div>
+            ) : (
+              walkData.photos?.map((photo, index) => (
+                <div
+                  key={photo.id}
+                  className="relative aspect-square overflow-hidden rounded-md border"
+                >
+                  <Image
+                    src={photo.url}
+                    alt={`Walk photo ${index + 1}`}
+                    className="object-cover"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* Notes Section */}
         <div className="space-y-2">
           <Textarea
@@ -458,7 +535,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            Rate how difficult this walk was (1 = Easy, 5 = Very Difficult)
+            (1 = Easy, 5 = Very Difficult)
           </p>
         </div>
 

@@ -47,11 +47,14 @@ export function KennelActions({
 }: KennelActionsProps) {
   const isMobile = useIsMobile();
 
+  const hasActiveNotes =
+    (animal?.medicalNotes?.some((note) => note.isActive) ?? false) ||
+    (animal?.behavioralNotes?.some((note) => note.isActive) ?? false) ||
+    (animal?.generalNotes?.some((note) => note.isActive) ?? false);
+
   const content = animal ? (
     <div className="flex flex-col gap-4">
-      {((animal.medicalNotes ?? "") ||
-        (animal.behavioralNotes ?? "") ||
-        (animal.generalNotes ?? "") ||
+      {(hasActiveNotes ||
         animal.difficultyLevel === "Purple" ||
         animal.difficultyLevel === "Red" ||
         animal.isFido) && (
@@ -60,22 +63,39 @@ export function KennelActions({
           <AlertTitle>Important Information</AlertTitle>
           <AlertDescription>
             <div className="mt-4 flex flex-col gap-2">
-              {animal.medicalNotes && (
+              {animal.medicalNotes?.some((note) => note.isActive) && (
                 <div className="flex items-center gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
-                  <span>Medical: {animal.medicalNotes}</span>
+                  <span>
+                    Medical:{" "}
+                    {animal.medicalNotes
+                      .filter((note) => note.isActive)
+                      .map((note) => note.notes)
+                      .join(", ")}
+                  </span>
                 </div>
               )}
-              {animal.behavioralNotes && (
+              {animal.behavioralNotes?.some((note) => note.isActive) && (
                 <div className="flex items-start gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
-                  <span>Behavioral: {animal.behavioralNotes}</span>
+                  <span>
+                    Behavioral:{" "}
+                    {animal.behavioralNotes
+                      .filter((note) => note.isActive)
+                      .map((note) => note.notes)
+                      .join(", ")}
+                  </span>
                 </div>
               )}
-              {animal.generalNotes && (
+              {animal.generalNotes?.some((note) => note.isActive) && (
                 <div className="flex items-start gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
-                  <span>{animal.generalNotes}</span>
+                  <span>
+                    {animal.generalNotes
+                      .filter((note) => note.isActive)
+                      .map((note) => note.notes)
+                      .join(", ")}
+                  </span>
                 </div>
               )}
               {(animal.difficultyLevel === "Purple" ||
@@ -102,6 +122,16 @@ export function KennelActions({
         </Alert>
       )}
       <div className="flex flex-col gap-2">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            // TODO: Handle add notes action
+            onOpenChange(false);
+          }}
+        >
+          Add Notes
+        </Button>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -114,7 +144,7 @@ export function KennelActions({
             Reassign Kennel
           </Button>
 
-          {!hasWalkInProgress(animal) && (
+          {!hasWalkInProgress(animal) && !animal.isOutOfKennel && (
             <Button
               variant="outline"
               className="flex-1"
@@ -123,7 +153,7 @@ export function KennelActions({
                 onOpenChange(false);
               }}
             >
-              {animal.isOutOfKennel ? "Mark In Kennel" : "Mark Out of Kennel"}
+              Mark Out of Kennel
             </Button>
           )}
         </div>
@@ -147,18 +177,16 @@ export function KennelActions({
           )}
         >
           <div className="mx-auto w-full max-w-sm">
-            <AnimalImages
-              name={animal?.name}
-              images={animal?.images}
-              isMobile
-            />
+            {animal && (
+              <AnimalImages name={animal.name} media={animal.media} isMobile />
+            )}
             <DrawerHeader>
               <div className="flex items-start justify-between">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <DrawerTitle>
                       <Link href={`/animals/${animal?.id}`}>
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 underline underline-offset-4">
                           {kennel.id} {animal && `${animal.name}`}
                           {animal && <ArrowRight className="size-4" />}
                         </span>
@@ -197,12 +225,9 @@ export function KennelActions({
                             <span className="flex flex-col gap-1 text-xs text-muted-foreground">
                               <span>
                                 Last walk{" "}
-                                {formatDistanceToNow(
-                                  new Date(lastWalk.date ?? ""),
-                                  {
-                                    addSuffix: true,
-                                  },
-                                )}
+                                {formatDistanceToNow(lastWalk.date, {
+                                  addSuffix: true,
+                                })}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Timer className="size-3" />
@@ -266,9 +291,9 @@ export function KennelActions({
                   <p className="text-sm text-muted-foreground">
                     {(() => {
                       const lastWalk = getLastCompletedWalk(animal);
-                      if (!lastWalk?.date) return "No walks completed";
+                      if (!lastWalk) return "No walks completed";
                       return `Last walk: ${format(
-                        new Date(lastWalk.date),
+                        lastWalk.date,
                         "h:mm a",
                       )} (${lastWalk.duration} min)`;
                     })()}
@@ -280,7 +305,7 @@ export function KennelActions({
           </div>
         </DialogHeader>
         <div className="mt-4">
-          <AnimalImages name={animal?.name} images={animal?.images} />
+          <AnimalImages name={animal?.name} media={animal?.media} />
           {content}
         </div>
       </DialogContent>

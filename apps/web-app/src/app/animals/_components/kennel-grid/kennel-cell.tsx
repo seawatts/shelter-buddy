@@ -1,5 +1,8 @@
 "use client";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -13,31 +16,59 @@ interface KennelCellProps {
   difficultyFilter?: string | null;
   tagFilter?: string | null;
   onClick: () => void;
+  showKennelId?: boolean;
+  isDraggingAnimal?: boolean;
 }
 
 export function KennelCell({
   kennel,
+  showKennelId,
   animal,
   difficultyFilter,
   tagFilter,
   onClick,
+  isDraggingAnimal,
 }: KennelCellProps) {
+  const isWalked = animal ? hasBeenWalkedToday(animal) : false;
+  const activeWalk = animal ? hasWalkInProgress(animal) : undefined;
+  const hasActiveWalk = Boolean(activeWalk);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isOver,
+  } = useSortable({
+    data: { animal, kennel },
+    disabled: !animal,
+    id: animal?.id ?? kennel.id,
+  });
+
+  const style = {
+    opacity: isDragging ? 0.5 : undefined,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
   const isFiltered = animal
     ? !matchesFilters(animal, difficultyFilter, tagFilter)
     : false;
-  const isWalked = animal ? hasBeenWalkedToday(animal) : false;
-  const hasActiveWalk = animal ? hasWalkInProgress(animal) : false;
   const isAvailable = kennel.status === "available";
   const isUnderMaintenance = kennel.status === "maintenance";
   const tags = animal?.tags ?? [];
 
   const shouldReduceOpacity = isFiltered || (isWalked && !hasActiveWalk);
+  const isValidDropTarget = !animal && !isUnderMaintenance && isAvailable;
 
   return (
     <div
       data-kennel-id={kennel.id}
       className={cn(
-        "relative flex h-14 items-center justify-between rounded-full border-4 border-[hsl(var(--border-color)/var(--border-opacity))] p-3 transition-opacity hover:opacity-80",
+        "relative flex h-14 items-center justify-between rounded-full border-4 border-[hsl(var(--border-color)/var(--border-opacity))] p-3 transition-all hover:opacity-80",
         {
           "[--border-color:var(--chart-3)]":
             animal?.difficultyLevel === "Yellow",
@@ -73,43 +104,70 @@ export function KennelCell({
           "bg-card": !animal?.isOutOfKennel || hasActiveWalk,
           "border-dashed": isAvailable || animal?.isOutOfKennel,
           "border-muted": isAvailable,
+          "cursor-grab": animal,
+          "cursor-grabbing": isDragging,
           "cursor-not-allowed": !animal,
-          "cursor-pointer": animal,
           "opacity-50": isUnderMaintenance || shouldReduceOpacity,
+          "ring-2 ring-primary ring-offset-2":
+            isValidDropTarget && isDraggingAnimal,
+          "ring-4 ring-primary": isValidDropTarget && isOver,
         },
       )}
       onClick={onClick}
     >
-      <div className="min-w-0 truncate">
-        <div className="text-sm font-medium">
-          {kennel.id}
-          {animal && (
-            <span className="ml-1 text-muted-foreground">{animal.name}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        {!isWalked && !hasActiveWalk && tags.length > 0 && (
-          <div className="flex gap-1">
-            {tags.map((tag) => (
-              <Badge
-                key={tag}
-                className={cn(
-                  "rounded-full text-xs",
-                  tag === "first" && "bg-gray-500",
-                  tag === "last" && "bg-gray-400",
-                )}
+      {animal ? (
+        <div
+          ref={setNodeRef}
+          style={style}
+          {...attributes}
+          {...listeners}
+          className="flex min-w-0 flex-1 items-center justify-between"
+        >
+          <div className="min-w-0 truncate">
+            <div className="text-sm font-medium">
+              <span
+                className={cn({
+                  hidden: !(showKennelId ?? true),
+                })}
               >
-                {tag}
-              </Badge>
-            ))}
+                {kennel.id}
+              </span>
+              <span className={"ml-1 text-muted-foreground"}>
+                {animal.name}
+              </span>
+            </div>
           </div>
-        )}
-        {animal && (isWalked || hasActiveWalk) && (
-          <WalkStatusBadge animal={animal} />
-        )}
-      </div>
+
+          <div className="flex items-center gap-2">
+            {!isWalked && !hasActiveWalk && tags.length > 0 && (
+              <div className="flex gap-1">
+                {tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    className={cn(
+                      "rounded-full text-xs",
+                      tag === "first" && "bg-gray-500",
+                      tag === "last" && "bg-gray-400",
+                    )}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            {(isWalked || hasActiveWalk) && <WalkStatusBadge animal={animal} />}
+          </div>
+        </div>
+      ) : (
+        <div
+          ref={setNodeRef}
+          className="flex min-w-0 flex-1 items-center justify-between"
+        >
+          <div className="min-w-0 truncate">
+            <div className="text-sm font-medium">{kennel.id}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
