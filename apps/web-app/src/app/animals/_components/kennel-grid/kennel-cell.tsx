@@ -18,35 +18,43 @@ const kennelCell = cva(
       {
         class: "bg-purple/20",
         difficulty: "purple",
+        isOutOfKennel: false,
         walkStatus: "none",
       },
       {
         class: "bg-red/20",
         difficulty: "red",
+        isOutOfKennel: false,
         walkStatus: "none",
       },
       {
         class: "bg-yellow/20",
         difficulty: "yellow",
+        isOutOfKennel: false,
         walkStatus: "none",
       },
       {
         class:
-          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--purple)/0.2)_10px,rgb(var(--purple)/0.2)_20px)]",
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--purple)/0.2)_10px,hsl(var(--purple)/0.2)_20px)]",
         difficulty: "purple",
         walkStatus: "inProgress",
       },
       {
         class:
-          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--red)/0.2)_10px,rgb(var(--red)/0.2)_20px)]",
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--red)/0.2)_10px,hsl(var(--red)/0.2)_20px)]",
         difficulty: "red",
         walkStatus: "inProgress",
       },
       {
         class:
-          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--yellow)/0.2)_10px,rgb(var(--yellow)/0.2)_20px)]",
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--yellow)/0.2)_10px,hsl(var(--yellow)/0.2)_20px)]",
         difficulty: "yellow",
         walkStatus: "inProgress",
+      },
+      {
+        class: "bg-transparent",
+        isOutOfKennel: true,
+        walkStatus: ["none", "walked"],
       },
       {
         class: "border-purple/25",
@@ -82,6 +90,10 @@ const kennelCell = cva(
       dropTarget: {
         valid: "ring-2 ring-primary ring-offset-2",
         validAndOver: "ring-4 ring-primary",
+      },
+      isOutOfKennel: {
+        false: "",
+        true: "",
       },
       kennelStatus: {
         available: "border-dashed border-muted",
@@ -196,6 +208,7 @@ export function KennelCell({
             | "yellow"
             | undefined,
           dropTarget: dropTargetVariant,
+          isOutOfKennel: animal?.isOutOfKennel ?? false,
           kennelStatus: kennelStatusVariant,
           state: stateVariant,
           walkStatus: walkStatusVariant,
@@ -234,8 +247,8 @@ export function KennelCell({
                     key={tag}
                     className={cn(
                       "rounded-full text-xs",
-                      tag === "first" && "bg-gray-500",
-                      tag === "last" && "bg-gray-400",
+                      tag === "first" && "bg-gray-500 dark:bg-gray-400",
+                      tag === "last" && "bg-gray-400 dark:bg-gray-500",
                     )}
                   >
                     {tag}

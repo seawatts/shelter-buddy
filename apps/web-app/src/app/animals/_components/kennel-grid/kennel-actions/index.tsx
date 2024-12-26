@@ -15,7 +15,7 @@ interface KennelActionsProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const snapPoints = ["50%", "70%", 1] as const;
+const snapPoints = ["148px", "355px", 1] satisfies (string | number)[];
 
 export function KennelActions({
   animal,
@@ -26,7 +26,7 @@ export function KennelActions({
   const isMobile = useIsMobile();
   const [activeSnapPoint, setActiveSnapPoint] = useState<
     string | number | null
-  >(snapPoints[0]);
+  >(snapPoints[0] as string);
 
   if (isMobile) {
     return (

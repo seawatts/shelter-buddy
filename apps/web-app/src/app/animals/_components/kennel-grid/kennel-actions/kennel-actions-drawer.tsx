@@ -14,7 +14,6 @@ import {
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Animal, Kennel } from "../../../types";
-import { DIFFICULTY_CONFIG } from "../../../difficulty-config";
 import { AnimalImages } from "../animal-images";
 import { formatDuration, getLastCompletedWalk } from "../utils";
 import { WalkStatus } from "../walk-status";
@@ -39,10 +38,6 @@ export function KennelActionsDrawer({
   activeSnapPoint,
   setActiveSnapPoint,
 }: KennelActionsDrawerProps) {
-  const difficultyConfig = animal
-    ? DIFFICULTY_CONFIG[animal.difficultyLevel]
-    : null;
-
   return (
     <Drawer
       open={open}
@@ -52,12 +47,11 @@ export function KennelActionsDrawer({
       setActiveSnapPoint={setActiveSnapPoint}
     >
       <DrawerContent
-        className={cn(
-          "overflow-y-auto",
-          animal?.difficultyLevel === "Yellow" && "border-t-yellow border-t-4",
-          animal?.difficultyLevel === "Purple" && "border-t-purple border-t-4",
-          animal?.difficultyLevel === "Red" && "border-t-red border-t-4",
-        )}
+        className={cn("overflow-y-auto", {
+          "border-t-purple border-t-4": animal?.difficultyLevel === "Purple",
+          "border-t-red border-t-4": animal?.difficultyLevel === "Red",
+          "border-t-yellow border-t-4": animal?.difficultyLevel === "Yellow",
+        })}
       >
         <div className="mx-auto w-full max-w-sm">
           {animal && (
@@ -75,27 +69,15 @@ export function KennelActionsDrawer({
                       </span>
                     </Link>
                   </DrawerTitle>
-                  {animal && difficultyConfig && (
-                    <div
-                      className="rounded-full px-2 py-0.5 text-xs font-medium"
-                      style={{
-                        backgroundColor: difficultyConfig.color,
-                        color: "white",
-                      }}
-                    >
-                      {difficultyConfig.label}
-                    </div>
-                  )}
                   {animal?.tags && animal.tags.length > 0 && (
                     <div className="flex gap-1">
                       {animal.tags.map((tag) => (
                         <Badge
                           key={tag}
-                          className={cn(
-                            "rounded-full text-xs",
-                            tag === "first" && "bg-gray-500",
-                            tag === "last" && "bg-gray-400",
-                          )}
+                          className={cn("rounded-full text-xs", {
+                            "bg-gray-400 dark:bg-gray-500": tag === "last",
+                            "bg-gray-500 dark:bg-gray-400": tag === "first",
+                          })}
                         >
                           {tag}
                         </Badge>

@@ -33,11 +33,11 @@ export function KennelActionsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(
-          animal?.difficultyLevel === "Yellow" && "border-t-yellow border-t-4",
-          animal?.difficultyLevel === "Purple" && "border-t-purple border-t-4",
-          animal?.difficultyLevel === "Red" && "border-t-red border-t-4",
-        )}
+        className={cn({
+          "border-t-purple border-t-4": animal?.difficultyLevel === "Purple",
+          "border-t-red border-t-4": animal?.difficultyLevel === "Red",
+          "border-t-yellow border-t-4": animal?.difficultyLevel === "Yellow",
+        })}
       >
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -51,11 +51,10 @@ export function KennelActionsDialog({
                     {animal.tags.map((tag) => (
                       <Badge
                         key={tag}
-                        className={cn(
-                          "rounded-full text-xs",
-                          tag === "first" && "bg-gray-500",
-                          tag === "last" && "bg-gray-400",
-                        )}
+                        className={cn("rounded-full text-xs", {
+                          "bg-gray-400 dark:bg-gray-500": tag === "last",
+                          "bg-gray-500 dark:bg-gray-400": tag === "first",
+                        })}
                       >
                         {tag}
                       </Badge>
