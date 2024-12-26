@@ -112,19 +112,19 @@ export function WalkProgress({ data }: WalkProgressProps) {
                     className={cn(
                       "relative h-10 w-full overflow-hidden rounded-full border-4 transition-all md:h-12",
                       {
-                        "border-[hsl(var(--chart-3))]": level === "Yellow",
-                        "border-[hsl(var(--chart-4))]": level === "Purple",
-                        "border-[hsl(var(--chart-5))]": level === "Red",
+                        "border-purple": level === "Purple",
+                        "border-red": level === "Red",
+                        "border-yellow": level === "Yellow",
                       },
                       selectedFilters.includes(level) && "ring-2 ring-offset-2",
                       {
-                        "[--ring-color:var(--chart-3)]":
-                          level === "Yellow" && selectedFilters.includes(level),
-                        "[--ring-color:var(--chart-4)]":
+                        "ring-purple":
                           level === "Purple" && selectedFilters.includes(level),
+                        "ring-yellow":
+                          level === "Yellow" && selectedFilters.includes(level),
                       },
-                      selectedFilters.includes(level) &&
-                        "ring-[hsl(var(--ring-color))]",
+                      // selectedFilters.includes(level) &&
+                      // "ring-[hsl(var(--ring-color))]",
                     )}
                     style={{
                       color: config.color,

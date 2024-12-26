@@ -70,37 +70,37 @@ export function KennelCell({
       className={cn(
         "relative flex h-14 items-center justify-between rounded-full border-4 border-[hsl(var(--border-color)/var(--border-opacity))] p-3 transition-all hover:opacity-80",
         {
-          "[--border-color:var(--chart-3)]":
-            animal?.difficultyLevel === "Yellow",
-          "[--border-color:var(--chart-4)]":
+          "[--border-color:var(--purple)]":
             animal?.difficultyLevel === "Purple",
-          "[--border-color:var(--chart-5)]": animal?.difficultyLevel === "Red",
+          "[--border-color:var(--red)]": animal?.difficultyLevel === "Red",
+          "[--border-color:var(--yellow)]":
+            animal?.difficultyLevel === "Yellow",
           "[--border-opacity:0.25]": shouldReduceOpacity,
           "[--border-opacity:1]": !shouldReduceOpacity,
-          "[background-color:hsl(var(--chart-3)/0.2)]":
-            animal?.difficultyLevel === "Yellow" &&
-            !isWalked &&
-            !hasActiveWalk &&
-            !isFiltered &&
-            !animal.isOutOfKennel,
-          "[background-color:hsl(var(--chart-4)/0.2)]":
+          "[background-color:hsl(var(--purple)/0.2)]":
             animal?.difficultyLevel === "Purple" &&
             !isWalked &&
             !hasActiveWalk &&
             !isFiltered &&
             !animal.isOutOfKennel,
-          "[background-color:hsl(var(--chart-5)/0.2)]":
+          "[background-color:hsl(var(--red)/0.2)]":
             animal?.difficultyLevel === "Red" &&
             !isWalked &&
             !hasActiveWalk &&
             !isFiltered &&
             !animal.isOutOfKennel,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--chart-3)/0.2)_10px,hsl(var(--chart-3)/0.2)_20px)]":
-            animal?.difficultyLevel === "Yellow" && hasActiveWalk,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--chart-4)/0.2)_10px,hsl(var(--chart-4)/0.2)_20px)]":
+          "[background-color:hsl(var(--yellow)/0.2)]":
+            animal?.difficultyLevel === "Yellow" &&
+            !isWalked &&
+            !hasActiveWalk &&
+            !isFiltered &&
+            !animal.isOutOfKennel,
+          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--purple)/0.2)_10px,hsl(var(--purple)/0.2)_20px)]":
             animal?.difficultyLevel === "Purple" && hasActiveWalk,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--chart-5)/0.2)_10px,hsl(var(--chart-5)/0.2)_20px)]":
+          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--red)/0.2)_10px,hsl(var(--red)/0.2)_20px)]":
             animal?.difficultyLevel === "Red" && hasActiveWalk,
+          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--yellow)/0.2)_10px,hsl(var(--yellow)/0.2)_20px)]":
+            animal?.difficultyLevel === "Yellow" && hasActiveWalk,
           "bg-card": !animal?.isOutOfKennel || hasActiveWalk,
           "border-dashed": isAvailable || animal?.isOutOfKennel,
           "border-muted": isAvailable,

@@ -5,12 +5,30 @@ import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@acme/ui/lib/utils";
 
+type BaseDrawerProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
+
+interface DrawerProps {
+  shouldScaleBackground?: boolean;
+  snapPoints?: (string | number)[];
+  activeSnapPoint?: string | number | null;
+  setActiveSnapPoint?: (snapPoint: string | number | null) => void;
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
 const Drawer = ({
   shouldScaleBackground = true,
+  snapPoints,
+  activeSnapPoint,
+  setActiveSnapPoint,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
+}: DrawerProps) => (
   <DrawerPrimitive.Root
     shouldScaleBackground={shouldScaleBackground}
+    snapPoints={snapPoints}
+    activeSnapPoint={activeSnapPoint}
+    setActiveSnapPoint={setActiveSnapPoint}
     {...props}
   />
 );

@@ -1,9 +1,9 @@
 export type DifficultyLevel = "Purple" | "Yellow" | "Red";
 
 export const DIFFICULTY_COLORS = {
-  Purple: "hsl(var(--chart-4))",
-  Red: "hsl(var(--chart-5))",
-  Yellow: "hsl(var(--chart-3))",
+  Purple: "hsl(var(--purple))",
+  Red: "hsl(var(--red))",
+  Yellow: "hsl(var(--yellow))",
 } as const;
 
 export const DIFFICULTY_CONFIG = {
