@@ -2,6 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { cva } from "class-variance-authority";
 
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
@@ -9,6 +10,96 @@ import { cn } from "@acme/ui/lib/utils";
 import type { Animal, Kennel } from "../../types";
 import { hasBeenWalkedToday, hasWalkInProgress, matchesFilters } from "./utils";
 import { WalkStatusBadge } from "./walk-status-badge";
+
+const kennelCell = cva(
+  "relative flex h-14 items-center justify-between rounded-full border-4 p-3 transition-all hover:opacity-80",
+  {
+    compoundVariants: [
+      {
+        class: "bg-purple/20",
+        difficulty: "purple",
+        walkStatus: "none",
+      },
+      {
+        class: "bg-red/20",
+        difficulty: "red",
+        walkStatus: "none",
+      },
+      {
+        class: "bg-yellow/20",
+        difficulty: "yellow",
+        walkStatus: "none",
+      },
+      {
+        class:
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--purple)/0.2)_10px,rgb(var(--purple)/0.2)_20px)]",
+        difficulty: "purple",
+        walkStatus: "inProgress",
+      },
+      {
+        class:
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--red)/0.2)_10px,rgb(var(--red)/0.2)_20px)]",
+        difficulty: "red",
+        walkStatus: "inProgress",
+      },
+      {
+        class:
+          "animate-slide-pattern bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgb(var(--yellow)/0.2)_10px,rgb(var(--yellow)/0.2)_20px)]",
+        difficulty: "yellow",
+        walkStatus: "inProgress",
+      },
+      {
+        class: "border-purple/25",
+        difficulty: "purple",
+        state: ["filtered", "maintenance"],
+      },
+      {
+        class: "border-red/25",
+        difficulty: "red",
+        state: ["filtered", "maintenance"],
+      },
+      {
+        class: "border-yellow/25",
+        difficulty: "yellow",
+        state: ["filtered", "maintenance"],
+      },
+    ],
+    defaultVariants: {
+      state: "active",
+      walkStatus: "none",
+    },
+    variants: {
+      cursor: {
+        grab: "cursor-grab",
+        grabbing: "cursor-grabbing",
+        notAllowed: "cursor-not-allowed",
+      },
+      difficulty: {
+        purple: "border-purple",
+        red: "border-red",
+        yellow: "border-yellow",
+      },
+      dropTarget: {
+        valid: "ring-2 ring-primary ring-offset-2",
+        validAndOver: "ring-4 ring-primary",
+      },
+      kennelStatus: {
+        available: "border-dashed border-muted",
+        outOfKennel: "border-dashed",
+      },
+      state: {
+        active: "",
+        filtered: "opacity-50",
+        maintenance: "opacity-50",
+      },
+      walkStatus: {
+        inProgress: "",
+        none: "",
+        walked: "",
+      },
+    },
+  },
+);
 
 interface KennelCellProps {
   kennel: Kennel;
@@ -64,54 +155,51 @@ export function KennelCell({
   const shouldReduceOpacity = isFiltered || (isWalked && !hasActiveWalk);
   const isValidDropTarget = !animal && !isUnderMaintenance && isAvailable;
 
+  // Compute variants
+  const cursorVariant = (() => {
+    if (!animal) return "notAllowed";
+    return isDragging ? "grabbing" : "grab";
+  })();
+
+  const dropTargetVariant = (() => {
+    if (!isValidDropTarget || !isDraggingAnimal) return undefined;
+    return isOver ? "validAndOver" : "valid";
+  })();
+
+  const kennelStatusVariant = (() => {
+    if (isAvailable) return "available";
+    if (animal?.isOutOfKennel) return "outOfKennel";
+    return undefined;
+  })();
+
+  const stateVariant = (() => {
+    if (isUnderMaintenance) return "maintenance";
+    if (shouldReduceOpacity) return "filtered";
+    return "active";
+  })();
+
+  const walkStatusVariant = (() => {
+    if (hasActiveWalk) return "inProgress";
+    if (isWalked) return "walked";
+    return "none";
+  })();
+
   return (
     <div
       data-kennel-id={kennel.id}
       className={cn(
-        "relative flex h-14 items-center justify-between rounded-full border-4 border-[hsl(var(--border-color)/var(--border-opacity))] p-3 transition-all hover:opacity-80",
-        {
-          "[--border-color:var(--purple)]":
-            animal?.difficultyLevel === "Purple",
-          "[--border-color:var(--red)]": animal?.difficultyLevel === "Red",
-          "[--border-color:var(--yellow)]":
-            animal?.difficultyLevel === "Yellow",
-          "[--border-opacity:0.25]": shouldReduceOpacity,
-          "[--border-opacity:1]": !shouldReduceOpacity,
-          "[background-color:hsl(var(--purple)/0.2)]":
-            animal?.difficultyLevel === "Purple" &&
-            !isWalked &&
-            !hasActiveWalk &&
-            !isFiltered &&
-            !animal.isOutOfKennel,
-          "[background-color:hsl(var(--red)/0.2)]":
-            animal?.difficultyLevel === "Red" &&
-            !isWalked &&
-            !hasActiveWalk &&
-            !isFiltered &&
-            !animal.isOutOfKennel,
-          "[background-color:hsl(var(--yellow)/0.2)]":
-            animal?.difficultyLevel === "Yellow" &&
-            !isWalked &&
-            !hasActiveWalk &&
-            !isFiltered &&
-            !animal.isOutOfKennel,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--purple)/0.2)_10px,hsl(var(--purple)/0.2)_20px)]":
-            animal?.difficultyLevel === "Purple" && hasActiveWalk,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--red)/0.2)_10px,hsl(var(--red)/0.2)_20px)]":
-            animal?.difficultyLevel === "Red" && hasActiveWalk,
-          "animate-slide-pattern [background:repeating-linear-gradient(45deg,transparent,transparent_10px,hsl(var(--yellow)/0.2)_10px,hsl(var(--yellow)/0.2)_20px)]":
-            animal?.difficultyLevel === "Yellow" && hasActiveWalk,
-          "bg-card": !animal?.isOutOfKennel || hasActiveWalk,
-          "border-dashed": isAvailable || animal?.isOutOfKennel,
-          "border-muted": isAvailable,
-          "cursor-grab": animal,
-          "cursor-grabbing": isDragging,
-          "cursor-not-allowed": !animal,
-          "opacity-50": isUnderMaintenance || shouldReduceOpacity,
-          "ring-2 ring-primary ring-offset-2":
-            isValidDropTarget && isDraggingAnimal,
-          "ring-4 ring-primary": isValidDropTarget && isOver,
-        },
+        kennelCell({
+          cursor: cursorVariant,
+          difficulty: animal?.difficultyLevel.toLowerCase() as
+            | "purple"
+            | "red"
+            | "yellow"
+            | undefined,
+          dropTarget: dropTargetVariant,
+          kennelStatus: kennelStatusVariant,
+          state: stateVariant,
+          walkStatus: walkStatusVariant,
+        }),
       )}
       onClick={onClick}
     >
