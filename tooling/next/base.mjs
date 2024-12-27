@@ -22,6 +22,7 @@ const nextConfig = {
       { hostname: "media.licdn.com" },
       { hostname: "img.clerk.com" },
       { hostname: "image.tmdb.org" },
+      { hostname: "picsum.photos" },
     ],
   },
   logging: {

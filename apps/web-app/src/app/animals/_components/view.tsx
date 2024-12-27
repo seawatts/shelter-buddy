@@ -2,11 +2,15 @@
 
 import { useQueryState } from "nuqs";
 
-import type { Animal, Kennel } from "../types";
+import type { AnimalType, KennelType } from "@acme/db/schema";
+
 import { AnimalsTable } from "./animals-table";
 import { KennelGrid } from "./kennel-grid";
 
-export function AnimalsView(props: { animals: Animal[]; kennels: Kennel[] }) {
+export function AnimalsView(props: {
+  animals: AnimalType[];
+  kennels: KennelType[];
+}) {
   const [viewMode] = useQueryState("viewMode", { defaultValue: "grid" });
   const [tagFilter] = useQueryState("tagFilter");
 
@@ -16,7 +20,7 @@ export function AnimalsView(props: { animals: Animal[]; kennels: Kennel[] }) {
   const filteredAnimals =
     selectedTags.length > 0
       ? props.animals.filter((animal) =>
-          selectedTags.some((tag) => animal.tags?.includes(tag)),
+          selectedTags.some((tag) => animal.tags.some((t) => t.tag === tag)),
         )
       : props.animals;
 

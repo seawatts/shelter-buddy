@@ -26,6 +26,8 @@ export interface Kennel {
   type: KennelType;
   size: KennelSize;
   location: string;
+  gridX: number;
+  gridY: number;
   features: KennelFeatures[];
   notes: string;
   lastCleanedAt: Date;

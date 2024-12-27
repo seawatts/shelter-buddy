@@ -6,12 +6,11 @@ import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { Camera, Pause, Play, Volume2, VolumeX } from "lucide-react";
 
+import type { AnimalMediaType } from "@acme/db/schema";
 import { Avatar, AvatarFallback } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Carousel, CarouselContent, CarouselItem } from "@acme/ui/carousel";
 import { cn } from "@acme/ui/lib/utils";
-
-import type { AnimalMedia, MediaMetadata } from "../../types";
 
 interface CarouselDotsProps {
   api: EmblaCarouselType | undefined;
@@ -70,7 +69,7 @@ function CarouselDots({ api }: CarouselDotsProps) {
 
 interface VideoPlayerProps {
   url: string;
-  thumbnailUrl?: string;
+  thumbnailUrl?: string | null;
   onPlay?: () => void;
 }
 
@@ -103,7 +102,7 @@ function VideoPlayer({ url, thumbnailUrl, onPlay }: VideoPlayerProps) {
       <video
         ref={videoRef}
         src={url}
-        poster={thumbnailUrl}
+        poster={thumbnailUrl ?? undefined}
         muted={isMuted}
         playsInline
         loop
@@ -141,18 +140,23 @@ function VideoPlayer({ url, thumbnailUrl, onPlay }: VideoPlayerProps) {
 
 interface AnimalImagesProps {
   name?: string;
-  media?: AnimalMedia[];
+  media?: AnimalMediaType[];
   isMobile?: boolean;
 }
 
+interface MediaMetadata extends Record<string, unknown> {
+  uploadedById: string;
+  uploadedAt: string;
+}
+
 function hasValidMetadata(
-  metadata: MediaMetadata | undefined,
+  metadata: Record<string, unknown> | undefined,
 ): metadata is MediaMetadata {
   return (
     metadata !== undefined &&
     typeof metadata.uploadedById === "string" &&
     metadata.uploadedById.length > 0 &&
-    metadata.uploadedAt instanceof Date
+    typeof metadata.uploadedAt === "string"
   );
 }
 
@@ -215,29 +219,33 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
                         onPlay={() => handleVideoPlay(index)}
                       />
                     )}
-                    {hasValidMetadata(item.metadata) && (
-                      <div className="absolute left-0 right-0 top-0 p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="size-6">
-                              <AvatarFallback>
-                                {item.metadata.uploadedById[0]?.toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium text-white drop-shadow-md">
-                                {item.metadata.uploadedById}
-                              </span>
-                              <span className="text-xs text-white/90 drop-shadow-md">
-                                {formatDistanceToNow(item.metadata.uploadedAt, {
-                                  addSuffix: true,
-                                })}
-                              </span>
+                    {item.metadata !== null &&
+                      hasValidMetadata(item.metadata) && (
+                        <div className="absolute left-0 right-0 top-0 p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Avatar className="size-6">
+                                <AvatarFallback>
+                                  {item.metadata.uploadedById[0]?.toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-white drop-shadow-md">
+                                  {item.metadata.uploadedById}
+                                </span>
+                                <span className="text-xs text-white/90 drop-shadow-md">
+                                  {formatDistanceToNow(
+                                    new Date(item.metadata.uploadedAt),
+                                    {
+                                      addSuffix: true,
+                                    },
+                                  )}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                     <div className="absolute bottom-4 left-4 right-4">
                       {(item.type === "image" ||
                         currentVideoIndex !== index) && (

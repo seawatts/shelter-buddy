@@ -4,6 +4,7 @@ import {
   decimal,
   integer,
   json,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -17,7 +18,8 @@ import { createId } from "@acme/id";
 
 export const userRoleEnum = pgEnum("userRole", ["admin", "superAdmin", "user"]);
 
-export const UserRoleType = z.enum(userRoleEnum.enumValues).Enum;
+export const UserRole = z.enum(userRoleEnum.enumValues).Enum;
+export type UserRoleEnum = (typeof UserRole)[keyof typeof UserRole];
 
 // Define the theme configuration type
 export const ThemeConfigSchema = z.object({
@@ -51,7 +53,7 @@ export const Users = pgTable("user", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   email: text("email").notNull().unique(),
   firstName: text("firstName"),
-  id: varchar("id", { length: 128 }).notNull().primaryKey(),
+  id: varchar("id", { length: 48 }).notNull().primaryKey(),
   lastName: text("lastName"),
   online: boolean("online").default(false).notNull(),
   updatedAt: timestamp("updatedAt", {
@@ -61,11 +63,14 @@ export const Users = pgTable("user", {
 });
 
 export const UsersRelations = relations(Users, ({ many }) => ({
+  assignedKennelMaintenance: many(KennelMaintenance),
   createdActivities: many(AnimalActivities),
   createdAnimalMedia: many(AnimalMedia),
   createdAnimalNotes: many(AnimalNotes),
   createdAnimalTags: many(AnimalTags),
   createdAnimals: many(Animals),
+  createdKennelMaintenance: many(KennelMaintenance),
+  createdKennelNotes: many(KennelNotes),
   createdShelterMembers: many(ShelterMembers),
   createdWalks: many(Walks),
   shelterMembers: many(ShelterMembers),
@@ -96,7 +101,7 @@ export const Shelters = pgTable("shelter", {
       onDelete: "cascade",
     })
     .notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "shelter" }))
     .notNull()
     .primaryKey(),
@@ -119,12 +124,10 @@ export const Shelters = pgTable("shelter", {
 
 export type ShelterType = typeof Shelters.$inferSelect;
 
-export const SheltersRelations = relations(Shelters, ({ one, many }) => ({
+export const SheltersRelations = relations(Shelters, ({ many }) => ({
   animals: many(Animals),
-  createdByUser: one(Users, {
-    fields: [Shelters.createdByUserId],
-    references: [Users.id],
-  }),
+  kennelMaintenanceRecords: many(KennelMaintenance),
+  kennelNotes: many(KennelNotes),
   kennels: many(Kennels),
   shelterMembers: many(ShelterMembers),
 }));
@@ -147,7 +150,7 @@ export const ShelterMembers = pgTable("shelter_members", {
       onDelete: "cascade",
     })
     .notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "member" }))
     .notNull()
     .primaryKey(),
@@ -177,7 +180,6 @@ export const ShelterMembersRelations = relations(ShelterMembers, ({ one }) => ({
   createdByUser: one(Users, {
     fields: [ShelterMembers.createdByUserId],
     references: [Users.id],
-    relationName: "createdByUser",
   }),
   shelter: one(Shelters, {
     fields: [ShelterMembers.shelterId],
@@ -186,14 +188,13 @@ export const ShelterMembersRelations = relations(ShelterMembers, ({ one }) => ({
   user: one(Users, {
     fields: [ShelterMembers.userId],
     references: [Users.id],
-    relationName: "user",
   }),
 }));
 
 export const ShortUrl = pgTable("short_url", {
   code: text("code").notNull().unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "url" }))
     .notNull()
     .primaryKey(),
@@ -205,6 +206,12 @@ export const ShortUrl = pgTable("short_url", {
 });
 
 // Animal Related Enums
+export const kennelNoteTypeEnum = pgEnum("kennelNoteType", [
+  "maintenance",
+  "cleaning",
+  "general",
+]);
+
 export const kennelSizeEnum = pgEnum("kennelSize", [
   "small",
   "medium",
@@ -232,6 +239,7 @@ export const difficultyLevelEnum = pgEnum("difficultyLevel", [
   "Purple",
   "Red",
 ]);
+
 export const walkStatusEnum = pgEnum("walkStatus", [
   "completed",
   "in_progress",
@@ -335,8 +343,10 @@ export const Kennels = pgTable("kennel", {
     mode: "date",
     withTimezone: true,
   }).defaultNow(),
-  features: json("features").$type<string[]>(),
-  id: varchar("id", { length: 128 })
+  features: jsonb("features").$type<string[]>().default([]).notNull(),
+  gridX: integer("gridX").default(0).notNull(),
+  gridY: integer("gridY").default(0).notNull(),
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "kennel" }))
     .notNull()
     .primaryKey(),
@@ -344,10 +354,8 @@ export const Kennels = pgTable("kennel", {
     mode: "date",
     withTimezone: true,
   }),
-  location: text("location"),
   maintenanceStatus: maintenanceStatusEnum("maintenanceStatus").default("good"),
   name: text("name").notNull(),
-  notes: text("notes"),
   shelterId: varchar("shelterId")
     .references(() => Shelters.id, {
       onDelete: "cascade",
@@ -356,6 +364,41 @@ export const Kennels = pgTable("kennel", {
   size: kennelSizeEnum("size").notNull(),
   status: kennelStatusEnum("status").default("available").notNull(),
   type: kennelTypeEnum("type").notNull(),
+  updatedAt: timestamp("updatedAt", {
+    mode: "date",
+    withTimezone: true,
+  }).$onUpdateFn(() => new Date()),
+});
+
+// Kennel Notes Table
+export const KennelNotes = pgTable("kennel_note", {
+  createdAt: timestamp("createdAt", {
+    mode: "date",
+    withTimezone: true,
+  }).defaultNow(),
+  createdByUserId: varchar("createdByUserId")
+    .references(() => Users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  id: varchar("id", { length: 48 })
+    .$defaultFn(() => createId({ prefix: "kennel_note" }))
+    .notNull()
+    .primaryKey(),
+  isActive: boolean("isActive").default(true).notNull(),
+  kennelId: varchar("kennelId")
+    .references(() => Kennels.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  notes: text("notes").notNull(),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  summary: text("summary"),
+  type: kennelNoteTypeEnum("type").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
@@ -382,7 +425,7 @@ export const KennelOccupants = pgTable("kennel_occupant", {
     mode: "date",
     withTimezone: true,
   }),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "occupant" }))
     .notNull()
     .primaryKey(),
@@ -412,9 +455,26 @@ export const KennelsRelations = relations(Kennels, ({ one, many }) => ({
     fields: [Kennels.id],
     references: [Animals.kennelId],
   }),
+  maintenanceRecords: many(KennelMaintenance),
+  notes: many(KennelNotes),
   occupants: many(KennelOccupants),
   shelter: one(Shelters, {
     fields: [Kennels.shelterId],
+    references: [Shelters.id],
+  }),
+}));
+
+export const KennelNotesRelations = relations(KennelNotes, ({ one }) => ({
+  createdByUser: one(Users, {
+    fields: [KennelNotes.createdByUserId],
+    references: [Users.id],
+  }),
+  kennel: one(Kennels, {
+    fields: [KennelNotes.kennelId],
+    references: [Kennels.id],
+  }),
+  shelter: one(Shelters, {
+    fields: [KennelNotes.shelterId],
     references: [Shelters.id],
   }),
 }));
@@ -459,7 +519,7 @@ export const Animals = pgTable("animal", {
     .notNull(),
   difficultyLevel: difficultyLevelEnum("difficultyLevel").notNull(),
   gender: genderEnum("gender").notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "animal" }))
     .notNull()
     .primaryKey(),
@@ -479,6 +539,14 @@ export const Animals = pgTable("animal", {
   weight: decimal("weight", { precision: 5, scale: 2 }),
 });
 
+export type AnimalType = typeof Animals.$inferSelect & {
+  tags: AnimalTagType[];
+  media: AnimalMediaType[];
+  notes: AnimalNoteType[];
+  walks: WalkType[];
+  activities: AnimalActivityType[];
+};
+
 // Animal Tags Table
 export const AnimalTags = pgTable("animal_tag", {
   animalId: varchar("animalId")
@@ -495,7 +563,7 @@ export const AnimalTags = pgTable("animal_tag", {
       onDelete: "cascade",
     })
     .notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "tag" }))
     .notNull()
     .primaryKey(),
@@ -532,7 +600,7 @@ export const AnimalMedia = pgTable("animal_media", {
     })
     .notNull(),
   default: boolean("default").default(false).notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "media" }))
     .notNull()
     .primaryKey(),
@@ -562,7 +630,7 @@ export const AnimalNotes = pgTable("animal_note", {
       onDelete: "cascade",
     })
     .notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "note" }))
     .notNull()
     .primaryKey(),
@@ -611,7 +679,7 @@ export const Walks = pgTable("walk", {
     mode: "date",
     withTimezone: true,
   }),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "walk" }))
     .notNull()
     .primaryKey(),
@@ -651,7 +719,7 @@ export const AnimalActivities = pgTable("animal_activity", {
       onDelete: "cascade",
     })
     .notNull(),
-  id: varchar("id", { length: 128 })
+  id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "activity" }))
     .notNull()
     .primaryKey(),
@@ -751,3 +819,177 @@ export const AnimalTagsRelations = relations(AnimalTags, ({ one }) => ({
 
 // Add ShortUrl relations
 export const ShortUrlRelations = relations(ShortUrl, () => ({}));
+
+export type ShortUrlType = typeof ShortUrl.$inferSelect;
+
+export type KennelType = typeof Kennels.$inferSelect & {
+  gridX: number;
+  gridY: number;
+};
+export type KennelOccupantType = typeof KennelOccupants.$inferSelect;
+
+export type AnimalTagType = typeof AnimalTags.$inferSelect;
+export type AnimalMediaType = typeof AnimalMedia.$inferSelect;
+export type AnimalNoteType = typeof AnimalNotes.$inferSelect;
+export type WalkType = typeof Walks.$inferSelect;
+export type AnimalActivityType = typeof AnimalActivities.$inferSelect;
+
+export const KennelSize = z.enum(kennelSizeEnum.enumValues).Enum;
+export type KennelSizeEnum = (typeof KennelSize)[keyof typeof KennelSize];
+
+export const KennelTypeEnum = z.enum(kennelTypeEnum.enumValues).Enum;
+export type KennelTypeEnum =
+  (typeof KennelTypeEnum)[keyof typeof KennelTypeEnum];
+
+export const KennelStatus = z.enum(kennelStatusEnum.enumValues).Enum;
+export type KennelStatusEnum = (typeof KennelStatus)[keyof typeof KennelStatus];
+
+export const MaintenanceStatus = z.enum(maintenanceStatusEnum.enumValues).Enum;
+export type MaintenanceStatusEnum =
+  (typeof MaintenanceStatus)[keyof typeof MaintenanceStatus];
+
+export const DifficultyLevel = z.enum(difficultyLevelEnum.enumValues).Enum;
+export type DifficultyLevelEnum =
+  (typeof DifficultyLevel)[keyof typeof DifficultyLevel];
+
+export const WalkStatus = z.enum(walkStatusEnum.enumValues).Enum;
+export type WalkStatusEnum = (typeof WalkStatus)[keyof typeof WalkStatus];
+
+export const ActivityType = z.enum(activityTypeEnum.enumValues).Enum;
+export type ActivityTypeEnum = (typeof ActivityType)[keyof typeof ActivityType];
+
+export const ActivityCategory = z.enum(activityCategoryEnum.enumValues).Enum;
+export type ActivityCategoryEnum =
+  (typeof ActivityCategory)[keyof typeof ActivityCategory];
+
+export const ActivitySeverity = z.enum(activitySeverityEnum.enumValues).Enum;
+export type ActivitySeverityEnum =
+  (typeof ActivitySeverity)[keyof typeof ActivitySeverity];
+
+export const AnimalNoteTypeEnum = z.enum(animalNoteTypeEnum.enumValues).Enum;
+export type AnimalNoteTypeEnum =
+  (typeof AnimalNoteTypeEnum)[keyof typeof AnimalNoteTypeEnum];
+
+export const Gender = z.enum(genderEnum.enumValues).Enum;
+export type GenderEnum = (typeof Gender)[keyof typeof Gender];
+
+export const KennelNoteType = z.enum(kennelNoteTypeEnum.enumValues).Enum;
+export type KennelNoteTypeEnum =
+  (typeof KennelNoteType)[keyof typeof KennelNoteType];
+
+export type KennelNoteType = typeof KennelNotes.$inferSelect;
+
+// Animal Related Enums
+export const kennelMaintenanceTypeEnum = pgEnum("kennelMaintenanceType", [
+  "repair",
+  "scheduled",
+  "emergency",
+  "inspection",
+  "upgrade",
+]);
+
+export const kennelMaintenancePriorityEnum = pgEnum(
+  "kennelMaintenancePriority",
+  ["low", "medium", "high", "critical"],
+);
+
+export const kennelMaintenanceStatusEnum = pgEnum("kennelMaintenanceStatus", [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+]);
+
+// Kennel Maintenance Table
+export const KennelMaintenance = pgTable("kennel_maintenance", {
+  assignedToUserId: varchar("assignedToUserId").references(() => Users.id, {
+    onDelete: "set null",
+  }),
+  completedAt: timestamp("completedAt", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  createdAt: timestamp("createdAt", {
+    mode: "date",
+    withTimezone: true,
+  }).defaultNow(),
+  createdByUserId: varchar("createdByUserId")
+    .references(() => Users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  description: text("description").notNull(),
+  dueDate: timestamp("dueDate", {
+    mode: "date",
+    withTimezone: true,
+  }),
+  estimatedCost: decimal("estimatedCost", { precision: 10, scale: 2 }),
+  id: varchar("id", { length: 48 })
+    .$defaultFn(() => createId({ prefix: "maintenance" }))
+    .notNull()
+    .primaryKey(),
+  kennelId: varchar("kennelId")
+    .references(() => Kennels.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  priority: kennelMaintenancePriorityEnum("priority")
+    .default("medium")
+    .notNull(),
+  resolution: text("resolution"),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  status: kennelMaintenanceStatusEnum("status").default("pending").notNull(),
+  title: text("title").notNull(),
+  type: kennelMaintenanceTypeEnum("type").notNull(),
+  updatedAt: timestamp("updatedAt", {
+    mode: "date",
+    withTimezone: true,
+  }).$onUpdateFn(() => new Date()),
+});
+
+// Relations
+export const KennelMaintenanceRelations = relations(
+  KennelMaintenance,
+  ({ one }) => ({
+    assignedToUser: one(Users, {
+      fields: [KennelMaintenance.assignedToUserId],
+      references: [Users.id],
+    }),
+    createdByUser: one(Users, {
+      fields: [KennelMaintenance.createdByUserId],
+      references: [Users.id],
+    }),
+    kennel: one(Kennels, {
+      fields: [KennelMaintenance.kennelId],
+      references: [Kennels.id],
+    }),
+    shelter: one(Shelters, {
+      fields: [KennelMaintenance.shelterId],
+      references: [Shelters.id],
+    }),
+  }),
+);
+
+export const KennelMaintenanceType = z.enum(
+  kennelMaintenanceTypeEnum.enumValues,
+).Enum;
+export type KennelMaintenanceTypeEnum =
+  (typeof KennelMaintenanceType)[keyof typeof KennelMaintenanceType];
+
+export const KennelMaintenancePriority = z.enum(
+  kennelMaintenancePriorityEnum.enumValues,
+).Enum;
+export type KennelMaintenancePriorityEnum =
+  (typeof KennelMaintenancePriority)[keyof typeof KennelMaintenancePriority];
+
+export const KennelMaintenanceStatus = z.enum(
+  kennelMaintenanceStatusEnum.enumValues,
+).Enum;
+export type KennelMaintenanceStatusEnum =
+  (typeof KennelMaintenanceStatus)[keyof typeof KennelMaintenanceStatus];
+
+export type KennelMaintenanceType = typeof KennelMaintenance.$inferSelect;

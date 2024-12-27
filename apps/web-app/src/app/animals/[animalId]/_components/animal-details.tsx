@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { formatDistanceToNow } from "date-fns";
+import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { Check, Timer, X } from "lucide-react";
 
+import type { AnimalType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal } from "../../types";
 import {
   formatDuration,
   getLastCompletedWalk,
@@ -16,7 +16,7 @@ import { DIFFICULTY_CONFIG } from "../../difficulty-config";
 import { QuickReferenceDialog } from "./quick-reference-dialog";
 
 interface AnimalDetailsProps {
-  animal: Animal;
+  animal: AnimalType;
 }
 
 export function AnimalDetails({ animal }: AnimalDetailsProps) {
@@ -28,6 +28,10 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
   const handleStartWalk = () => {
     router.push(`/animals/${animal.id}/walk`);
   };
+
+  const generateNotes = animal.notes.filter(
+    (note) => note.type === "general" && note.isActive,
+  );
 
   return (
     <div className="grid gap-4">
@@ -46,18 +50,18 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
               >
                 {difficultyConfig.label}
               </div>
-              {animal.tags && animal.tags.length > 0 && (
+              {animal.tags.length > 0 && (
                 <div className="flex gap-1">
                   {animal.tags.map((tag) => (
                     <Badge
-                      key={tag}
+                      key={tag.id}
                       className={cn(
                         "rounded-full text-xs",
-                        tag === "first" && "bg-gray-500",
-                        tag === "last" && "bg-gray-400",
+                        tag.tag === "first" && "bg-gray-500",
+                        tag.tag === "last" && "bg-gray-400",
                       )}
                     >
-                      {tag}
+                      {tag.tag}
                     </Badge>
                   ))}
                 </div>
@@ -68,7 +72,11 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
                 <span>Kennel {animal.kennelId}</span>
                 <span>{animal.breed}</span>
                 <span>{animal.weight} lbs</span>
-                <span>{animal.age} years</span>
+                <span>
+                  {animal.birthDate
+                    ? `${differenceInYears(new Date(), new Date(animal.birthDate))} years`
+                    : "Unknown age"}
+                </span>
                 <span>
                   {animal.isOutOfKennel ? "Out of Kennel" : "In Kennel"}
                 </span>
@@ -116,19 +124,21 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
                 <p className="text-sm">FIDO Certified</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {animal.approvedActivities &&
-                animal.approvedActivities.length > 0 ? (
-                  animal.approvedActivities.map((activity, index) => (
+                {animal.notes
+                  .filter(
+                    (note) =>
+                      note.type === "approvedActivities" && note.isActive,
+                  )
+                  .map((note, index) => (
                     <div key={index} className="flex items-center gap-1.5">
                       <Check className="size-3 text-green-600" />
-                      <p className="text-sm">{activity}</p>
+                      <p className="text-sm">{note.notes}</p>
                     </div>
-                  ))
-                ) : (
+                  )).length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     No approved activities listed
                   </p>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -137,17 +147,17 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
           <div className="rounded-lg border bg-card p-4">
             <h2 className="mb-3 text-lg font-semibold">Medical Information</h2>
             <div className="space-y-1.5">
-              {animal.medicalNotes
-                ?.filter((note) => note.isActive)
+              {animal.notes
+                .filter((note) => note.type === "medical" && note.isActive)
                 .map((note, index) => (
                   <p key={index} className="text-sm text-muted-foreground">
                     {note.notes}
                   </p>
-                )) ?? (
+                )).length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   No medical notes available
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -158,17 +168,11 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
           <div className="rounded-lg border bg-card p-4">
             <h2 className="mb-3 text-lg font-semibold">General Notes</h2>
             <div className="space-y-1.5">
-              {animal.generalNotes
-                ?.filter((note) => note.isActive)
-                .map((note, index) => (
-                  <p key={index} className="text-sm text-muted-foreground">
-                    {note.notes}
-                  </p>
-                )) ?? (
-                <p className="text-sm text-muted-foreground">
-                  No general notes available
+              {generateNotes.map((note) => (
+                <p key={note.id} className="text-sm text-muted-foreground">
+                  {note.notes}
                 </p>
-              )}
+              ))}
             </div>
           </div>
 
@@ -181,33 +185,35 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
               <div>
                 <h3 className="mb-1.5 text-sm font-medium">In Kennel</h3>
                 <div className="space-y-1.5">
-                  {animal.inKennelNotes
-                    ?.filter((note) => note.isActive)
+                  {animal.notes
+                    .filter((note) => note.type === "inKennel" && note.isActive)
                     .map((note, index) => (
                       <p key={index} className="text-sm text-muted-foreground">
                         {note.notes}
                       </p>
-                    )) ?? (
+                    )).length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No in-kennel notes available
                     </p>
-                  )}
+                  ) : null}
                 </div>
               </div>
               <div>
                 <h3 className="mb-1.5 text-sm font-medium">Out of Kennel</h3>
                 <div className="space-y-1.5">
-                  {animal.outKennelNotes
-                    ?.filter((note) => note.isActive)
+                  {animal.notes
+                    .filter(
+                      (note) => note.type === "outKennel" && note.isActive,
+                    )
                     .map((note, index) => (
                       <p key={index} className="text-sm text-muted-foreground">
                         {note.notes}
                       </p>
-                    )) ?? (
+                    )).length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No out-of-kennel notes available
                     </p>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -217,7 +223,7 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
           <div className="rounded-lg border bg-card p-4">
             <h2 className="mb-3 text-lg font-semibold">Walking History</h2>
             <div className="space-y-2">
-              {animal.walks?.map((walk, index) => (
+              {animal.walks.map((walk, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
@@ -235,11 +241,11 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
                     {walk.status === "completed" ? "Completed" : "In Progress"}
                   </span>
                 </div>
-              )) ?? (
+              )).length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   No walk history available
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

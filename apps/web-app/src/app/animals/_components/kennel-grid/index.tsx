@@ -13,14 +13,15 @@ import {
 import { SortableContext } from "@dnd-kit/sortable";
 import { useQueryState } from "nuqs";
 
-import type { Animal, Kennel } from "../../types";
+import type { AnimalType, KennelType } from "@acme/db/schema";
+
 import { KennelActions } from "./kennel-actions";
 import { KennelCell } from "./kennel-cell";
-import { arrangeKennels, sortKennels } from "./utils";
+import { sortKennels } from "./utils";
 
 interface KennelGridProps {
-  animals: Animal[];
-  kennels: Kennel[];
+  animals: AnimalType[];
+  kennels: KennelType[];
   onAnimalMove?: (
     animalId: string,
     fromKennelId: string,
@@ -36,7 +37,7 @@ const adjustTranslate: Modifier = ({ transform }) => {
 };
 
 export function KennelGrid(props: KennelGridProps) {
-  const [selectedKennel, setSelectedKennel] = useState<Kennel | null>(null);
+  const [selectedKennel, setSelectedKennel] = useState<KennelType | null>(null);
   const [difficultyFilter] = useQueryState("difficultyFilter");
   const [tagFilter] = useQueryState("tagFilter");
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -44,13 +45,13 @@ export function KennelGrid(props: KennelGridProps) {
   // Configure sensors for drag and drop
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 10, // 10px of movement required before activation
+      distance: 10,
     },
   });
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 250, // Wait this many ms before activating
-      tolerance: 5, // Allow 5px of movement during delay
+      delay: 250,
+      tolerance: 5,
     },
   });
   const sensors = useSensors(mouseSensor, touchSensor);
@@ -59,10 +60,6 @@ export function KennelGrid(props: KennelGridProps) {
   const sortedKennels = useMemo(
     () => sortKennels(props.kennels),
     [props.kennels],
-  );
-  const [leftColumn, rightColumn] = useMemo(
-    () => arrangeKennels(sortedKennels),
-    [sortedKennels],
   );
 
   // Effect to handle scrolling when filter changes
@@ -81,15 +78,15 @@ export function KennelGrid(props: KennelGridProps) {
         return false;
 
       // Check if the animal has been walked today or has a walk in progress
-      const todayWalks = animal.walks?.filter((walk) => {
+      const todayWalks = animal.walks.filter((walk) => {
         const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
         return walkDate === today;
       });
 
-      const hasBeenWalked = todayWalks?.some(
+      const hasBeenWalked = todayWalks.some(
         (walk) => walk.status === "completed",
       );
-      const hasWalkInProgress = todayWalks?.some(
+      const hasWalkInProgress = todayWalks.some(
         (walk) => walk.status === "in_progress",
       );
 
@@ -128,7 +125,7 @@ export function KennelGrid(props: KennelGridProps) {
       const fromKennelId = activeAnimal.kennelId;
       if (fromKennelId === overKennelId) return;
 
-      props.onAnimalMove?.(activeAnimalId, fromKennelId, overKennelId);
+      props.onAnimalMove?.(activeAnimalId, fromKennelId ?? "", overKennelId);
     },
     [props],
   );
@@ -140,6 +137,10 @@ export function KennelGrid(props: KennelGridProps) {
     ? props.kennels.find((k) => k.id === activeAnimal.kennelId)
     : null;
 
+  const numberOfCols = Math.max(...sortedKennels.map((k) => k.gridX)) + 1;
+  const numberOfRows = Math.max(...sortedKennels.map((k) => k.gridY)) + 1;
+  const halfCols = Math.ceil(numberOfCols / 2);
+  const halfRows = Math.ceil(numberOfRows / 2);
   return (
     <DndContext
       sensors={sensors}
@@ -147,11 +148,22 @@ export function KennelGrid(props: KennelGridProps) {
       onDragEnd={handleDragEnd}
     >
       <div className="flex w-full justify-center">
-        <div className="grid w-full grid-cols-2 justify-center gap-3 sm:min-w-[640px] sm:max-w-[800px] sm:gap-4">
-          <SortableContext items={leftColumn.map((k) => k.id)}>
-            <div className="flex flex-col gap-3 sm:gap-4">
-              {leftColumn.map((kennel) => (
-                <Fragment key={kennel.id}>
+        <div
+          className="grid w-full grid-cols-2 justify-center gap-3 sm:min-w-[640px] sm:max-w-[800px] sm:gap-4"
+          style={{
+            // gridTemplateColumns: `repeat(${halfCols}, minmax(200px, 1fr))`,
+            gridTemplateRows: `repeat(${halfRows}, minmax(0, 1fr))`,
+          }}
+        >
+          <SortableContext items={sortedKennels.map((k) => k.id)}>
+            {sortedKennels.map((kennel) => (
+              <Fragment key={kennel.id}>
+                <div
+                  style={{
+                    gridColumn: kennel.gridX + 1,
+                    gridRow: kennel.gridY + 1,
+                  }}
+                >
                   <KennelCell
                     kennel={kennel}
                     animal={props.animals.find((a) => a.kennelId === kennel.id)}
@@ -160,25 +172,9 @@ export function KennelGrid(props: KennelGridProps) {
                     isDraggingAnimal={Boolean(activeId)}
                     onClick={() => setSelectedKennel(kennel)}
                   />
-                </Fragment>
-              ))}
-            </div>
-          </SortableContext>
-          <SortableContext items={rightColumn.map((k) => k.id)}>
-            <div className="flex flex-col gap-3 sm:gap-4">
-              {rightColumn.map((kennel) => (
-                <Fragment key={kennel.id}>
-                  <KennelCell
-                    kennel={kennel}
-                    animal={props.animals.find((a) => a.kennelId === kennel.id)}
-                    difficultyFilter={difficultyFilter}
-                    tagFilter={tagFilter}
-                    isDraggingAnimal={Boolean(activeId)}
-                    onClick={() => setSelectedKennel(kennel)}
-                  />
-                </Fragment>
-              ))}
-            </div>
+                </div>
+              </Fragment>
+            ))}
           </SortableContext>
         </div>
       </div>

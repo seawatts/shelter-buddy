@@ -4,17 +4,17 @@ import { isToday } from "date-fns";
 import { Check, Circle } from "lucide-react";
 import { useQueryState } from "nuqs";
 
+import type { AnimalType } from "@acme/db/schema";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DifficultyLevel } from "../difficulty-config";
-import type { Animal } from "../types";
 import { DIFFICULTY_CONFIG } from "../difficulty-config";
 
 interface WalkProgressProps {
-  data: Animal[];
+  animals: AnimalType[];
 }
 
-export function WalkProgress({ data }: WalkProgressProps) {
+export function WalkProgress({ animals }: WalkProgressProps) {
   const [difficultyFilter, setDifficultyFilter] =
     useQueryState("difficultyFilter");
 
@@ -38,7 +38,7 @@ export function WalkProgress({ data }: WalkProgressProps) {
   };
 
   // Count dogs per difficulty
-  for (const animal of data) {
+  for (const animal of animals) {
     dogsByDifficulty[animal.difficultyLevel]++;
   }
 
@@ -52,10 +52,9 @@ export function WalkProgress({ data }: WalkProgressProps) {
   }
 
   // Count completed and in-progress walks
-  for (const animal of data) {
+  for (const animal of animals) {
     const level = animal.difficultyLevel;
-    const todayWalks =
-      animal.walks?.filter((walk) => isToday(walk.startedAt)) ?? [];
+    const todayWalks = animal.walks.filter((walk) => isToday(walk.startedAt));
 
     const completedCount = todayWalks.filter(
       (walk) => walk.status === "completed",
@@ -110,7 +109,7 @@ export function WalkProgress({ data }: WalkProgressProps) {
                 >
                   <div
                     className={cn(
-                      "relative h-10 w-full overflow-hidden rounded-full border-4 transition-all md:h-12",
+                      "relative h-10 w-full overflow-hidden rounded-xl border-4 transition-all md:h-12",
                       {
                         "border-purple": level === "Purple",
                         "border-red": level === "Red",
@@ -148,9 +147,6 @@ export function WalkProgress({ data }: WalkProgressProps) {
                       }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center px-6 text-base">
-                      <span className="absolute left-6 hidden font-medium text-primary sm:inline">
-                        {level}
-                      </span>
                       <div className="flex items-center justify-center gap-6 text-sm font-semibold">
                         <div className="flex items-center gap-1.5">
                           <Check

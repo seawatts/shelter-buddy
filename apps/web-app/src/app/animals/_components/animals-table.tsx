@@ -16,6 +16,7 @@ import {
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
 
+import type { AnimalType } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import {
   Table,
@@ -26,11 +27,10 @@ import {
   TableRow,
 } from "@acme/ui/table";
 
-import type { Animal } from "../types";
 import { columns } from "./columns";
 
 interface AnimalsTableProps {
-  animals: Animal[];
+  animals: AnimalType[];
 }
 
 export function AnimalsTable({ animals }: AnimalsTableProps) {

@@ -1,9 +1,9 @@
 import { differenceInMinutes, intervalToDuration, isToday } from "date-fns";
 
-import type { Animal, Kennel, WalkSession } from "../../types";
+import type { AnimalType, KennelType, WalkType } from "@acme/db/schema";
 
 export function matchesFilters(
-  animal: Animal,
+  animal: AnimalType,
   difficultyFilter?: string | null,
   tagFilter?: string | null,
 ) {
@@ -23,7 +23,7 @@ export function matchesFilters(
     const selectedTags = tagFilter.split(",").filter(Boolean);
     if (
       selectedTags.length > 0 &&
-      !selectedTags.some((tag) => animal.tags?.includes(tag))
+      !selectedTags.some((tag) => animal.tags.some((t) => t.tag === tag))
     ) {
       return false;
     }
@@ -32,18 +32,18 @@ export function matchesFilters(
   return true;
 }
 
-export function hasBeenWalkedToday(animal: Animal): boolean {
-  return animal.walks?.some((walk) => isToday(walk.startedAt)) ?? false;
+export function hasBeenWalkedToday(animal: AnimalType): boolean {
+  return animal.walks.some((walk) => isToday(walk.startedAt));
 }
 
-export function hasWalkInProgress(animal: Animal): WalkSession | undefined {
-  const walk = animal.walks?.find((walk) => !walk.endedAt);
+export function hasWalkInProgress(animal: AnimalType): WalkType | undefined {
+  const walk = animal.walks.find((walk) => !walk.endedAt);
   if (!walk) return undefined;
 
   return walk;
 }
 
-export function sortKennels(kennels: Kennel[]): Kennel[] {
+export function sortKennels(kennels: KennelType[]): KennelType[] {
   return [...kennels].sort((a, b) => {
     const aNumber = Number.parseInt(a.id.replaceAll(/\D/g, ""));
     const bNumber = Number.parseInt(b.id.replaceAll(/\D/g, ""));
@@ -51,7 +51,9 @@ export function sortKennels(kennels: Kennel[]): Kennel[] {
   });
 }
 
-export function arrangeKennels(kennels: Kennel[]): [Kennel[], Kennel[]] {
+export function arrangeKennels(
+  kennels: KennelType[],
+): [KennelType[], KennelType[]] {
   const midpoint = Math.ceil(kennels.length / 2);
 
   // First column: bottom to top
@@ -63,8 +65,8 @@ export function arrangeKennels(kennels: Kennel[]): [Kennel[], Kennel[]] {
   return [firstColumn, secondColumn];
 }
 
-export function getActiveWalkStartTime(animal: Animal): Date | null {
-  if (!animal.walks) return null;
+export function getActiveWalkStartTime(animal: AnimalType): Date | null {
+  if (animal.walks.length === 0) return null;
 
   const today = new Date().toISOString().split("T")[0];
   const activeWalk = animal.walks.find((walk) => {
@@ -85,9 +87,9 @@ export function formatElapsedTime(startTime: Date): string {
 }
 
 export function getCompletedWalkInfo(
-  animal: Animal,
+  animal: AnimalType,
 ): { completedTime: Date; duration: number } | null {
-  if (!animal.walks) return null;
+  if (animal.walks.length === 0) return null;
 
   const today = new Date().toISOString().split("T")[0];
   const completedWalk = animal.walks.find((walk) => {
@@ -121,10 +123,10 @@ export function formatDuration(minutes: number): string {
 }
 
 export function getLastCompletedWalk(
-  animal: Animal,
+  animal: AnimalType,
 ): { date: Date; duration: number } | undefined {
-  const completedWalks = animal.walks?.filter((walk) => walk.endedAt);
-  if (!completedWalks?.length) return undefined;
+  const completedWalks = animal.walks.filter((walk) => walk.endedAt);
+  if (completedWalks.length === 0) return undefined;
 
   const sortedWalks = [...completedWalks].sort((a, b) => {
     if (!a.endedAt || !b.endedAt) return 0;

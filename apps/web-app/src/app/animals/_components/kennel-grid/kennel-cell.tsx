@@ -4,10 +4,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cva } from "class-variance-authority";
 
+import type { AnimalType, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal, Kennel } from "../../types";
 import { hasBeenWalkedToday, hasWalkInProgress, matchesFilters } from "./utils";
 import { WalkStatusBadge } from "./walk-status-badge";
 
@@ -22,10 +22,10 @@ const kennelCell = cva(
         walkStatus: "none",
       },
       {
-        class: "bg-red/20",
+        class: "[&_.cell-content]:opacity-10",
         difficulty: "red",
-        isOutOfKennel: false,
-        walkStatus: "none",
+        isOutOfKennel: [false, true],
+        walkStatus: ["none", "walked", "inProgress"],
       },
       {
         class: "bg-yellow/20",
@@ -53,6 +53,13 @@ const kennelCell = cva(
       },
       {
         class: "bg-transparent",
+        difficulty: ["purple", "yellow"],
+        isOutOfKennel: true,
+        walkStatus: ["none", "walked"],
+      },
+      {
+        class: "border-dashed",
+        difficulty: "red",
         isOutOfKennel: true,
         walkStatus: ["none", "walked"],
       },
@@ -71,6 +78,18 @@ const kennelCell = cva(
         difficulty: "yellow",
         state: ["filtered", "maintenance"],
       },
+      {
+        class: "[&_.cell-content]:opacity-25",
+        state: "filtered",
+      },
+      {
+        class: "[&_.cell-content]:opacity-25",
+        state: "maintenance",
+      },
+      {
+        class: "[&_.cell-content]:opacity-25",
+        walkStatus: "walked",
+      },
     ],
     defaultVariants: {
       state: "active",
@@ -84,7 +103,7 @@ const kennelCell = cva(
       },
       difficulty: {
         purple: "border-purple",
-        red: "border-red",
+        red: "border-red/10",
         yellow: "border-yellow",
       },
       dropTarget: {
@@ -101,8 +120,8 @@ const kennelCell = cva(
       },
       state: {
         active: "",
-        filtered: "opacity-50",
-        maintenance: "opacity-50",
+        filtered: "",
+        maintenance: "",
       },
       walkStatus: {
         inProgress: "",
@@ -114,8 +133,8 @@ const kennelCell = cva(
 );
 
 interface KennelCellProps {
-  kennel: Kennel;
-  animal?: Animal;
+  kennel: KennelType;
+  animal?: AnimalType;
   difficultyFilter?: string | null;
   tagFilter?: string | null;
   onClick: () => void;
@@ -196,6 +215,15 @@ export function KennelCell({
     return "none";
   })();
 
+  if (kennel.name === "16") {
+    console.log(
+      kennel.name,
+      walkStatusVariant,
+      animal?.isOutOfKennel,
+      kennelStatusVariant,
+      stateVariant,
+    );
+  }
   return (
     <div
       data-kennel-id={kennel.id}
@@ -231,27 +259,27 @@ export function KennelCell({
                   hidden: !(showKennelId ?? true),
                 })}
               >
-                {kennel.id}
+                {kennel.name}
               </span>
-              <span className={"ml-1 text-muted-foreground"}>
+              <span className="cell-content ml-1 text-muted-foreground">
                 {animal.name}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="cell-content flex items-center gap-2">
             {!isWalked && !hasActiveWalk && tags.length > 0 && (
               <div className="flex gap-1">
                 {tags.map((tag) => (
                   <Badge
-                    key={tag}
+                    key={tag.id}
                     className={cn(
                       "rounded-full text-xs",
-                      tag === "first" && "bg-gray-500 dark:bg-gray-400",
-                      tag === "last" && "bg-gray-400 dark:bg-gray-500",
+                      tag.tag === "first" && "bg-gray-500 dark:bg-gray-400",
+                      tag.tag === "last" && "bg-gray-400 dark:bg-gray-500",
                     )}
                   >
-                    {tag}
+                    {tag.tag}
                   </Badge>
                 ))}
               </div>
@@ -265,7 +293,7 @@ export function KennelCell({
           className="flex min-w-0 flex-1 items-center justify-between"
         >
           <div className="min-w-0 truncate">
-            <div className="text-sm font-medium">{kennel.id}</div>
+            <div className="text-sm font-medium">{kennel.name}</div>
           </div>
         </div>
       )}

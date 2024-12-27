@@ -1,5 +1,6 @@
 "use client";
 
+import type { AnimalType } from "@acme/db/schema";
 import {
   Accordion,
   AccordionContent,
@@ -15,11 +16,10 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
-import type { Animal } from "../../types";
 import { DIFFICULTY_CONFIG } from "../../difficulty-config";
 
 interface QuickReferenceDialogProps {
-  animal: Animal;
+  animal: AnimalType;
   onStartWalk: () => void;
 }
 
@@ -76,14 +76,23 @@ export function QuickReferenceDialog({
           <AccordionItem value="approved-activities">
             <AccordionTrigger>Approved Activities</AccordionTrigger>
             <AccordionContent>
-              {animal.approvedActivities &&
-              animal.approvedActivities.length > 0 ? (
+              {animal.notes.some(
+                (note) => note.type === "approvedActivities" && note.isActive,
+              ) ? (
                 <ul className="space-y-1">
-                  {animal.approvedActivities.map((activity, index) => (
-                    <li key={index} className="text-sm text-muted-foreground">
-                      • {activity}
-                    </li>
-                  ))}
+                  {animal.notes
+                    .filter(
+                      (note) =>
+                        note.type === "approvedActivities" && note.isActive,
+                    )
+                    .map((note) => (
+                      <li
+                        key={note.id}
+                        className="text-sm text-muted-foreground"
+                      >
+                        • {note.notes}
+                      </li>
+                    ))}
                 </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -96,16 +105,20 @@ export function QuickReferenceDialog({
           <AccordionItem value="important-notes">
             <AccordionTrigger>Important Notes</AccordionTrigger>
             <AccordionContent>
-              {animal.generalNotes
-                ?.filter((note) => note.isActive)
-                .map((note, index) => (
-                  <p key={index} className="text-sm text-muted-foreground">
-                    {note.notes}
-                  </p>
-                )) ?? (
+              {animal.notes.filter(
+                (note) => note.type === "general" && note.isActive,
+              ).length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   No general notes available
                 </p>
+              ) : (
+                animal.notes
+                  .filter((note) => note.type === "general" && note.isActive)
+                  .map((note) => (
+                    <p key={note.id} className="text-sm text-muted-foreground">
+                      {note.notes}
+                    </p>
+                  ))
               )}
             </AccordionContent>
           </AccordionItem>
@@ -113,30 +126,36 @@ export function QuickReferenceDialog({
           <AccordionItem value="kennel-handling">
             <AccordionTrigger>Out of Kennel Handling</AccordionTrigger>
             <AccordionContent>
-              {animal.outKennelNotes
-                ?.filter((note) => note.isActive)
-                .map((note, index) => (
-                  <p key={index} className="text-sm text-muted-foreground">
-                    {note.notes}
-                  </p>
-                )) ?? (
+              {animal.notes.filter(
+                (note) => note.type === "outKennel" && note.isActive,
+              ).length === 0 ? (
                 <p className="text-sm text-muted-foreground">
                   No out-of-kennel notes available
                 </p>
+              ) : (
+                animal.notes
+                  .filter((note) => note.type === "outKennel" && note.isActive)
+                  .map((note) => (
+                    <p key={note.id} className="text-sm text-muted-foreground">
+                      {note.notes}
+                    </p>
+                  ))
               )}
             </AccordionContent>
           </AccordionItem>
 
-          {animal.medicalNotes?.some((note) => note.isActive) && (
+          {animal.notes.some(
+            (note) => note.type === "medical" && note.isActive,
+          ) && (
             <AccordionItem value="medical-notes">
               <AccordionTrigger className="text-red-500">
                 Medical Notes
               </AccordionTrigger>
               <AccordionContent>
-                {animal.medicalNotes
-                  .filter((note) => note.isActive)
-                  .map((note, index) => (
-                    <p key={index} className="text-sm text-muted-foreground">
+                {animal.notes
+                  .filter((note) => note.type === "medical" && note.isActive)
+                  .map((note) => (
+                    <p key={note.id} className="text-sm text-muted-foreground">
                       {note.notes}
                     </p>
                   ))}

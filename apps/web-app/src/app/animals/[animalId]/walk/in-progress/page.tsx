@@ -114,7 +114,7 @@ export default function WalkInProgressPage({ params }: PageProps) {
                 )}
               >
                 <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
-                  {animal.kennelNumber}
+                  {animal.name}
                 </div>
                 <div
                   className="rounded-full px-3 py-1 text-center text-sm font-medium"

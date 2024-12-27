@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Clock, MoreHorizontal } from "lucide-react";
 
+import type { AnimalType, WalkType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Checkbox } from "@acme/ui/checkbox";
@@ -20,11 +21,10 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 
-import type { Animal, WalkSession } from "../types";
 import { DIFFICULTY_CONFIG } from "../difficulty-config";
 import { formatDuration } from "./kennel-grid/utils";
 
-const WalkBadge = ({ session }: { session?: WalkSession }) => {
+const WalkBadge = ({ session }: { session?: WalkType }) => {
   if (!session) {
     return (
       <Badge variant="outline" className="bg-muted/50">
@@ -72,9 +72,9 @@ const WalkBadge = ({ session }: { session?: WalkSession }) => {
                 {formatDuration(durationInMinutes)}
               </Badge>
             </div>
-            {session.walkedById && (
+            {session.userId && (
               <span className="text-xs text-muted-foreground">
-                by {session.walkedById}
+                by {session.userId}
               </span>
             )}
           </div>
@@ -89,7 +89,7 @@ const WalkBadge = ({ session }: { session?: WalkSession }) => {
   );
 };
 
-export const columns: ColumnDef<Animal>[] = [
+export const columns: ColumnDef<AnimalType>[] = [
   {
     cell: ({ row }) => (
       <Checkbox
@@ -172,7 +172,7 @@ export const columns: ColumnDef<Animal>[] = [
   {
     cell: ({ row }) => {
       const today = new Date().toISOString().split("T")[0];
-      const morningWalk = row.original.walks?.find((walk) => {
+      const morningWalk = row.original.walks.find((walk) => {
         const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
         return walkDate === today && new Date(walk.startedAt).getHours() < 12;
       });
@@ -184,7 +184,7 @@ export const columns: ColumnDef<Animal>[] = [
   {
     cell: ({ row }) => {
       const today = new Date().toISOString().split("T")[0];
-      const middayWalk = row.original.walks?.find((walk) => {
+      const middayWalk = row.original.walks.find((walk) => {
         const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
         const hours = new Date(walk.startedAt).getHours();
         return walkDate === today && hours >= 12 && hours < 17;
@@ -197,7 +197,7 @@ export const columns: ColumnDef<Animal>[] = [
   {
     cell: ({ row }) => {
       const today = new Date().toISOString().split("T")[0];
-      const eveningWalk = row.original.walks?.find((walk) => {
+      const eveningWalk = row.original.walks.find((walk) => {
         const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
         return walkDate === today && new Date(walk.startedAt).getHours() >= 17;
       });

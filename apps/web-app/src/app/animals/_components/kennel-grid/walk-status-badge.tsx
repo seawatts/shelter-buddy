@@ -2,7 +2,8 @@
 
 import { Check, Circle, Timer } from "lucide-react";
 
-import type { Animal } from "../../types";
+import type { AnimalType } from "@acme/db/schema";
+
 import {
   formatElapsedTime,
   getActiveWalkStartTime,
@@ -12,7 +13,7 @@ import {
 } from "./utils";
 
 interface WalkStatusBadgeProps {
-  animal: Animal;
+  animal: AnimalType;
 }
 
 export function WalkStatusBadge({ animal }: WalkStatusBadgeProps) {

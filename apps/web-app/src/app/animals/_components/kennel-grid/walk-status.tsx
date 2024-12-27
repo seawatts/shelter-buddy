@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation";
 import { differenceInMinutes } from "date-fns";
 import { Download, Play, Square, Timer } from "lucide-react";
 
+import type { AnimalType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal } from "../../types";
 import { formatDuration, hasWalkInProgress } from "./utils";
 
 interface WalkStatusProps {
-  animal: Animal;
+  animal: AnimalType;
   className?: string;
 }
 

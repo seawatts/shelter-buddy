@@ -4,6 +4,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "1",
     features: ["heated", "covered"],
+    gridX: 0,
+    gridY: 0,
     id: "K1",
     lastCleanedAt: new Date("2024-02-20T08:00:00Z"),
     location: "Building A",
@@ -17,6 +19,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "2",
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 0,
     id: "K2",
     lastCleanedAt: new Date("2024-02-20T08:15:00Z"),
     location: "Building A",
@@ -30,6 +34,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "3",
     features: ["heated", "covered", "sound-proof"],
+    gridX: 0,
+    gridY: 1,
     id: "K3",
     lastCleanedAt: new Date("2024-02-20T08:30:00Z"),
     location: "Building B",
@@ -49,6 +55,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "4",
     features: ["heated", "covered", "extra-padding"],
+    gridX: 1,
+    gridY: 1,
     id: "K4",
     lastCleanedAt: new Date("2024-02-20T08:45:00Z"),
     location: "Building A",
@@ -62,6 +70,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "5",
     features: ["heated", "covered"],
+    gridX: 0,
+    gridY: 2,
     id: "K5",
     lastCleanedAt: new Date("2024-02-20T09:00:00Z"),
     location: "Building A",
@@ -75,6 +85,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "6",
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 2,
     id: "K6",
     lastCleanedAt: new Date("2024-02-20T09:15:00Z"),
     location: "Building A",
@@ -88,6 +100,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "7",
     features: ["heated", "covered", "reinforced"],
+    gridX: 0,
+    gridY: 3,
     id: "K7",
     lastCleanedAt: new Date("2024-02-20T09:30:00Z"),
     location: "Building B",
@@ -101,6 +115,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "8",
     features: ["heated", "covered", "sound-dampening"],
+    gridX: 1,
+    gridY: 3,
     id: "K8",
     lastCleanedAt: new Date("2024-02-20T09:45:00Z"),
     location: "Building A",
@@ -114,6 +130,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "9",
     features: ["heated", "covered", "sound-proof"],
+    gridX: 0,
+    gridY: 4,
     id: "K9",
     lastCleanedAt: new Date("2024-02-20T10:00:00Z"),
     location: "Building B",
@@ -127,6 +145,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "10",
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 4,
     id: "K10",
     lastCleanedAt: new Date("2024-02-20T10:15:00Z"),
     location: "Building A",
@@ -140,6 +160,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "11",
     features: ["heated", "covered"],
+    gridX: 0,
+    gridY: 5,
     id: "K11",
     lastCleanedAt: new Date("2024-02-20T10:30:00Z"),
     location: "Building A",
@@ -153,6 +175,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "12",
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 5,
     id: "K12",
     lastCleanedAt: new Date("2024-02-20T10:45:00Z"),
     location: "Building A",
@@ -166,6 +190,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "13",
     features: ["heated", "covered", "sound-proof"],
+    gridX: 0,
+    gridY: 6,
     id: "K13",
     lastCleanedAt: new Date("2024-02-20T11:00:00Z"),
     location: "Building B",
@@ -179,6 +205,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "14",
     features: ["heated", "covered", "extra-padding"],
+    gridX: 1,
+    gridY: 6,
     id: "K14",
     lastCleanedAt: new Date("2024-02-20T11:15:00Z"),
     location: "Building A",
@@ -192,6 +220,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: "15",
     features: ["heated", "covered", "extra-padding"],
+    gridX: 0,
+    gridY: 7,
     id: "K15",
     lastCleanedAt: new Date("2024-02-20T11:30:00Z"),
     location: "Building A",
@@ -205,6 +235,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 7,
     id: "K16",
     lastCleanedAt: new Date("2024-02-20T11:45:00Z"),
     location: "Building A",
@@ -218,6 +250,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "sound-dampening"],
+    gridX: 0,
+    gridY: 8,
     id: "K17",
     lastCleanedAt: new Date("2024-02-20T12:00:00Z"),
     location: "Building A",
@@ -231,6 +265,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 8,
     id: "K18",
     lastCleanedAt: new Date("2024-02-20T12:15:00Z"),
     location: "Building A",
@@ -244,6 +280,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "reinforced"],
+    gridX: 0,
+    gridY: 9,
     id: "K19",
     lastCleanedAt: new Date("2024-02-20T12:30:00Z"),
     location: "Building B",
@@ -257,6 +295,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 9,
     id: "K20",
     lastCleanedAt: new Date("2024-02-20T12:45:00Z"),
     location: "Building A",
@@ -270,6 +310,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "extra-padding"],
+    gridX: 0,
+    gridY: 10,
     id: "K21",
     lastCleanedAt: new Date("2024-02-20T13:00:00Z"),
     location: "Building A",
@@ -283,6 +325,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 10,
     id: "K22",
     lastCleanedAt: new Date("2024-02-20T13:15:00Z"),
     location: "Building A",
@@ -296,6 +340,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "sound-proof"],
+    gridX: 0,
+    gridY: 11,
     id: "K23",
     lastCleanedAt: new Date("2024-02-20T13:30:00Z"),
     location: "Building B",
@@ -309,6 +355,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 11,
     id: "K24",
     lastCleanedAt: new Date("2024-02-20T13:45:00Z"),
     location: "Building A",
@@ -322,6 +370,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "sound-dampening"],
+    gridX: 0,
+    gridY: 12,
     id: "K25",
     lastCleanedAt: new Date("2024-02-20T14:00:00Z"),
     location: "Building A",
@@ -335,6 +385,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 12,
     id: "K26",
     lastCleanedAt: new Date("2024-02-20T14:15:00Z"),
     location: "Building A",
@@ -348,6 +400,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "extra-padding"],
+    gridX: 0,
+    gridY: 13,
     id: "K27",
     lastCleanedAt: new Date("2024-02-20T14:30:00Z"),
     location: "Building A",
@@ -361,6 +415,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 13,
     id: "K28",
     lastCleanedAt: new Date("2024-02-20T14:45:00Z"),
     location: "Building A",
@@ -374,6 +430,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "reinforced"],
+    gridX: 0,
+    gridY: 14,
     id: "K29",
     lastCleanedAt: new Date("2024-02-20T15:00:00Z"),
     location: "Building B",
@@ -387,6 +445,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 1,
+    gridY: 14,
     id: "K30",
     lastCleanedAt: new Date("2024-02-20T15:15:00Z"),
     location: "Building A",
@@ -400,6 +460,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered"],
+    gridX: 0,
+    gridY: 15,
     id: "K31",
     lastCleanedAt: new Date("2024-02-20T15:30:00Z"),
     location: "Building A",
@@ -413,6 +475,8 @@ export const mockKennels: Kennel[] = [
   {
     currentOccupantId: null,
     features: ["heated", "covered", "sound-dampening"],
+    gridX: 1,
+    gridY: 15,
     id: "K32",
     lastCleanedAt: new Date("2024-02-20T15:45:00Z"),
     location: "Building A",

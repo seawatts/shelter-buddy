@@ -2,17 +2,17 @@
 
 import { AlertTriangle, Check, Info, X } from "lucide-react";
 
+import type { AnimalNoteType, AnimalType } from "@acme/db/schema";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal } from "../../../types";
 import { AddAnimalForm } from "../add-animal-form";
 import { AnimalImages } from "../animal-images";
 import { hasWalkInProgress } from "../utils";
 
 interface KennelActionsContentProps {
-  animal: Animal | undefined;
+  animal?: AnimalType | undefined;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -24,10 +24,9 @@ export function KennelActionsContent({
     return <AddAnimalForm />;
   }
 
-  const hasActiveNotes =
-    (animal.medicalNotes?.some((note) => note.isActive) ?? false) ||
-    (animal.behavioralNotes?.some((note) => note.isActive) ?? false) ||
-    (animal.generalNotes?.some((note) => note.isActive) ?? false);
+  const hasActiveNotes = animal.notes.some(
+    (note: AnimalNoteType) => note.isActive,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,36 +39,54 @@ export function KennelActionsContent({
           <AlertTitle>Important Information</AlertTitle>
           <AlertDescription>
             <div className="mt-4 flex flex-col gap-2">
-              {animal.medicalNotes?.some((note) => note.isActive) && (
+              {animal.notes.some(
+                (note: AnimalNoteType) =>
+                  note.type === "medical" && note.isActive,
+              ) && (
                 <div className="flex items-center gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
                   <span>
                     Medical:{" "}
-                    {animal.medicalNotes
-                      .filter((note) => note.isActive)
+                    {animal.notes
+                      .filter(
+                        (note: AnimalNoteType) =>
+                          note.type === "medical" && note.isActive,
+                      )
                       .map((note) => note.notes)
                       .join(", ")}
                   </span>
                 </div>
               )}
-              {animal.behavioralNotes?.some((note) => note.isActive) && (
+              {animal.notes.some(
+                (note: AnimalNoteType) =>
+                  note.type === "behavioral" && note.isActive,
+              ) && (
                 <div className="flex items-start gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
                   <span>
                     Behavioral:{" "}
-                    {animal.behavioralNotes
-                      .filter((note) => note.isActive)
+                    {animal.notes
+                      .filter(
+                        (note: AnimalNoteType) =>
+                          note.type === "behavioral" && note.isActive,
+                      )
                       .map((note) => note.notes)
                       .join(", ")}
                   </span>
                 </div>
               )}
-              {animal.generalNotes?.some((note) => note.isActive) && (
+              {animal.notes.some(
+                (note: AnimalNoteType) =>
+                  note.type === "general" && note.isActive,
+              ) && (
                 <div className="flex items-start gap-2">
                   <Info className="mt-0.5 size-3 shrink-0" />
                   <span>
-                    {animal.generalNotes
-                      .filter((note) => note.isActive)
+                    {animal.notes
+                      .filter(
+                        (note: AnimalNoteType) =>
+                          note.type === "general" && note.isActive,
+                      )
                       .map((note) => note.notes)
                       .join(", ")}
                   </span>
@@ -154,7 +171,7 @@ export function KennelActionsContent({
             </div>
             <div className="flex items-center justify-between">
               <span>Age</span>
-              <span>{animal.age} years</span>
+              <span>{animal.birthDate?.toLocaleString()} years</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Status</span>
@@ -182,14 +199,21 @@ export function KennelActionsContent({
               <p className="text-sm">FIDO Certified</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {animal.approvedActivities &&
-              animal.approvedActivities.length > 0 ? (
-                animal.approvedActivities.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-1.5">
-                    <Check className="size-3 text-green-600" />
-                    <p className="text-sm">{activity}</p>
-                  </div>
-                ))
+              {animal.notes.some(
+                (note: AnimalNoteType) =>
+                  note.type === "approvedActivities" && note.isActive,
+              ) ? (
+                animal.notes
+                  .filter(
+                    (note: AnimalNoteType) =>
+                      note.type === "approvedActivities" && note.isActive,
+                  )
+                  .map((note, index) => (
+                    <div key={index} className="flex items-center gap-1.5">
+                      <Check className="size-3 text-green-600" />
+                      <p className="text-sm">{note.notes}</p>
+                    </div>
+                  ))
               ) : (
                 <p className="text-sm text-muted-foreground">
                   No approved activities listed
@@ -203,7 +227,7 @@ export function KennelActionsContent({
         <div className="rounded-lg border bg-card p-4">
           <h2 className="mb-3 text-lg font-semibold">Walking History</h2>
           <div className="space-y-2">
-            {animal.walks?.map((walk, index) => (
+            {animal.walks.map((walk, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
@@ -222,11 +246,7 @@ export function KennelActionsContent({
                   {walk.status === "completed" ? "Completed" : "In Progress"}
                 </span>
               </div>
-            )) ?? (
-              <p className="text-sm text-muted-foreground">
-                No walk history available
-              </p>
-            )}
+            ))}
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRight, Timer } from "lucide-react";
 
+import type { AnimalType, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import {
   Drawer,
@@ -14,14 +15,13 @@ import {
 } from "@acme/ui/drawer";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal, Kennel } from "../../../types";
 import { formatDuration, getLastCompletedWalk } from "../utils";
 import { WalkStatus } from "../walk-status";
 import { KennelActionsContent } from "./kennel-actions-content";
 
 interface KennelActionsDrawerProps {
-  animal: Animal | undefined;
-  kennel: Kennel;
+  animal?: AnimalType;
+  kennel: KennelType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -49,9 +49,9 @@ export function KennelActionsDrawer({
     >
       <DrawerContent
         className={cn({
-          "border-t-purple border-t-4": animal?.difficultyLevel === "Purple",
-          "border-t-red border-t-4": animal?.difficultyLevel === "Red",
-          "border-t-yellow border-t-4": animal?.difficultyLevel === "Yellow",
+          "border-t-4 border-t-purple": animal?.difficultyLevel === "Purple",
+          "border-t-4 border-t-red": animal?.difficultyLevel === "Red",
+          "border-t-4 border-t-yellow": animal?.difficultyLevel === "Yellow",
         })}
       >
         <div className="mx-auto w-full max-w-sm">
@@ -62,7 +62,7 @@ export function KennelActionsDrawer({
                   <DrawerTitle>
                     <Link href={`/animals/${animal?.id}`}>
                       <span className="flex items-center gap-2 underline underline-offset-4">
-                        {kennel.id} {animal && `${animal.name}`}
+                        {kennel.name} {animal && `${animal.name}`}
                         {animal && <ArrowRight className="size-4" />}
                       </span>
                     </Link>
@@ -71,13 +71,13 @@ export function KennelActionsDrawer({
                     <div className="flex gap-1">
                       {animal.tags.map((tag) => (
                         <Badge
-                          key={tag}
+                          key={tag.id}
                           className={cn("rounded-full text-xs", {
-                            "bg-gray-400 dark:bg-gray-500": tag === "last",
-                            "bg-gray-500 dark:bg-gray-400": tag === "first",
+                            "bg-gray-400 dark:bg-gray-500": tag.tag === "last",
+                            "bg-gray-500 dark:bg-gray-400": tag.tag === "first",
                           })}
                         >
-                          {tag}
+                          {tag.tag}
                         </Badge>
                       ))}
                     </div>

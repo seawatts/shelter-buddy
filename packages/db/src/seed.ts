@@ -28,7 +28,7 @@ import {
   walkStatusEnum,
 } from "./schema";
 
-async function main() {
+try {
   await seed(db, {
     AnimalActivities,
     AnimalMedia,
@@ -75,7 +75,9 @@ async function main() {
         isActive: funcs.boolean(),
         notes: funcs.loremIpsum(),
         summary: funcs.loremIpsum({ sentencesCount: 1 }),
-        type: funcs.valuesFromArray({ values: animalNoteTypeEnum.enumValues }),
+        type: funcs.valuesFromArray({
+          values: animalNoteTypeEnum.enumValues,
+        }),
       },
       count: 50,
     },
@@ -88,7 +90,10 @@ async function main() {
     },
     Animals: {
       columns: {
-        birthDate: funcs.date({ maxDate: "2024-01-01", minDate: "2020-01-01" }),
+        birthDate: funcs.date({
+          maxDate: "2024-01-01",
+          minDate: "2020-01-01",
+        }),
         breed: funcs.default({ defaultValue: "Mixed" }),
         difficultyLevel: funcs.valuesFromArray({
           values: difficultyLevelEnum.enumValues,
@@ -104,7 +109,10 @@ async function main() {
     KennelOccupants: {
       columns: {
         endedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
-        startedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
+        startedAt: funcs.date({
+          maxDate: "2024-02-14",
+          minDate: "2024-01-01",
+        }),
       },
       count: 25,
     },
@@ -113,17 +121,20 @@ async function main() {
         features: funcs.default({
           defaultValue: ["heated", "covered", "indoor"],
         }),
-        location: funcs.streetAddress(),
+        gridX: funcs.int({ maxValue: 1, minValue: 0 }),
+        gridY: funcs.int({ maxValue: 15, minValue: 0 }),
         maintenanceStatus: funcs.valuesFromArray({
           values: maintenanceStatusEnum.enumValues,
         }),
-        name: funcs.companyName(),
+        name: funcs.intPrimaryKey(),
         notes: funcs.loremIpsum(),
         size: funcs.valuesFromArray({ values: kennelSizeEnum.enumValues }),
-        status: funcs.valuesFromArray({ values: kennelStatusEnum.enumValues }),
+        status: funcs.valuesFromArray({
+          values: kennelStatusEnum.enumValues,
+        }),
         type: funcs.valuesFromArray({ values: kennelTypeEnum.enumValues }),
       },
-      count: 20,
+      count: 32,
     },
     ShelterMembers: {
       columns: {
@@ -159,7 +170,10 @@ async function main() {
       columns: {
         endedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
         notes: funcs.loremIpsum(),
-        startedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
+        startedAt: funcs.date({
+          maxDate: "2024-02-14",
+          minDate: "2024-01-01",
+        }),
         status: funcs.valuesFromArray({ values: walkStatusEnum.enumValues }),
         summary: funcs.loremIpsum({ sentencesCount: 1 }),
         walkDifficulty: funcs.int({ maxValue: 5, minValue: 1 }),
@@ -167,8 +181,7 @@ async function main() {
       count: 40,
     },
   }));
+} finally {
+  // eslint-disable-next-line unicorn/no-process-exit
+  process.exit(0);
 }
-
-(() => {
-  main().catch(console.error);
-})();

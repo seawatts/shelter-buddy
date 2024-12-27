@@ -1,9 +1,9 @@
+import { db } from "@acme/db/client";
+
 import { Header } from "./_components/header";
 import { ScrollToBottom } from "./_components/scroll-to-bottom";
 import { AnimalsView } from "./_components/view";
 import { WalkProgress } from "./_components/walk-progress";
-import { mockAnimals } from "./_mock-data/animals";
-import { mockKennels } from "./_mock-data/kennels";
 import { searchParamsCache } from "./search-params";
 
 function getCurrentShift(): {
@@ -42,6 +42,17 @@ export default async function AnimalsPage(props: {
     year: "numeric",
   });
 
+  const animals = await db.query.Animals.findMany({
+    with: {
+      activities: true,
+      media: true,
+      notes: true,
+      tags: true,
+      walks: true,
+    },
+  });
+  const kennels = await db.query.Kennels.findMany();
+
   return (
     <ScrollToBottom>
       <div>
@@ -51,10 +62,10 @@ export default async function AnimalsPage(props: {
             fullDate={fullDate}
             currentShift={currentShift}
           />
-          <WalkProgress data={mockAnimals} />
+          <WalkProgress animals={animals} />
         </div>
         <div className="p-4 sm:p-8">
-          <AnimalsView kennels={mockKennels} animals={mockAnimals} />
+          <AnimalsView kennels={kennels} animals={animals} />
         </div>
       </div>
     </ScrollToBottom>
