@@ -37,6 +37,7 @@
     "@t3-oss/env-core": "0.11.1",
     "@vercel/postgres": "0.10.0",
     "drizzle-orm": "0.38.2",
+    "drizzle-seed": "0.2.1",
     "drizzle-zod": "0.6.0",
     "lodash-es": "4.17.21",
     "zod": "3.24.1"

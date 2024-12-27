@@ -571,6 +571,9 @@ importers:
       drizzle-orm:
         specifier: 0.38.2
         version: 0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0)
+      drizzle-seed:
+        specifier: 0.2.1
+        version: 0.2.1(drizzle-orm@0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0))
       drizzle-zod:
         specifier: 0.6.0
         version: 0.6.0(drizzle-orm@0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0))(zod@3.24.1)
@@ -5405,6 +5408,14 @@ packages:
       sqlite3:
         optional: true
 
+  drizzle-seed@0.2.1:
+    resolution: {integrity: sha512-PbIhPf/gsUYj/TLD0YiTAPj4GJjzavCvwgjFWHZtbcGAwysFVxcVkgTYbszAYyg5qPdeCMR5cxRACTATsyU+Iw==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.4'
+    peerDependenciesMeta:
+      drizzle-orm:
+        optional: true
+
   drizzle-zod@0.6.0:
     resolution: {integrity: sha512-7K1k7Y/5Jw9D4cTlrHL3mRTLg3oaglbi4VvBIYmSAtMvYkgqvusPtra7cnntMCe1r1cBcwxhlEkfiNdU23lp2g==}
     peerDependencies:
@@ -8157,6 +8168,9 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  pure-rand@6.1.0:
+    resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
   qr.js@0.0.0:
     resolution: {integrity: sha512-c4iYnWb+k2E+vYpRimHqSu575b1/wKl4XFeJGpFmrJQz5I88v9aY2czh7s0w36srfCM1sXgC/xpoJz5dJfq+OQ==}
@@ -14597,6 +14611,12 @@ snapshots:
       '@vercel/postgres': 0.10.0(utf-8-validate@6.0.4)
       react: 19.0.0
 
+  drizzle-seed@0.2.1(drizzle-orm@0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0)):
+    dependencies:
+      pure-rand: 6.1.0
+    optionalDependencies:
+      drizzle-orm: 0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0)
+
   drizzle-zod@0.6.0(drizzle-orm@0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0))(zod@3.24.1):
     dependencies:
       drizzle-orm: 0.38.2(@opentelemetry/api@1.9.0)(@types/pg@8.11.6)(@types/react@19.0.2)(@vercel/postgres@0.10.0(utf-8-validate@6.0.4))(react@19.0.0)
@@ -17662,6 +17682,8 @@ snapshots:
       once: 1.4.0
 
   punycode@2.3.1: {}
+
+  pure-rand@6.1.0: {}
 
   qr.js@0.0.0: {}
 
