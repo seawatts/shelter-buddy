@@ -7,7 +7,7 @@ import { Webhook } from "svix";
 import { db } from "@acme/db/client";
 import { Users } from "@acme/db/schema";
 
-import { env } from "~/env";
+import { env } from "~/env.server";
 
 export const runtime = "edge";
 
@@ -19,9 +19,9 @@ const posthog = new PostHog(env.POSTHOG_KEY, {
 
 export async function POST(request: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-  const WEBHOOK_SECRET = env.WEBHOOK_SECRET;
+  const CLERK_WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 
-  if (!WEBHOOK_SECRET) {
+  if (!CLERK_WEBHOOK_SECRET) {
     return new Response(
       "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local",
       { status: 400 },
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET);
+  const wh = new Webhook(CLERK_WEBHOOK_SECRET);
 
   let event: WebhookEvent;
 

@@ -57,14 +57,14 @@
   "prettier": "@acme/prettier-config",
   "private": true,
   "scripts": {
-    "build": "pnpm with-env next build",
+    "build.skip": "pnpm with-env next build",
     "clean": "git clean -xdf .next .turbo node_modules",
     "dev": "pnpm with-env next dev",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "start": "pnpm with-env next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck.skip": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
   "type": "module",

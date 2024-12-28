@@ -12,31 +12,22 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_KEY: z.string(),
   },
 
-  /**
-   * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
-   */
-  experimental__runtimeEnv: {
-    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-    NODE_ENV: process.env.NODE_ENV,
-    // POSTGRES_URL: process.env.POSTGRES_URL ?? "test",
-  },
-
   extends: [vercel()],
 
   /**
-   * Specify your server-side environment variables schema here.
-   * This way you can ensure the app isn't built with invalid env vars.
+   * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
    */
-  server: {
-    POSTHOG_KEY: z.string(),
+  runtimeEnv: {
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NODE_ENV: process.env.NODE_ENV,
   },
-
   shared: {
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
   },
+
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });

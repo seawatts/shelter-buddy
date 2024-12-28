@@ -14,7 +14,14 @@ import tseslint from "typescript-eslint";
  */
 export const restrictEnvAccess = tseslint.config({
   files: ["**/*.js", "**/*.ts", "**/*.tsx"],
-  ignores: ["**/env.ts", "**/*.config.*", "**/_generated/*", "*.config.js"],
+  ignores: [
+    "**/env.ts",
+    "**/env.client.ts",
+    "**/env.server.ts",
+    "**/*.config.*",
+    "**/_generated/*",
+    "*.config.js",
+  ],
   rules: {
     "no-restricted-imports": [
       "error",

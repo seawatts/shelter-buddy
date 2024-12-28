@@ -17,7 +17,7 @@ import { Toaster } from "@acme/ui/toast";
 import { TooltipProvider } from "@acme/ui/tooltip";
 
 import { AppSidebar } from "~/components/app-sidebar";
-import { env } from "~/env";
+import { env } from "~/env.server";
 import { getCurrentShelter } from "~/lib/shelter";
 
 export const metadata: Metadata = {

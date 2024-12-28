@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import posthog from "posthog-js";
 import { PostHogProvider as Provider, usePostHog } from "posthog-js/react";
 
-import { env } from "../env";
+import { env } from "../env.client";
 
 export function PosthogWebVitals() {
   const posthog = usePostHog();
@@ -56,8 +56,7 @@ export function PostHogIdentifyUser() {
 export function PostHogProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
-      api_host:
-        env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
+      api_host: env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
       // api_host: "/ingest",
       // Disable automatic pageview capture, as we capture manually
       capture_pageleave: true,

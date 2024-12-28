@@ -4,7 +4,8 @@ import createJiti from "jiti";
 import baseConfig from "@acme/next-config/base";
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
-createJiti(fileURLToPath(import.meta.url))("./src/env");
+createJiti(fileURLToPath(import.meta.url))("./src/env.server");
+createJiti(fileURLToPath(import.meta.url))("./src/env.client");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
