@@ -43,7 +43,7 @@ export const startWalkAction = authenticatedAction
       .insert(Walks)
       .values({
         animalId: input.animalId,
-        difficultyLevel: animal.difficultyLevel,
+        shelterId: animal.shelterId,
         startedAt: new Date(),
         status: "in_progress",
         userId: ctx.user.id,
@@ -90,9 +90,7 @@ export const stopWalkAction = authenticatedAction
       .update(Walks)
       .set({
         endedAt: new Date(),
-        notes: input.notes,
         status: "completed",
-        summary: input.summary,
       })
       .where(eq(Walks.id, input.walkId));
 

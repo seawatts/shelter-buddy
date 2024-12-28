@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { Check, Timer, X } from "lucide-react";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -17,7 +17,7 @@ import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
 import { QuickReferenceDialog } from "./quick-reference-dialog";
 
 interface AnimalDetailsProps {
-  animal: AnimalType;
+  animal: AnimalTypeWithRelations;
 }
 
 export function AnimalDetails({ animal }: AnimalDetailsProps) {
@@ -39,7 +39,7 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
   }, [lastWalk]);
 
   const handleStartWalk = () => {
-    router.push(`/animals/walks/${walkInProgress.id}/in-progress`);
+    // router.push(`/animals/walks/${walkInProgress.id}/in-progress`);
   };
 
   const generateNotes = animal.notes.filter(

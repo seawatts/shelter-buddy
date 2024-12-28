@@ -1,10 +1,10 @@
 import { db } from "@acme/db/client";
 
-import { Header } from "../_components/header";
-import { AnimalsView } from "../_components/view";
-import { WalkProgress } from "../_components/walk-progress";
-import { searchParamsCache } from "../_utils/search-params";
-import { ScrollToBottom } from "../../../components/scroll-to-bottom";
+import { ScrollToBottom } from "../../components/scroll-to-bottom";
+import { Header } from "./_components/header";
+import { AnimalsView } from "./_components/view";
+import { WalkProgress } from "./_components/walk-progress";
+import { searchParamsCache } from "./_utils/search-params";
 
 export default async function AnimalsPage(props: {
   searchParams: Promise<{
@@ -29,7 +29,11 @@ export default async function AnimalsPage(props: {
       media: true,
       notes: true,
       tags: true,
-      walks: true,
+      walks: {
+        with: {
+          media: true,
+        },
+      },
     },
   });
 

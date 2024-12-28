@@ -4,14 +4,14 @@ import { isToday } from "date-fns";
 import { Check, Circle } from "lucide-react";
 import { useQueryState } from "nuqs";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DifficultyLevel } from "../_utils/difficulty-config";
 import { DIFFICULTY_CONFIG } from "../_utils/difficulty-config";
 
 interface WalkProgressProps {
-  animals: AnimalType[];
+  animals: AnimalTypeWithRelations[];
 }
 
 export function WalkProgress({ animals }: WalkProgressProps) {

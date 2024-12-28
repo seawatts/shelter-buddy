@@ -615,7 +615,9 @@ export const Animals = pgTable("animal", {
   weight: decimal("weight", { precision: 5, scale: 2 }),
 });
 
-export type AnimalType = typeof Animals.$inferSelect & {
+export type AnimalType = typeof Animals.$inferSelect;
+
+export type AnimalTypeWithRelations = typeof Animals.$inferSelect & {
   tags: AnimalTagType[];
   media: AnimalMediaType[];
   kennelOccupants: (KennelOccupantType & {
@@ -626,6 +628,7 @@ export type AnimalType = typeof Animals.$inferSelect & {
   activities: AnimalActivityType[];
 };
 
+export type AnimalTypeWithoutWalks = Omit<AnimalTypeWithRelations, "walks">;
 // Animal Tags Table
 export const AnimalTags = pgTable("animal_tag", {
   animalId: varchar("animalId")
@@ -729,6 +732,9 @@ export const AnimalNotes = pgTable("animal_note", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
+  walkId: varchar("walkId").references(() => Walks.id, {
+    onDelete: "cascade",
+  }),
 });
 
 export const AnimalNotesRelations = relations(AnimalNotes, ({ one }) => ({
@@ -744,6 +750,10 @@ export const AnimalNotesRelations = relations(AnimalNotes, ({ one }) => ({
     fields: [AnimalNotes.shelterId],
     references: [Shelters.id],
   }),
+  walk: one(Walks, {
+    fields: [AnimalNotes.walkId],
+    references: [Walks.id],
+  }),
 }));
 
 // Walks Table
@@ -757,7 +767,6 @@ export const Walks = pgTable("walk", {
     mode: "date",
     withTimezone: true,
   }).defaultNow(),
-  difficultyLevel: difficultyLevelEnum("difficultyLevel").notNull(),
   endedAt: timestamp("endedAt", {
     mode: "date",
     withTimezone: true,
@@ -766,13 +775,16 @@ export const Walks = pgTable("walk", {
     .$defaultFn(() => createId({ prefix: "walk" }))
     .notNull()
     .primaryKey(),
-  notes: text("notes"),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   startedAt: timestamp("startedAt", {
     mode: "date",
     withTimezone: true,
   }).notNull(),
   status: walkStatusEnum("status").default("not_started").notNull(),
-  summary: text("summary"),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
@@ -782,6 +794,7 @@ export const Walks = pgTable("walk", {
       onDelete: "cascade",
     })
     .notNull(),
+  walkDifficultyLevel: integer("walkDifficultyLevel").default(0).notNull(),
 });
 
 // Activities Table (can be associated with a walk or standalone)
@@ -843,6 +856,11 @@ export const WalksRelations = relations(Walks, ({ one, many }) => ({
     references: [Animals.id],
   }),
   media: many(AnimalMedia),
+  notes: many(AnimalNotes),
+  shelter: one(Shelters, {
+    fields: [Walks.shelterId],
+    references: [Shelters.id],
+  }),
   tags: many(AnimalTags),
   user: one(Users, {
     fields: [Walks.userId],
@@ -914,10 +932,12 @@ export type KennelOccupantType = typeof KennelOccupants.$inferSelect;
 export type AnimalTagType = typeof AnimalTags.$inferSelect;
 export type AnimalMediaType = typeof AnimalMedia.$inferSelect;
 export type AnimalNoteType = typeof AnimalNotes.$inferSelect;
-export type WalkType = typeof Walks.$inferSelect & {
+export type WalkTypeWithRelations = typeof Walks.$inferSelect & {
   media: AnimalMediaType[];
-  animal: AnimalType;
+  animal: AnimalTypeWithoutWalks;
+  notes: AnimalNoteType[];
 };
+export type WalkType = typeof Walks.$inferSelect;
 export type AnimalActivityType = typeof AnimalActivities.$inferSelect;
 
 export type KennelNoteType = typeof KennelNotes.$inferSelect;

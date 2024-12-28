@@ -6,7 +6,6 @@ import { Walks } from "@acme/db/schema";
 
 import { WalkHeader } from "../_components/walk-header";
 import { WalkTimer } from "../_components/walk-timer";
-import { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
 
 interface PageProps {
   params: Promise<{
@@ -19,8 +18,24 @@ export default async function WalkInProgressPage({ params }: PageProps) {
   const walk = await db.query.Walks.findFirst({
     where: eq(Walks.id, walkId),
     with: {
-      animal: true,
+      animal: {
+        with: {
+          activities: true,
+          kennelOccupants: {
+            limit: 1,
+            orderBy: (kennel, { desc }) => desc(kennel.startedAt),
+            where: (kennel, { isNull }) => isNull(kennel.endedAt),
+            with: {
+              kennel: true,
+            },
+          },
+          media: true,
+          notes: true,
+          tags: true,
+        },
+      },
       media: true,
+      notes: true
     },
   });
 
@@ -28,18 +43,12 @@ export default async function WalkInProgressPage({ params }: PageProps) {
     notFound();
   }
 
-  const difficultyConfig = DIFFICULTY_CONFIG[walk.animal.difficultyLevel];
-
   return (
     <>
-      <WalkHeader
-        walkId={walkId}
-        animalName={walk.animal.name}
-        difficultyConfig={difficultyConfig}
-      />
+      <WalkHeader walk={walk} />
 
       <div className="container flex min-h-[calc(100vh-96px)] max-w-3xl items-center justify-center pb-24">
-        <WalkTimer walkId={walkId} />
+        <WalkTimer walk={walk} />
       </div>
     </>
   );

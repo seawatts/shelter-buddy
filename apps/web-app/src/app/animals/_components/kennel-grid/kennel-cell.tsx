@@ -5,7 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cva } from "class-variance-authority";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -135,7 +135,7 @@ const kennelCell = cva(
 
 interface KennelCellProps {
   kennel: KennelType;
-  animal?: AnimalType;
+  animal?: AnimalTypeWithRelations;
   difficultyFilter?: string | null;
   tagFilter?: string | null;
   onClick: () => void;

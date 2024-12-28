@@ -1,10 +1,11 @@
 "use client";
 
+import type { Route } from "next";
 import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { toast } from "@acme/ui/toast";
@@ -12,7 +13,7 @@ import { toast } from "@acme/ui/toast";
 import { startWalkAction, stopWalkAction } from "../actions";
 import { hasWalkInProgress } from "./utils";
 
-export function WalkStatus({ animal }: { animal: AnimalType }) {
+export function WalkStatus({ animal }: { animal: AnimalTypeWithRelations }) {
   const router = useRouter();
   const startWalkServerAction = useServerAction(startWalkAction);
   const stopWalkServerAction = useServerAction(stopWalkAction);
@@ -25,7 +26,7 @@ export function WalkStatus({ animal }: { animal: AnimalType }) {
       });
 
       if (result) {
-        router.push(`/animals/walks/${result.id}/in-progress`);
+        router.push(`/animals/walks/${result.id}/in-progress` as Route);
       } else if (error) {
         console.error("Error starting walk", error);
         toast.error(error.message);
@@ -48,7 +49,7 @@ export function WalkStatus({ animal }: { animal: AnimalType }) {
         console.error("Error stopping walk", error);
         toast.error(error.message);
       } else {
-        router.push(`/animals/walks/${walkInProgress.id}/finished`);
+        router.push(`/animals/walks/${walkInProgress.id}/finished` as Route);
       }
     } catch {
       toast.error("Failed to stop walk");

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Circle, Timer } from "lucide-react";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 
 import {
   formatDuration,
@@ -14,7 +14,7 @@ import {
 } from "./utils";
 
 interface WalkStatusBadgeProps {
-  animal: AnimalType;
+  animal: AnimalTypeWithRelations;
 }
 
 export function WalkStatusBadge({ animal }: WalkStatusBadgeProps) {

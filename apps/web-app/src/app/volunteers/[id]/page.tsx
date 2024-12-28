@@ -54,9 +54,10 @@ async function getVolunteerData(id: string) {
 export default async function VolunteerPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const volunteer = await getVolunteerData(params.id);
+  const id = await params;
+  const volunteer = await getVolunteerData(id.id);
 
   return (
     <div className="container mx-auto py-8">

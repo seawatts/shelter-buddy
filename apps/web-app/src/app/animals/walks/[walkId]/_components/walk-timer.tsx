@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useServerAction } from "zsa-react";
 
+import type { WalkTypeWithRelations } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
+import { Icons } from "@acme/ui/icons";
 
-import { PhotoCapture } from "./photo-capture";
+import { endWalkAction } from "./actions";
 
 interface WalkTimerProps {
-  walkId: string;
+  walk: WalkTypeWithRelations;
 }
 
-export function WalkTimer({ walkId }: WalkTimerProps) {
+export function WalkTimer({ walk }: WalkTimerProps) {
   const router = useRouter();
+  const endWalkServerAction = useServerAction(endWalkAction);
   const [startTime] = useState(() => new Date());
   const [elapsedTime, setElapsedTime] = useState("0:00");
-  const [photos, setPhotos] = useState<string[]>([]);
+  // const [photos, setPhotos] = useState<string[]>([]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -31,10 +35,24 @@ export function WalkTimer({ walkId }: WalkTimerProps) {
     return () => clearInterval(timer);
   }, [startTime]);
 
-  const handleEndWalk = () => {
-    router.push(
-      `/animals/walks/${walkInProgress.id}/finished?startTime=${startTime.toISOString()}&elapsedTime=${elapsedTime}`,
-    );
+  const handleEndWalk = async () => {
+    try {
+      const [data, error] = await endWalkServerAction.execute({
+        walkId: walk.id,
+      });
+
+      if (data?.success) {
+        router.push(`/animals/walks/${walk.id}/finished`);
+      } else if (error) {
+        console.error("Failed to end walk:", error.message);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Failed to end walk:", error.message);
+      } else {
+        console.error("Failed to end walk:", error);
+      }
+    }
   };
 
   return (
@@ -44,7 +62,14 @@ export function WalkTimer({ walkId }: WalkTimerProps) {
         <p className="mt-2 text-muted-foreground">Time Elapsed</p>
       </div>
 
-      <PhotoCapture photos={photos} onPhotosTaken={setPhotos} />
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span>Return to kennel</span>
+        <div className="rounded-full bg-secondary px-3 py-1 text-center font-medium">
+          {walk.animal.kennelOccupants[0]?.kennel.name}
+        </div>
+      </div>
+
+      {/* <PhotoCapture photos={photos} onPhotosTaken={setPhotos} /> */}
 
       <div className="flex w-full max-w-sm flex-col gap-4">
         <Button
@@ -52,8 +77,16 @@ export function WalkTimer({ walkId }: WalkTimerProps) {
           size="lg"
           className="w-full"
           onClick={handleEndWalk}
+          disabled={endWalkServerAction.isPending}
         >
-          End Walk
+          {endWalkServerAction.isPending ? (
+            <>
+              <Icons.Spinner className="mr-2" />
+              Ending Walk...
+            </>
+          ) : (
+            "End Walk"
+          )}
         </Button>
       </div>
     </div>

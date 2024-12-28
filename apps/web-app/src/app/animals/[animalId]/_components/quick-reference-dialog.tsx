@@ -1,6 +1,6 @@
 "use client";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import {
   Accordion,
   AccordionContent,
@@ -16,10 +16,10 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
-import { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
+import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
 
 interface QuickReferenceDialogProps {
-  animal: AnimalType;
+  animal: AnimalTypeWithRelations;
   onStartWalk: () => void;
 }
 

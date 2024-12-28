@@ -1,23 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Camera } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import { useServerAction } from "zsa-react";
 
-import type {
-  ActivityTypeEnum,
-  AnimalType,
-  DifficultyLevelEnum,
-  WalkType,
-} from "@acme/db/schema";
+import type { ActivityTypeEnum, WalkTypeWithRelations } from "@acme/db/schema";
 import { activityTypeEnum } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
+import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea } from "@acme/ui/textarea";
 
 import { formatDuration } from "../../../_components/kennel-grid/utils";
+import { finishWalkAction } from "./actions";
 import {
   BackIcon,
   BallIcon,
@@ -232,15 +229,14 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   },
 ];
 
-const DIFFICULTY_SCORES: DifficultyLevelEnum[] = ["Yellow", "Purple", "Red"];
-
 interface WalkSessionProps {
-  animal: AnimalType;
-  walk: WalkType;
+  walk: WalkTypeWithRelations;
 }
 
-export function WalkSession({ animal, walk }: WalkSessionProps) {
+export function WalkSession({ walk }: WalkSessionProps) {
   const router = useRouter();
+  const { animal } = walk;
+  const finishWalkServerAction = useServerAction(finishWalkAction);
   const [isScrolled, setIsScrolled] = useState(false);
   const [activities, setActivities] = useState<
     Record<ActivityTypeEnum, boolean>
@@ -251,37 +247,23 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
     }
     return initialActivities;
   });
-  const [walkData, setWalkData] = useState<Partial<WalkType>>(walk);
-  const [mounted, setMounted] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  // Only start updating time after component is mounted on client
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || !walkData.startedAt) return;
-
-    const calculateElapsedTime = () => {
-      const startTimeMs = walkData.startedAt?.getTime() ?? 0;
-      if (startTimeMs === 0) return 0;
-      return Math.floor((Date.now() - startTimeMs) / (1000 * 60));
-    };
-
-    setElapsedTime(calculateElapsedTime());
-
-    const interval = setInterval(() => {
-      setElapsedTime(calculateElapsedTime());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [mounted, walkData.startedAt]);
-
-  const formattedDuration = useMemo(
-    () => formatDuration(elapsedTime),
-    [elapsedTime],
+  const [walkDifficultyLevel, setWalkDifficultyLevel] = useState<number>(
+    walk.walkDifficultyLevel > 0 ? walk.walkDifficultyLevel : 1,
   );
+  const [noteText, setNoteText] = useState<string>("");
+
+  useEffect(() => {
+    const notes = walk.notes.map((note) => note.notes);
+    setNoteText(notes.join("\n"));
+  }, [walk.notes]);
+
+  const formattedDuration = useMemo(() => {
+    const endTime = walk.endedAt ?? new Date();
+    const durationInMinutes = Math.floor(
+      (endTime.getTime() - walk.startedAt.getTime()) / (1000 * 60),
+    );
+    return formatDuration(durationInMinutes);
+  }, [walk.startedAt, walk.endedAt]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -295,10 +277,7 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
   const { isRecording, recordingStatus, startRecording, stopRecording } =
     useAudioRecorder({
       onTranscriptionComplete: (notes) => {
-        setWalkData((previous) => ({
-          ...previous,
-          notes: previous.notes ? `${previous.notes}\n${notes}` : notes,
-        }));
+        setNoteText(notes);
       },
     });
 
@@ -354,6 +333,29 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
     (section) => section.type === "medical",
   );
 
+  const handleSubmitWalk = async () => {
+    try {
+      const [data, error] = await finishWalkServerAction.execute({
+        activities,
+        notes: noteText || undefined,
+        walkDifficultyLevel,
+        walkId: walk.id,
+      });
+
+      if (data?.success) {
+        router.push("/animals");
+      } else if (error) {
+        console.error("Failed to submit walk:", error.message);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Failed to submit walk:", error.message);
+      } else {
+        console.error("Failed to submit walk:", error);
+      }
+    }
+  };
+
   return (
     <>
       {/* Sticky Header */}
@@ -395,8 +397,9 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
                     : "flex-col sm:flex-row sm:items-center",
                 )}
               >
+                Return to kennel
                 <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
-                  {animal.kennelOccupants[0]?.id}
+                  {animal.kennelOccupants[0]?.kennel.name}
                 </div>
                 {/* <div
                   className="rounded-full px-3 py-1 text-center text-sm font-medium text-white"
@@ -415,7 +418,7 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
 
       <div className="container flex max-w-3xl flex-col gap-8 pb-24 pt-4">
         {/* Walk Photos Section */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Walk Photos</h2>
             <Button variant="outline" size="sm" className="gap-2">
@@ -446,7 +449,7 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
               ))
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Notes Section */}
         <div className="space-y-2">
@@ -454,13 +457,8 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
             className="w-full rounded-lg border p-4"
             rows={3}
             placeholder="Add any notes about the walk..."
-            value={walkData.notes ?? ""}
-            onChange={(event) =>
-              setWalkData((previous) => ({
-                ...previous,
-                notes: event.target.value,
-              }))
-            }
+            value={noteText}
+            onChange={(event) => setNoteText(event.target.value)}
           />
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button
@@ -496,23 +494,16 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
         <div className="space-y-2">
           <h2 className="font-medium">Walk Difficulty Score</h2>
           <div className="flex gap-2">
-            {DIFFICULTY_SCORES.map((score) => (
+            {[1, 2, 3, 4, 5].map((score) => (
               <Button
                 key={score}
-                variant={
-                  walkData.difficultyLevel === score ? "default" : "outline"
-                }
+                variant={walkDifficultyLevel === score ? "default" : "outline"}
                 className={cn(
                   "flex-1 text-lg font-semibold",
-                  walkData.difficultyLevel === score &&
+                  walkDifficultyLevel === score &&
                     "bg-primary text-primary-foreground hover:bg-primary/90",
                 )}
-                onClick={() =>
-                  setWalkData((previous) => ({
-                    ...previous,
-                    difficultyLevel: score,
-                  }))
-                }
+                onClick={() => setWalkDifficultyLevel(score)}
               >
                 {score}
               </Button>
@@ -545,9 +536,17 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
             variant="default"
             size="lg"
             className="w-full bg-green-600 hover:bg-green-700"
-            onClick={() => router.push("/animals")}
+            onClick={handleSubmitWalk}
+            disabled={finishWalkServerAction.isPending}
           >
-            Submit Walk
+            {finishWalkServerAction.isPending ? (
+              <>
+                <Icons.Spinner className="mr-2" />
+                Submitting Walk...
+              </>
+            ) : (
+              "Submit Walk"
+            )}
           </Button>
         </div>
       </div>

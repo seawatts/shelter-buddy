@@ -1,13 +1,13 @@
 "use client";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { useIsMobile } from "@acme/ui/hooks/use-mobile";
 
 import { KennelActionsDialog } from "./kennel-actions-dialog";
 import { KennelActionsDrawer } from "./kennel-actions-drawer";
 
 interface KennelActionsProps {
-  animal?: AnimalType;
+  animal?: AnimalTypeWithRelations;
   kennel: KennelType;
   open: boolean;
   onOpenChange: (open: boolean) => void;

@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { ArrowUpDown, Clock, MoreHorizontal } from "lucide-react";
 
-import type { AnimalType, WalkType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, WalkType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Checkbox } from "@acme/ui/checkbox";
@@ -15,12 +15,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@acme/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
 import { formatDuration } from "../kennel-grid/utils";
@@ -86,17 +81,17 @@ const WalkBadge = ({ session }: { session?: WalkType }) => {
             )}
           </div>
         </TooltipTrigger>
-        {session.notes && (
+        {/* {session.notes && (
           <TooltipContent>
             <p>{session.notes}</p>
           </TooltipContent>
-        )}
+        )} */}
       </Tooltip>
     </TooltipProvider>
   );
 };
 
-export const columns: ColumnDef<AnimalType>[] = [
+export const columns: ColumnDef<AnimalTypeWithRelations>[] = [
   {
     cell: ({ row }) => (
       <Checkbox

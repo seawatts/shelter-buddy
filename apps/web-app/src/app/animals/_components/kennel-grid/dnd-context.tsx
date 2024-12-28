@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 
 import { KennelCell } from "./kennel-cell";
 
@@ -24,7 +24,7 @@ const adjustTranslate: Modifier = ({ transform }) => {
 interface DndContextWrapperProps {
   children: React.ReactNode;
   kennels: KennelType[];
-  animals: AnimalType[];
+  animals: AnimalTypeWithRelations[];
   difficultyFilter: string | null;
   tagFilter: string | null;
   activeId: string | null;

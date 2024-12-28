@@ -3,21 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-import type { WalkType } from "@acme/db/schema";
+import type { WalkTypeWithRelations } from "@acme/db/schema";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
+import { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
 import { BackIcon } from "./icons";
 
-type DifficultyConfig =
-  (typeof DIFFICULTY_CONFIG)[keyof typeof DIFFICULTY_CONFIG];
-
 interface WalkHeaderProps {
-  walk: WalkType;
-  difficultyConfig: DifficultyConfig;
+  walk: WalkTypeWithRelations;
 }
 
-export function WalkHeader({ walk, difficultyConfig }: WalkHeaderProps) {
+export function WalkHeader({ walk }: WalkHeaderProps) {
+  const { animal } = walk;
+  const difficultyConfig = DIFFICULTY_CONFIG[animal.difficultyLevel];
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {

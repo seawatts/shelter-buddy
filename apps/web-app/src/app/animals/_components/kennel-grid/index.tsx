@@ -5,7 +5,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { isSameDay } from "date-fns";
 import { useQueryState } from "nuqs";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 
 import { DndContextWrapper } from "./dnd-context";
 import { KennelActions } from "./kennel-actions";
@@ -13,7 +13,7 @@ import { KennelCell } from "./kennel-cell";
 import { sortKennels } from "./utils";
 
 interface KennelGridProps {
-  animals: AnimalType[];
+  animals: AnimalTypeWithRelations[];
   kennels: KennelType[];
   onAnimalMove?: (
     animalId: string,

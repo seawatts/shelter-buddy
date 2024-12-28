@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { format } from "date-fns";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import {
   Dialog,
@@ -18,7 +18,7 @@ import { WalkStatus } from "../walk-status";
 import { KennelActionsContent } from "./kennel-actions-content";
 
 interface KennelActionsDialogProps {
-  animal?: AnimalType;
+  animal?: AnimalTypeWithRelations;
   kennel: KennelType;
   open: boolean;
   onOpenChange: (open: boolean) => void;

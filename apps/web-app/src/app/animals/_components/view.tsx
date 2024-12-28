@@ -2,13 +2,13 @@
 
 import { useQueryState } from "nuqs";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 
 import { AnimalsTable } from "./animals-table/table";
 import { KennelGrid } from "./kennel-grid";
 
 export function AnimalsView(props: {
-  animals: AnimalType[];
+  animals: AnimalTypeWithRelations[];
   kennels: KennelType[];
 }) {
   const [viewMode] = useQueryState("viewMode", { defaultValue: "grid" });

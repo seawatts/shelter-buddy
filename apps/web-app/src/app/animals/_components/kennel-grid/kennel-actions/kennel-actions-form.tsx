@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { toast } from "@acme/ui/toast";
@@ -14,7 +14,7 @@ import {
 } from "./actions";
 
 interface KennelActionsFormProps {
-  animal: AnimalType;
+  animal: AnimalTypeWithRelations;
   onOpenChange: (open: boolean) => void;
 }
 

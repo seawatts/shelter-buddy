@@ -6,10 +6,14 @@ import {
   isToday,
 } from "date-fns";
 
-import type { AnimalType, KennelType, WalkType } from "@acme/db/schema";
+import type {
+  AnimalTypeWithRelations,
+  KennelType,
+  WalkType,
+} from "@acme/db/schema";
 
 export function matchesFilters(
-  animal: AnimalType,
+  animal: AnimalTypeWithRelations,
   difficultyFilter?: string | null,
   tagFilter?: string | null,
 ) {
@@ -38,11 +42,13 @@ export function matchesFilters(
   return true;
 }
 
-export function hasBeenWalkedToday(animal: AnimalType): boolean {
+export function hasBeenWalkedToday(animal: AnimalTypeWithRelations): boolean {
   return animal.walks.some((walk) => isToday(walk.startedAt));
 }
 
-export function hasWalkInProgress(animal: AnimalType): WalkType | undefined {
+export function hasWalkInProgress(
+  animal: AnimalTypeWithRelations,
+): WalkType | undefined {
   const walk = animal.walks.find(
     (walk) =>
       walk.status === "in_progress" && isSameDay(walk.startedAt, new Date()),
@@ -74,7 +80,9 @@ export function arrangeKennels(
   return [firstColumn, secondColumn];
 }
 
-export function getActiveWalkStartTime(animal: AnimalType): Date | null {
+export function getActiveWalkStartTime(
+  animal: AnimalTypeWithRelations,
+): Date | null {
   if (animal.walks.length === 0) return null;
 
   const activeWalk = animal.walks.find(
@@ -94,7 +102,7 @@ export function formatElapsedTime(startTime: Date): string {
 }
 
 export function getCompletedWalkInfo(
-  animal: AnimalType,
+  animal: AnimalTypeWithRelations,
 ): { completedTime: Date; duration: number } | null {
   if (animal.walks.length === 0) return null;
 
@@ -127,7 +135,7 @@ export function formatDuration(minutes: number): string {
 }
 
 export function getLastCompletedWalk(
-  animal: AnimalType,
+  animal: AnimalTypeWithRelations,
 ): { date: Date; duration: number } | undefined {
   const completedWalks = animal.walks.filter((walk) => walk.endedAt);
   if (completedWalks.length === 0) return undefined;

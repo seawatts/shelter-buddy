@@ -2,7 +2,7 @@
 
 import { AlertTriangle, Check, Info, X } from "lucide-react";
 
-import type { AnimalNoteType, AnimalType } from "@acme/db/schema";
+import type { AnimalNoteType, AnimalTypeWithRelations } from "@acme/db/schema";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -11,7 +11,7 @@ import { AnimalImages } from "../animal-images";
 import { KennelActionsForm } from "./kennel-actions-form";
 
 interface KennelActionsContentProps {
-  animal?: AnimalType | undefined;
+  animal?: AnimalTypeWithRelations | undefined;
   onOpenChange: (open: boolean) => void;
 }
 

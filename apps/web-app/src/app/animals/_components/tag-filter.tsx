@@ -2,7 +2,7 @@
 
 import { useQueryState } from "nuqs";
 
-import type { AnimalType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
@@ -17,7 +17,7 @@ import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 interface TagFilterProps {
-  data: AnimalType[];
+  data: AnimalTypeWithRelations[];
 }
 
 export function TagFilter({ data }: TagFilterProps) {

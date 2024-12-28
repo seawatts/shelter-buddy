@@ -5,7 +5,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRight, Timer } from "lucide-react";
 
-import type { AnimalType, KennelType } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import {
   Drawer,
@@ -20,7 +20,7 @@ import { WalkStatus } from "../walk-status";
 import { KennelActionsContent } from "./kennel-actions-content";
 
 interface KennelActionsDrawerProps {
-  animal?: AnimalType;
+  animal?: AnimalTypeWithRelations;
   kennel: KennelType;
   open: boolean;
   onOpenChange: (open: boolean) => void;
