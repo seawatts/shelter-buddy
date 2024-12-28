@@ -25,7 +25,7 @@ export function WalkStatus({ animal }: { animal: AnimalType }) {
       });
 
       if (result) {
-        router.push(`/animals/${animal.id}/walk/in-progress`);
+        router.push(`/animals/walks/${result.id}/in-progress`);
       } else if (error) {
         console.error("Error starting walk", error);
         toast.error(error.message);
@@ -48,7 +48,7 @@ export function WalkStatus({ animal }: { animal: AnimalType }) {
         console.error("Error stopping walk", error);
         toast.error(error.message);
       } else {
-        router.push(`/animals/${animal.id}/walk/finished`);
+        router.push(`/animals/walks/${walkInProgress.id}/finished`);
       }
     } catch {
       toast.error("Failed to stop walk");

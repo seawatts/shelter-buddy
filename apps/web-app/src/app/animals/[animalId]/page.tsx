@@ -1,26 +1,27 @@
-import { eq } from "drizzle-orm";
-
 import { db } from "@acme/db/client";
-import { Animals } from "@acme/db/schema";
 
-import { AnimalDetails } from "./_components/animal-details";
+import { Header } from "../_components/header";
+import { AnimalsView } from "../_components/view";
+import { WalkProgress } from "../_components/walk-progress";
+import { searchParamsCache } from "../_utils/search-params";
+import { ScrollToBottom } from "../../../components/scroll-to-bottom";
 
-interface PageProps {
-  params: Promise<{
-    animalId: string;
+export default async function AnimalsPage(props: {
+  searchParams: Promise<{
+    viewMode: string;
+    difficultyFilter: string;
+    tagFilter: string;
   }>;
-}
+}) {
+  await searchParamsCache.parse(props.searchParams);
 
-export default async function AnimalPage({ params }: PageProps) {
-  const { animalId } = await params;
-  const animal = await db.query.Animals.findFirst({
-    where: eq(Animals.id, animalId),
+  const animals = await db.query.Animals.findMany({
     with: {
       activities: true,
       kennelOccupants: {
         limit: 1,
         orderBy: (kennel, { desc }) => desc(kennel.startedAt),
-        where: (kennel, { isNotNull }) => isNotNull(kennel.endedAt),
+        where: (kennel, { isNull }) => isNull(kennel.endedAt),
         with: {
           kennel: true,
         },
@@ -36,20 +37,19 @@ export default async function AnimalPage({ params }: PageProps) {
     },
   });
 
-  if (!animal) {
-    return (
-      <div className="container py-8">
-        <h1 className="text-red-500 text-3xl font-bold">Animal Not Found</h1>
-        <p className="mt-4">
-          The animal with ID {animalId} could not be found.
-        </p>
-      </div>
-    );
-  }
+  const kennels = await db.query.Kennels.findMany();
 
   return (
-    <div className="container py-8">
-      <AnimalDetails animal={animal} />
-    </div>
+    <ScrollToBottom>
+      <div>
+        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-background p-4 sm:gap-8 sm:p-8">
+          <Header />
+          <WalkProgress animals={animals} />
+        </div>
+        <div className="p-4 sm:p-8">
+          <AnimalsView kennels={kennels} animals={animals} />
+        </div>
+      </div>
+    </ScrollToBottom>
   );
 }

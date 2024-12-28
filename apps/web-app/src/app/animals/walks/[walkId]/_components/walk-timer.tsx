@@ -8,10 +8,10 @@ import { Button } from "@acme/ui/button";
 import { PhotoCapture } from "./photo-capture";
 
 interface WalkTimerProps {
-  animalId: string;
+  walkId: string;
 }
 
-export function WalkTimer({ animalId }: WalkTimerProps) {
+export function WalkTimer({ walkId }: WalkTimerProps) {
   const router = useRouter();
   const [startTime] = useState(() => new Date());
   const [elapsedTime, setElapsedTime] = useState("0:00");
@@ -33,7 +33,7 @@ export function WalkTimer({ animalId }: WalkTimerProps) {
 
   const handleEndWalk = () => {
     router.push(
-      `/animals/${animalId}/walk/finished?startTime=${startTime.toISOString()}&elapsedTime=${elapsedTime}`,
+      `/animals/walks/${walkInProgress.id}/finished?startTime=${startTime.toISOString()}&elapsedTime=${elapsedTime}`,
     );
   };
 

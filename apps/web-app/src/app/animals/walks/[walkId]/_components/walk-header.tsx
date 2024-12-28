@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import type { WalkType } from "@acme/db/schema";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
@@ -12,16 +13,11 @@ type DifficultyConfig =
   (typeof DIFFICULTY_CONFIG)[keyof typeof DIFFICULTY_CONFIG];
 
 interface WalkHeaderProps {
-  animalId: string;
-  animalName: string;
+  walk: WalkType;
   difficultyConfig: DifficultyConfig;
 }
 
-export function WalkHeader({
-  animalId,
-  animalName,
-  difficultyConfig,
-}: WalkHeaderProps) {
+export function WalkHeader({ walk, difficultyConfig }: WalkHeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -43,7 +39,7 @@ export function WalkHeader({
       <div className="container h-full max-w-3xl">
         <div className="flex h-full items-center gap-4">
           <Link
-            href={`/animals/${animalId}`}
+            href={`/animals`}
             className="text-muted-foreground hover:text-foreground"
           >
             <BackIcon />
@@ -56,7 +52,7 @@ export function WalkHeader({
                   isScrolled ? "text-2xl" : "text-3xl",
                 )}
               >
-                {animalName}
+                {walk.animal.name}
               </h1>
               {!isScrolled && (
                 <p className="text-sm text-muted-foreground">
@@ -73,7 +69,7 @@ export function WalkHeader({
               )}
             >
               <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
-                {animalName}
+                {walk.animal.name}
               </div>
               <div
                 className="rounded-full px-3 py-1 text-center text-sm font-medium"

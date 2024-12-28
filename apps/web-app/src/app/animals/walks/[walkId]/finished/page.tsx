@@ -7,15 +7,25 @@ import { WalkSession } from "../_components/walk-session";
 
 interface PageProps {
   params: Promise<{
-    animalId: string;
     walkId: string;
   }>;
 }
 
 export default async function WalkFinishedPage({ params }: PageProps) {
-  const { animalId, walkId } = await params;
+  const { walkId } = await params;
+  const walk = await db.query.Walks.findFirst({
+    where: eq(Walks.id, walkId),
+    with: {
+      animal: true,
+      media: true,
+    },
+  });
+
+  if (!walk) {
+    return null;
+  }
   const animal = await db.query.Animals.findFirst({
-    where: eq(Animals.id, animalId),
+    where: eq(Animals.id, walk.animalId),
     with: {
       activities: true,
       kennelOccupants: {
@@ -36,14 +46,8 @@ export default async function WalkFinishedPage({ params }: PageProps) {
       },
     },
   });
-  const walk = await db.query.Walks.findFirst({
-    where: eq(Walks.id, walkId),
-    with: {
-      media: true,
-    },
-  });
 
-  if (!animal || !walk) {
+  if (!animal) {
     return null;
   }
 

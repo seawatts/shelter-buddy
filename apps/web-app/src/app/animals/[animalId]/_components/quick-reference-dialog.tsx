@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
-import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
+import { DIFFICULTY_CONFIG } from "../../../_utils/difficulty-config";
 
 interface QuickReferenceDialogProps {
   animal: AnimalType;

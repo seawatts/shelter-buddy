@@ -75,6 +75,10 @@ export const stopWalkAction = authenticatedAction
 
     const walk = await db.query.Walks.findFirst({
       where: eq(Walks.id, input.walkId),
+      with: {
+        animal: true,
+        media: true,
+      },
     });
 
     if (!walk) {

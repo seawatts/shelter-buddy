@@ -916,6 +916,7 @@ export type AnimalMediaType = typeof AnimalMedia.$inferSelect;
 export type AnimalNoteType = typeof AnimalNotes.$inferSelect;
 export type WalkType = typeof Walks.$inferSelect & {
   media: AnimalMediaType[];
+  animal: AnimalType;
 };
 export type AnimalActivityType = typeof AnimalActivities.$inferSelect;
 

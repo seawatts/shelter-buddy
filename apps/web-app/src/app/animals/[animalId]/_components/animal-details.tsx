@@ -39,7 +39,7 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
   }, [lastWalk]);
 
   const handleStartWalk = () => {
-    router.push(`/animals/${animal.id}/walk`);
+    router.push(`/animals/walks/${walkInProgress.id}/in-progress`);
   };
 
   const generateNotes = animal.notes.filter(
