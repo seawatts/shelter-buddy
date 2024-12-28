@@ -11,13 +11,12 @@ import { env } from "~/env.server";
 
 export const runtime = "edge";
 
-const posthog = new PostHog(env.POSTHOG_KEY, {
-  flushAt: 1,
-  flushInterval: 0,
-  host: "https://us.i.posthog.com",
-});
-
 export async function POST(request: Request) {
+  const posthog = new PostHog(env.POSTHOG_KEY, {
+    flushAt: 1,
+    flushInterval: 0,
+    host: "https://us.i.posthog.com",
+  });
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
   const CLERK_WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 
