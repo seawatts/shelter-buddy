@@ -4,12 +4,11 @@ import { AlertTriangle, Check, Info, X } from "lucide-react";
 
 import type { AnimalNoteType, AnimalType } from "@acme/db/schema";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
-import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/lib/utils";
 
 import { AddAnimalForm } from "../add-animal-form";
 import { AnimalImages } from "../animal-images";
-import { hasWalkInProgress } from "../utils";
+import { KennelActionsForm } from "./kennel-actions-form";
 
 interface KennelActionsContentProps {
   animal?: AnimalType | undefined;
@@ -117,44 +116,10 @@ export function KennelActionsContent({
       )}
 
       {/* Quick Actions */}
-      <div className="flex flex-col gap-2">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            // TODO: Handle add notes action
-            onOpenChange(false);
-          }}
-        >
-          Add Notes
-        </Button>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => {
-              // TODO: Handle adopted action
-              onOpenChange(false);
-            }}
-          >
-            Reassign Kennel
-          </Button>
+      <KennelActionsForm animal={animal} onOpenChange={onOpenChange} />
 
-          {!hasWalkInProgress(animal) && !animal.isOutOfKennel && (
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => {
-                // TODO: Handle out of kennel action
-                onOpenChange(false);
-              }}
-            >
-              Mark Out of Kennel
-            </Button>
-          )}
-        </div>
-      </div>
       <AnimalImages name={animal.name} media={animal.media} isMobile />
+
       {/* Additional Details */}
       <div className="grid gap-4">
         {/* Basic Info */}

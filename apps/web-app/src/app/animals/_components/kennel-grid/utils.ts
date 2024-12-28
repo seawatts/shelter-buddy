@@ -1,4 +1,10 @@
-import { differenceInMinutes, intervalToDuration, isToday } from "date-fns";
+import {
+  differenceInMinutes,
+  formatDuration as formatDurationFns,
+  intervalToDuration,
+  isSameDay,
+  isToday,
+} from "date-fns";
 
 import type { AnimalType, KennelType, WalkType } from "@acme/db/schema";
 
@@ -37,7 +43,10 @@ export function hasBeenWalkedToday(animal: AnimalType): boolean {
 }
 
 export function hasWalkInProgress(animal: AnimalType): WalkType | undefined {
-  const walk = animal.walks.find((walk) => !walk.endedAt);
+  const walk = animal.walks.find(
+    (walk) =>
+      walk.status === "in_progress" && isSameDay(walk.startedAt, new Date()),
+  );
   if (!walk) return undefined;
 
   return walk;
@@ -68,12 +77,10 @@ export function arrangeKennels(
 export function getActiveWalkStartTime(animal: AnimalType): Date | null {
   if (animal.walks.length === 0) return null;
 
-  const today = new Date().toISOString().split("T")[0];
-  const activeWalk = animal.walks.find((walk) => {
-    if (walk.status !== "in_progress") return false;
-    const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
-    return walkDate === today;
-  });
+  const activeWalk = animal.walks.find(
+    (walk) =>
+      walk.status === "in_progress" && isSameDay(walk.startedAt, new Date()),
+  );
 
   return activeWalk ? activeWalk.startedAt : null;
 }
@@ -91,18 +98,18 @@ export function getCompletedWalkInfo(
 ): { completedTime: Date; duration: number } | null {
   if (animal.walks.length === 0) return null;
 
-  const today = new Date().toISOString().split("T")[0];
-  const completedWalk = animal.walks.find((walk) => {
-    if (walk.status !== "completed" || !walk.endedAt) return false;
-    const walkDate = new Date(walk.startedAt).toISOString().split("T")[0];
-    return walkDate === today;
-  });
+  const completedWalk = animal.walks.find(
+    (walk) =>
+      walk.status === "completed" &&
+      walk.endedAt &&
+      isSameDay(walk.startedAt, new Date()),
+  );
 
   if (!completedWalk?.endedAt) return null;
 
-  const durationInMinutes = Math.floor(
-    (completedWalk.endedAt.getTime() - completedWalk.startedAt.getTime()) /
-      (1000 * 60),
+  const durationInMinutes = differenceInMinutes(
+    completedWalk.endedAt,
+    completedWalk.startedAt,
   );
 
   return {
@@ -112,14 +119,11 @@ export function getCompletedWalkInfo(
 }
 
 export function formatDuration(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-
-  if (hours === 0) {
-    return `${remainingMinutes}m`;
-  }
-
-  return `${hours}h ${remainingMinutes}m`;
+  return formatDurationFns({ minutes }, { format: ["hours", "minutes"] })
+    .replace(" hours", "h")
+    .replace(" hour", "h")
+    .replace(" minutes", "m")
+    .replace(" minute", "m");
 }
 
 export function getLastCompletedWalk(

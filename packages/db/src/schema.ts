@@ -18,8 +18,221 @@ import { createId } from "@acme/id";
 
 export const userRoleEnum = pgEnum("userRole", ["admin", "superAdmin", "user"]);
 
+// Animal Related Enums
+export const kennelNoteTypeEnum = pgEnum("kennelNoteType", [
+  "maintenance",
+  "cleaning",
+  "general",
+]);
+
+export const kennelSizeEnum = pgEnum("kennelSize", [
+  "small",
+  "medium",
+  "large",
+]);
+export const kennelTypeEnum = pgEnum("kennelType", [
+  "standard",
+  "isolation",
+  "senior",
+  "quiet",
+]);
+export const kennelStatusEnum = pgEnum("kennelStatus", [
+  "available",
+  "occupied",
+  "maintenance",
+  "reserved",
+]);
+export const maintenanceStatusEnum = pgEnum("maintenanceStatus", [
+  "good",
+  "needs-repair",
+  "under-maintenance",
+]);
+export const difficultyLevelEnum = pgEnum("difficultyLevel", [
+  "Yellow",
+  "Purple",
+  "Red",
+]);
+
+export const walkStatusEnum = pgEnum("walkStatus", [
+  "completed",
+  "in_progress",
+  "not_started",
+]);
+
+export const activityTypeEnum = pgEnum("activityType", [
+  // Bathroom
+  "pee",
+  "poop",
+  "accident",
+  // Play
+  "played_ball",
+  "played_tug",
+  "played_fetch",
+  // Training
+  "training",
+  "treats",
+  // Incidents
+  "pulled",
+  "dog_reactive",
+  "human_reactive",
+  "aggressive",
+  "bite",
+  // Safety
+  "pulls_hard",
+  "jumpy",
+  "mouthy",
+  "bolting_tendency",
+  "resource_guarding",
+  "eats_everything",
+  "no_touches",
+  // Health
+  "vomit",
+  "diarrhea",
+  "limping",
+  "frequent_urination",
+  "loose_stool",
+  "bloody_stool",
+  "scratching",
+  "shaking_head",
+  "coughing",
+  "sneezing",
+  "eye_discharge",
+  "nose_discharge",
+  "hot_spots",
+  // Positive Behaviors
+  "likes_sniffing",
+  "likes_pets",
+  "good_behavior",
+  "leash_trained",
+  "checks_in",
+  "easy_out",
+  "easy_in",
+  "plays_bow",
+  "shares_toys",
+  "takes_treats_gently",
+  "knows_sit",
+  "knows_123_treat",
+  "knows_stay",
+  "knows_leave",
+  "knows_wait",
+  "knows_come",
+  "focused_on_handler",
+  "calm_in_new_places",
+]);
+
+export const activityCategoryEnum = pgEnum("activityCategory", [
+  "bathroom",
+  "play",
+  "training",
+  "incident",
+  "safety",
+  "health",
+  "behavior",
+]);
+
+export const activitySeverityEnum = pgEnum("activitySeverity", [
+  "info",
+  "low",
+  "medium",
+  "high",
+  "critical",
+]);
+
+// Animal Related Enums
+export const animalNoteTypeEnum = pgEnum("animalNoteType", [
+  "medical",
+  "behavioral",
+  "general",
+  "inKennel",
+  "outKennel",
+  "approvedActivities",
+]);
+
+export const genderEnum = pgEnum("gender", ["male", "female"]);
+
+// Animal Related Enums
+export const kennelMaintenanceTypeEnum = pgEnum("kennelMaintenanceType", [
+  "repair",
+  "scheduled",
+  "emergency",
+  "inspection",
+  "upgrade",
+]);
+
+export const kennelMaintenancePriorityEnum = pgEnum(
+  "kennelMaintenancePriority",
+  ["low", "medium", "high", "critical"],
+);
+
+export const kennelMaintenanceStatusEnum = pgEnum("kennelMaintenanceStatus", [
+  "pending",
+  "in_progress",
+  "completed",
+  "cancelled",
+]);
 export const UserRole = z.enum(userRoleEnum.enumValues).Enum;
 export type UserRoleEnum = (typeof UserRole)[keyof typeof UserRole];
+
+export const KennelMaintenanceType = z.enum(
+  kennelMaintenanceTypeEnum.enumValues,
+).Enum;
+export type KennelMaintenanceTypeEnum =
+  (typeof KennelMaintenanceType)[keyof typeof KennelMaintenanceType];
+
+export const KennelMaintenancePriority = z.enum(
+  kennelMaintenancePriorityEnum.enumValues,
+).Enum;
+export type KennelMaintenancePriorityEnum =
+  (typeof KennelMaintenancePriority)[keyof typeof KennelMaintenancePriority];
+
+export const KennelMaintenanceStatus = z.enum(
+  kennelMaintenanceStatusEnum.enumValues,
+).Enum;
+export type KennelMaintenanceStatusEnum =
+  (typeof KennelMaintenanceStatus)[keyof typeof KennelMaintenanceStatus];
+
+export const KennelSize = z.enum(kennelSizeEnum.enumValues).Enum;
+export type KennelSizeEnum = (typeof KennelSize)[keyof typeof KennelSize];
+
+export const KennelTypeEnum = z.enum(kennelTypeEnum.enumValues).Enum;
+export type KennelTypeEnum =
+  (typeof KennelTypeEnum)[keyof typeof KennelTypeEnum];
+
+export const KennelStatus = z.enum(kennelStatusEnum.enumValues).Enum;
+export type KennelStatusEnum = (typeof KennelStatus)[keyof typeof KennelStatus];
+
+export const MaintenanceStatus = z.enum(maintenanceStatusEnum.enumValues).Enum;
+export type MaintenanceStatusEnum =
+  (typeof MaintenanceStatus)[keyof typeof MaintenanceStatus];
+
+export const DifficultyLevel = z.enum(difficultyLevelEnum.enumValues).Enum;
+export type DifficultyLevelEnum =
+  (typeof DifficultyLevel)[keyof typeof DifficultyLevel];
+
+export const WalkStatus = z.enum(walkStatusEnum.enumValues).Enum;
+export type WalkStatusEnum = (typeof WalkStatus)[keyof typeof WalkStatus];
+
+export const ActivityType = z.enum(activityTypeEnum.enumValues).Enum;
+export type ActivityTypeEnum = (typeof ActivityType)[keyof typeof ActivityType];
+
+export const ActivityCategory = z.enum(activityCategoryEnum.enumValues).Enum;
+export type ActivityCategoryEnum =
+  (typeof ActivityCategory)[keyof typeof ActivityCategory];
+
+export const ActivitySeverity = z.enum(activitySeverityEnum.enumValues).Enum;
+export type ActivitySeverityEnum =
+  (typeof ActivitySeverity)[keyof typeof ActivitySeverity];
+
+export const AnimalNoteTypeEnum = z.enum(animalNoteTypeEnum.enumValues).Enum;
+export type AnimalNoteTypeEnum =
+  (typeof AnimalNoteTypeEnum)[keyof typeof AnimalNoteTypeEnum];
+
+export const Gender = z.enum(genderEnum.enumValues).Enum;
+export type GenderEnum = (typeof Gender)[keyof typeof Gender];
+
+export const KennelNoteType = z.enum(kennelNoteTypeEnum.enumValues).Enum;
+export type KennelNoteTypeEnum =
+  (typeof KennelNoteType)[keyof typeof KennelNoteType];
 
 // Define the theme configuration type
 export const ThemeConfigSchema = z.object({
@@ -205,138 +418,6 @@ export const ShortUrl = pgTable("short_url", {
   }).$onUpdateFn(() => new Date()),
 });
 
-// Animal Related Enums
-export const kennelNoteTypeEnum = pgEnum("kennelNoteType", [
-  "maintenance",
-  "cleaning",
-  "general",
-]);
-
-export const kennelSizeEnum = pgEnum("kennelSize", [
-  "small",
-  "medium",
-  "large",
-]);
-export const kennelTypeEnum = pgEnum("kennelType", [
-  "standard",
-  "isolation",
-  "senior",
-  "quiet",
-]);
-export const kennelStatusEnum = pgEnum("kennelStatus", [
-  "available",
-  "occupied",
-  "maintenance",
-  "reserved",
-]);
-export const maintenanceStatusEnum = pgEnum("maintenanceStatus", [
-  "good",
-  "needs-repair",
-  "under-maintenance",
-]);
-export const difficultyLevelEnum = pgEnum("difficultyLevel", [
-  "Yellow",
-  "Purple",
-  "Red",
-]);
-
-export const walkStatusEnum = pgEnum("walkStatus", [
-  "completed",
-  "in_progress",
-  "not_started",
-]);
-
-export const activityTypeEnum = pgEnum("activityType", [
-  // Bathroom
-  "pee",
-  "poop",
-  "accident",
-  // Play
-  "played_ball",
-  "played_tug",
-  "played_fetch",
-  // Training
-  "training",
-  "treats",
-  // Incidents
-  "pulled",
-  "dog_reactive",
-  "human_reactive",
-  "aggressive",
-  "bite",
-  // Safety
-  "pulls_hard",
-  "jumpy",
-  "mouthy",
-  "bolting_tendency",
-  "resource_guarding",
-  "eats_everything",
-  "no_touches",
-  // Health
-  "vomit",
-  "diarrhea",
-  "limping",
-  "frequent_urination",
-  "loose_stool",
-  "bloody_stool",
-  "scratching",
-  "shaking_head",
-  "coughing",
-  "sneezing",
-  "eye_discharge",
-  "nose_discharge",
-  "hot_spots",
-  // Positive Behaviors
-  "likes_sniffing",
-  "likes_pets",
-  "good_behavior",
-  "leash_trained",
-  "checks_in",
-  "easy_out",
-  "easy_in",
-  "plays_bow",
-  "shares_toys",
-  "takes_treats_gently",
-  "knows_sit",
-  "knows_123_treat",
-  "knows_stay",
-  "knows_leave",
-  "knows_wait",
-  "knows_come",
-  "focused_on_handler",
-  "calm_in_new_places",
-]);
-
-export const activityCategoryEnum = pgEnum("activityCategory", [
-  "bathroom",
-  "play",
-  "training",
-  "incident",
-  "safety",
-  "health",
-  "behavior",
-]);
-
-export const activitySeverityEnum = pgEnum("activitySeverity", [
-  "info",
-  "low",
-  "medium",
-  "high",
-  "critical",
-]);
-
-// Animal Related Enums
-export const animalNoteTypeEnum = pgEnum("animalNoteType", [
-  "medical",
-  "behavioral",
-  "general",
-  "inKennel",
-  "outKennel",
-  "approvedActivities",
-]);
-
-export const genderEnum = pgEnum("gender", ["male", "female"]);
-
 // Kennels Table
 export const Kennels = pgTable("kennel", {
   createdAt: timestamp("createdAt", {
@@ -361,9 +442,9 @@ export const Kennels = pgTable("kennel", {
       onDelete: "cascade",
     })
     .notNull(),
-  size: kennelSizeEnum("size").notNull(),
+  size: kennelSizeEnum("size").default("medium").notNull(),
   status: kennelStatusEnum("status").default("available").notNull(),
-  type: kennelTypeEnum("type").notNull(),
+  type: kennelTypeEnum("type").default("standard").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
@@ -612,6 +693,9 @@ export const AnimalMedia = pgTable("animal_media", {
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
   url: text("url").notNull(),
+  walkId: varchar("walkId").references(() => Walks.id, {
+    onDelete: "cascade",
+  }),
 });
 
 // Animal Notes Table
@@ -675,6 +759,7 @@ export const Walks = pgTable("walk", {
     mode: "date",
     withTimezone: true,
   }).defaultNow(),
+  difficultyLevel: difficultyLevelEnum("difficultyLevel").notNull(),
   endedAt: timestamp("endedAt", {
     mode: "date",
     withTimezone: true,
@@ -699,7 +784,6 @@ export const Walks = pgTable("walk", {
       onDelete: "cascade",
     })
     .notNull(),
-  walkDifficulty: integer("walkDifficulty").notNull(),
 });
 
 // Activities Table (can be associated with a walk or standalone)
@@ -764,6 +848,7 @@ export const WalksRelations = relations(Walks, ({ one, many }) => ({
     fields: [Walks.animalId],
     references: [Animals.id],
   }),
+  media: many(AnimalMedia),
   tags: many(AnimalTags),
   user: one(Users, {
     fields: [Walks.userId],
@@ -794,6 +879,10 @@ export const AnimalMediaRelations = relations(AnimalMedia, ({ one }) => ({
   createdByUser: one(Users, {
     fields: [AnimalMedia.createdByUserId],
     references: [Users.id],
+  }),
+  walk: one(Walks, {
+    fields: [AnimalMedia.walkId],
+    references: [Walks.id],
   }),
 }));
 
@@ -831,74 +920,12 @@ export type KennelOccupantType = typeof KennelOccupants.$inferSelect;
 export type AnimalTagType = typeof AnimalTags.$inferSelect;
 export type AnimalMediaType = typeof AnimalMedia.$inferSelect;
 export type AnimalNoteType = typeof AnimalNotes.$inferSelect;
-export type WalkType = typeof Walks.$inferSelect;
+export type WalkType = typeof Walks.$inferSelect & {
+  media: AnimalMediaType[];
+};
 export type AnimalActivityType = typeof AnimalActivities.$inferSelect;
 
-export const KennelSize = z.enum(kennelSizeEnum.enumValues).Enum;
-export type KennelSizeEnum = (typeof KennelSize)[keyof typeof KennelSize];
-
-export const KennelTypeEnum = z.enum(kennelTypeEnum.enumValues).Enum;
-export type KennelTypeEnum =
-  (typeof KennelTypeEnum)[keyof typeof KennelTypeEnum];
-
-export const KennelStatus = z.enum(kennelStatusEnum.enumValues).Enum;
-export type KennelStatusEnum = (typeof KennelStatus)[keyof typeof KennelStatus];
-
-export const MaintenanceStatus = z.enum(maintenanceStatusEnum.enumValues).Enum;
-export type MaintenanceStatusEnum =
-  (typeof MaintenanceStatus)[keyof typeof MaintenanceStatus];
-
-export const DifficultyLevel = z.enum(difficultyLevelEnum.enumValues).Enum;
-export type DifficultyLevelEnum =
-  (typeof DifficultyLevel)[keyof typeof DifficultyLevel];
-
-export const WalkStatus = z.enum(walkStatusEnum.enumValues).Enum;
-export type WalkStatusEnum = (typeof WalkStatus)[keyof typeof WalkStatus];
-
-export const ActivityType = z.enum(activityTypeEnum.enumValues).Enum;
-export type ActivityTypeEnum = (typeof ActivityType)[keyof typeof ActivityType];
-
-export const ActivityCategory = z.enum(activityCategoryEnum.enumValues).Enum;
-export type ActivityCategoryEnum =
-  (typeof ActivityCategory)[keyof typeof ActivityCategory];
-
-export const ActivitySeverity = z.enum(activitySeverityEnum.enumValues).Enum;
-export type ActivitySeverityEnum =
-  (typeof ActivitySeverity)[keyof typeof ActivitySeverity];
-
-export const AnimalNoteTypeEnum = z.enum(animalNoteTypeEnum.enumValues).Enum;
-export type AnimalNoteTypeEnum =
-  (typeof AnimalNoteTypeEnum)[keyof typeof AnimalNoteTypeEnum];
-
-export const Gender = z.enum(genderEnum.enumValues).Enum;
-export type GenderEnum = (typeof Gender)[keyof typeof Gender];
-
-export const KennelNoteType = z.enum(kennelNoteTypeEnum.enumValues).Enum;
-export type KennelNoteTypeEnum =
-  (typeof KennelNoteType)[keyof typeof KennelNoteType];
-
 export type KennelNoteType = typeof KennelNotes.$inferSelect;
-
-// Animal Related Enums
-export const kennelMaintenanceTypeEnum = pgEnum("kennelMaintenanceType", [
-  "repair",
-  "scheduled",
-  "emergency",
-  "inspection",
-  "upgrade",
-]);
-
-export const kennelMaintenancePriorityEnum = pgEnum(
-  "kennelMaintenancePriority",
-  ["low", "medium", "high", "critical"],
-);
-
-export const kennelMaintenanceStatusEnum = pgEnum("kennelMaintenanceStatus", [
-  "pending",
-  "in_progress",
-  "completed",
-  "cancelled",
-]);
 
 // Kennel Maintenance Table
 export const KennelMaintenance = pgTable("kennel_maintenance", {
@@ -973,23 +1000,5 @@ export const KennelMaintenanceRelations = relations(
     }),
   }),
 );
-
-export const KennelMaintenanceType = z.enum(
-  kennelMaintenanceTypeEnum.enumValues,
-).Enum;
-export type KennelMaintenanceTypeEnum =
-  (typeof KennelMaintenanceType)[keyof typeof KennelMaintenanceType];
-
-export const KennelMaintenancePriority = z.enum(
-  kennelMaintenancePriorityEnum.enumValues,
-).Enum;
-export type KennelMaintenancePriorityEnum =
-  (typeof KennelMaintenancePriority)[keyof typeof KennelMaintenancePriority];
-
-export const KennelMaintenanceStatus = z.enum(
-  kennelMaintenanceStatusEnum.enumValues,
-).Enum;
-export type KennelMaintenanceStatusEnum =
-  (typeof KennelMaintenanceStatus)[keyof typeof KennelMaintenanceStatus];
 
 export type KennelMaintenanceType = typeof KennelMaintenance.$inferSelect;

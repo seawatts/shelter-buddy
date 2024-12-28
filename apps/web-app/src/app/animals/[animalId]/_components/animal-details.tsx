@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { differenceInYears, formatDistanceToNow } from "date-fns";
 import { Check, Timer, X } from "lucide-react";
@@ -12,7 +13,7 @@ import {
   formatDuration,
   getLastCompletedWalk,
 } from "../../_components/kennel-grid/utils";
-import { DIFFICULTY_CONFIG } from "../../difficulty-config";
+import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
 import { QuickReferenceDialog } from "./quick-reference-dialog";
 
 interface AnimalDetailsProps {
@@ -22,8 +23,20 @@ interface AnimalDetailsProps {
 export function AnimalDetails({ animal }: AnimalDetailsProps) {
   const router = useRouter();
   const difficultyConfig = DIFFICULTY_CONFIG[animal.difficultyLevel];
-  const lastWalk: { date: Date; duration: number } | undefined =
-    getLastCompletedWalk(animal);
+
+  const lastWalk = useMemo(() => getLastCompletedWalk(animal), [animal]);
+  const animalAge = useMemo(() => {
+    if (!animal.birthDate) return "Unknown age";
+    return `${differenceInYears(new Date(), new Date(animal.birthDate))} years`;
+  }, [animal.birthDate]);
+
+  const lastWalkFormatted = useMemo(() => {
+    if (!lastWalk) return null;
+    return {
+      duration: formatDuration(lastWalk.duration),
+      timeAgo: formatDistanceToNow(lastWalk.date, { addSuffix: true }),
+    };
+  }, [lastWalk]);
 
   const handleStartWalk = () => {
     router.push(`/animals/${animal.id}/walk`);
@@ -72,25 +85,18 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
                 <span>Kennel {animal.kennelId}</span>
                 <span>{animal.breed}</span>
                 <span>{animal.weight} lbs</span>
-                <span>
-                  {animal.birthDate
-                    ? `${differenceInYears(new Date(), new Date(animal.birthDate))} years`
-                    : "Unknown age"}
-                </span>
+                <span>{animalAge}</span>
                 <span>
                   {animal.isOutOfKennel ? "Out of Kennel" : "In Kennel"}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                {lastWalk ? (
+                {lastWalkFormatted ? (
                   <div className="flex items-center gap-4">
-                    <span>
-                      Last walk{" "}
-                      {formatDistanceToNow(lastWalk.date, { addSuffix: true })}
-                    </span>
+                    <span>Last walk {lastWalkFormatted.timeAgo}</span>
                     <span className="flex items-center gap-1">
                       <Timer className="size-3" />
-                      {formatDuration(lastWalk.duration)}
+                      {lastWalkFormatted.duration}
                     </span>
                   </div>
                 ) : (

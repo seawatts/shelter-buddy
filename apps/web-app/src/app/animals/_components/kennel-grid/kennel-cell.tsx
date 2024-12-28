@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cva } from "class-variance-authority";
@@ -151,9 +152,21 @@ export function KennelCell({
   onClick,
   isDraggingAnimal,
 }: KennelCellProps) {
-  const isWalked = animal ? hasBeenWalkedToday(animal) : false;
-  const activeWalk = animal ? hasWalkInProgress(animal) : undefined;
+  const isWalked = useMemo(
+    () => (animal ? hasBeenWalkedToday(animal) : false),
+    [animal],
+  );
+  const activeWalk = useMemo(
+    () => (animal ? hasWalkInProgress(animal) : undefined),
+    [animal],
+  );
   const hasActiveWalk = Boolean(activeWalk);
+
+  const isFiltered = useMemo(
+    () =>
+      animal ? !matchesFilters(animal, difficultyFilter, tagFilter) : false,
+    [animal, difficultyFilter, tagFilter],
+  );
 
   const {
     attributes,
@@ -176,9 +189,6 @@ export function KennelCell({
     zIndex: isDragging ? 50 : undefined,
   };
 
-  const isFiltered = animal
-    ? !matchesFilters(animal, difficultyFilter, tagFilter)
-    : false;
   const isAvailable = kennel.status === "available";
   const isUnderMaintenance = kennel.status === "maintenance";
   const tags = animal?.tags ?? [];
@@ -215,15 +225,6 @@ export function KennelCell({
     return "none";
   })();
 
-  if (kennel.name === "16") {
-    console.log(
-      kennel.name,
-      walkStatusVariant,
-      animal?.isOutOfKennel,
-      kennelStatusVariant,
-      stateVariant,
-    );
-  }
   return (
     <div
       data-kennel-id={kennel.id}

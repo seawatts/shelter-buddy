@@ -2,6 +2,7 @@
 
 import { useQueryState } from "nuqs";
 
+import type { AnimalType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import {
@@ -15,24 +16,24 @@ import {
 import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Animal } from "../types";
-
 interface TagFilterProps {
-  data: Animal[];
+  data: AnimalType[];
 }
 
 export function TagFilter({ data }: TagFilterProps) {
   const [tagFilter, setTagFilter] = useQueryState("tagFilter");
 
   // Get unique tags from all animals
-  const uniqueTags = [...new Set(data.flatMap((animal) => animal.tags ?? []))];
+  const uniqueTags = [...new Set(data.flatMap((animal) => animal.tags))];
 
   const selectedTags = tagFilter?.split(",").filter(Boolean) ?? [];
 
   // Count animals for each tag using a loop instead of reduce
   const tagCounts: Record<string, number> = {};
   for (const tag of uniqueTags) {
-    tagCounts[tag] = data.filter((animal) => animal.tags?.includes(tag)).length;
+    tagCounts[tag.tag] = data.filter((animal) =>
+      animal.tags.includes(tag),
+    ).length;
   }
 
   const toggleTag = (tag: string) => {
@@ -78,14 +79,14 @@ export function TagFilter({ data }: TagFilterProps) {
                   <DropdownMenuSeparator />
                   {uniqueTags.map((tag) => (
                     <DropdownMenuCheckboxItem
-                      key={tag}
-                      checked={selectedTags.includes(tag)}
-                      onCheckedChange={() => toggleTag(tag)}
+                      key={tag.id}
+                      checked={selectedTags.includes(tag.tag)}
+                      onCheckedChange={() => toggleTag(tag.tag)}
                       className="capitalize"
                     >
-                      {tag}
+                      {tag.tag}
                       <Badge variant="secondary" className="ml-auto">
-                        {tagCounts[tag]}
+                        {tagCounts[tag.tag]}
                       </Badge>
                     </DropdownMenuCheckboxItem>
                   ))}

@@ -1,3 +1,6 @@
+/* eslint-disable drizzle/enforce-update-with-where */
+/* eslint-disable drizzle/enforce-delete-with-where */
+import { eq } from "drizzle-orm";
 import { seed } from "drizzle-seed";
 
 import { db } from "./client";
@@ -15,173 +18,229 @@ import {
   genderEnum,
   KennelOccupants,
   Kennels,
-  kennelSizeEnum,
-  kennelStatusEnum,
-  kennelTypeEnum,
-  maintenanceStatusEnum,
   ShelterMembers,
   Shelters,
-  ShortUrl,
   userRoleEnum,
   Users,
-  Walks,
   walkStatusEnum,
 } from "./schema";
 
-try {
-  await seed(db, {
-    AnimalActivities,
-    AnimalMedia,
-    AnimalNotes,
-    AnimalTags,
-    Animals,
-    KennelOccupants,
-    Kennels,
-    ShelterMembers,
-    Shelters,
-    ShortUrl,
-    Users,
-    Walks,
-  }).refine((funcs) => ({
-    AnimalActivities: {
-      columns: {
-        category: funcs.valuesFromArray({
-          values: activityCategoryEnum.enumValues,
-        }),
-        metadata: funcs.default({ defaultValue: {} }),
-        notes: funcs.loremIpsum(),
-        severity: funcs.valuesFromArray({
-          values: activitySeverityEnum.enumValues,
-        }),
-        type: funcs.valuesFromArray({ values: activityTypeEnum.enumValues }),
-        value: funcs.int({ maxValue: 10, minValue: 1 }),
-      },
-      count: 100,
+// Reset all tables
+await db.delete(AnimalActivities);
+await db.delete(AnimalMedia);
+await db.delete(AnimalNotes);
+await db.delete(AnimalTags);
+await db.delete(KennelOccupants);
+await db.delete(Animals);
+await db.delete(Kennels);
+await db.delete(ShelterMembers);
+await db.delete(Users);
+await db.delete(Shelters);
+
+await seed(db, {
+  AnimalActivities,
+  AnimalMedia,
+  AnimalNotes,
+  AnimalTags,
+  Animals,
+  KennelOccupants,
+  Kennels,
+  ShelterMembers,
+  Shelters,
+  Users,
+}).refine((funcs) => ({
+  AnimalActivities: {
+    columns: {
+      category: funcs.valuesFromArray({
+        values: activityCategoryEnum.enumValues,
+      }),
+      metadata: funcs.default({ defaultValue: {} }),
+      notes: funcs.loremIpsum(),
+      severity: funcs.valuesFromArray({
+        values: activitySeverityEnum.enumValues,
+      }),
+      type: funcs.valuesFromArray({ values: activityTypeEnum.enumValues }),
+      value: funcs.int({ maxValue: 10, minValue: 1 }),
     },
-    AnimalMedia: {
-      columns: {
-        default: funcs.boolean(),
-        metadata: funcs.default({ defaultValue: {} }),
-        thumbnailUrl: funcs.default({
-          defaultValue: "https://picsum.photos/200/300",
-        }),
-        type: funcs.default({ defaultValue: "image" }),
-        url: funcs.default({ defaultValue: "https://picsum.photos/800/600" }),
-      },
-      count: 60,
+    count: 100,
+  },
+  AnimalMedia: {
+    columns: {
+      default: funcs.boolean(),
+      metadata: funcs.default({ defaultValue: {} }),
+      thumbnailUrl: funcs.default({
+        defaultValue: "https://picsum.photos/200/300",
+      }),
+      type: funcs.default({ defaultValue: "image" }),
+      url: funcs.default({ defaultValue: "https://picsum.photos/800/600" }),
     },
-    AnimalNotes: {
-      columns: {
-        isActive: funcs.boolean(),
-        notes: funcs.loremIpsum(),
-        summary: funcs.loremIpsum({ sentencesCount: 1 }),
-        type: funcs.valuesFromArray({
-          values: animalNoteTypeEnum.enumValues,
-        }),
-      },
-      count: 50,
+    count: 60,
+  },
+  AnimalNotes: {
+    columns: {
+      isActive: funcs.boolean(),
+      notes: funcs.loremIpsum(),
+      summary: funcs.loremIpsum({ sentencesCount: 1 }),
+      type: funcs.valuesFromArray({
+        values: animalNoteTypeEnum.enumValues,
+      }),
     },
-    AnimalTags: {
-      columns: {
-        isActive: funcs.boolean(),
-        tag: funcs.default({ defaultValue: "tag" }),
-      },
-      count: 80,
+    count: 50,
+  },
+  AnimalTags: {
+    columns: {
+      isActive: funcs.boolean(),
+      tag: funcs.valuesFromArray({
+        values: ["first", "last"],
+      }),
     },
-    Animals: {
-      columns: {
-        birthDate: funcs.date({
-          maxDate: "2024-01-01",
-          minDate: "2020-01-01",
-        }),
-        breed: funcs.default({ defaultValue: "Mixed" }),
-        difficultyLevel: funcs.valuesFromArray({
-          values: difficultyLevelEnum.enumValues,
-        }),
-        gender: funcs.valuesFromArray({ values: genderEnum.enumValues }),
-        isFido: funcs.boolean(),
-        isOutOfKennel: funcs.boolean(),
-        name: funcs.firstName(),
-        weight: funcs.number({ maxValue: 100, minValue: 5, precision: 2 }),
-      },
-      count: 30,
+    count: 4,
+  },
+  Animals: {
+    columns: {
+      birthDate: funcs.date({
+        maxDate: "2024-01-01",
+        minDate: "2020-01-01",
+      }),
+      breed: funcs.default({ defaultValue: "Mixed" }),
+      difficultyLevel: funcs.valuesFromArray({
+        values: difficultyLevelEnum.enumValues,
+      }),
+      gender: funcs.valuesFromArray({ values: genderEnum.enumValues }),
+      isFido: funcs.boolean(),
+      isOutOfKennel: funcs.boolean(),
+      name: funcs.firstName(),
+      weight: funcs.number({ maxValue: 100, minValue: 5, precision: 2 }),
     },
-    KennelOccupants: {
-      columns: {
-        endedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
-        startedAt: funcs.date({
-          maxDate: "2024-02-14",
-          minDate: "2024-01-01",
-        }),
-      },
-      count: 25,
+    count: 30,
+  },
+  KennelOccupants: {
+    columns: {
+      endedAt: funcs.default({ defaultValue: null }),
+      startedAt: funcs.date({
+        maxDate: "2024-02-14",
+        minDate: "2024-01-01",
+      }),
     },
-    Kennels: {
-      columns: {
-        features: funcs.default({
-          defaultValue: ["heated", "covered", "indoor"],
-        }),
-        gridX: funcs.int({ maxValue: 1, minValue: 0 }),
-        gridY: funcs.int({ maxValue: 15, minValue: 0 }),
-        maintenanceStatus: funcs.valuesFromArray({
-          values: maintenanceStatusEnum.enumValues,
-        }),
-        name: funcs.intPrimaryKey(),
-        notes: funcs.loremIpsum(),
-        size: funcs.valuesFromArray({ values: kennelSizeEnum.enumValues }),
-        status: funcs.valuesFromArray({
-          values: kennelStatusEnum.enumValues,
-        }),
-        type: funcs.valuesFromArray({ values: kennelTypeEnum.enumValues }),
-      },
-      count: 32,
+    count: 25,
+  },
+  Kennels: {
+    columns: {
+      gridX: funcs.int(),
+      gridY: funcs.int(),
+      lastCleanedAt: funcs.date({
+        maxDate: "2024-02-14",
+        minDate: "2024-01-01",
+      }),
+      maintenanceStatus: funcs.valuesFromArray({
+        values: ["good"],
+      }),
+      name: funcs.intPrimaryKey(),
+      status: funcs.valuesFromArray({
+        values: ["available"],
+      }),
+      type: funcs.valuesFromArray({
+        values: ["standard"],
+      }),
     },
-    ShelterMembers: {
-      columns: {
-        role: funcs.valuesFromArray({ values: userRoleEnum.enumValues }),
-      },
-      count: 10,
+    count: 32,
+  },
+  ShelterMembers: {
+    columns: {
+      role: funcs.valuesFromArray({ values: userRoleEnum.enumValues }),
     },
-    Shelters: {
-      columns: {
-        name: funcs.companyName(),
-        themeConfig: funcs.default({
-          defaultValue: {
-            colors: {
-              accent: "220 90% 75%",
-              primary: "220 90% 45%",
-              secondary: "220 20% 92%",
-            },
+    count: 10,
+  },
+  Shelters: {
+    columns: {
+      name: funcs.companyName(),
+      themeConfig: funcs.default({
+        defaultValue: {
+          colors: {
+            accent: "220 90% 75%",
+            primary: "220 90% 45%",
+            secondary: "220 20% 92%",
           },
-        }),
-      },
-      count: 2,
+        },
+      }),
     },
-    Users: {
-      columns: {
-        email: funcs.email(),
-        firstName: funcs.firstName(),
-        lastName: funcs.lastName(),
-        online: funcs.boolean(),
-      },
-      count: 20,
+    count: 1,
+  },
+  Users: {
+    columns: {
+      email: funcs.email(),
+      firstName: funcs.firstName(),
+      id: funcs.default({ defaultValue: "user_2qXtp8yCYqltHXZTFvFwZYeilwz" }),
+      lastName: funcs.lastName(),
+      online: funcs.boolean(),
     },
-    Walks: {
-      columns: {
-        endedAt: funcs.date({ maxDate: "2024-02-14", minDate: "2024-01-01" }),
-        notes: funcs.loremIpsum(),
-        startedAt: funcs.date({
-          maxDate: "2024-02-14",
-          minDate: "2024-01-01",
-        }),
-        status: funcs.valuesFromArray({ values: walkStatusEnum.enumValues }),
-        summary: funcs.loremIpsum({ sentencesCount: 1 }),
-        walkDifficulty: funcs.int({ maxValue: 5, minValue: 1 }),
-      },
-      count: 40,
+    count: 1,
+  },
+  Walks: {
+    columns: {
+      notes: funcs.loremIpsum(),
+      status: funcs.valuesFromArray({ values: walkStatusEnum.enumValues }),
+      summary: funcs.loremIpsum({ sentencesCount: 1 }),
+      walkDifficulty: funcs.int({ maxValue: 5, minValue: 1 }),
     },
-  }));
-} finally {
-  // eslint-disable-next-line unicorn/no-process-exit
-  process.exit(0);
+    count: 40,
+  },
+}));
+
+// Update kennel grid coordinates
+const kennels = await db.select().from(Kennels).orderBy(Kennels.name);
+
+for (const [index, kennel] of kennels.entries()) {
+  const kennelNumber = index + 1; // Start from 1 up to 32
+  const gridX = kennelNumber <= 16 ? 0 : 1;
+  const gridY =
+    kennelNumber <= 16
+      ? 15 - (kennelNumber - 1) // Left column: 15 down to 0
+      : kennelNumber - 17; // Right column: 0 up to 15
+
+  await db
+    .update(Kennels)
+    .set({
+      gridX,
+      gridY,
+      name: String(kennelNumber),
+    })
+    .where(eq(Kennels.id, kennel.id));
 }
+
+// Update kennel status based on occupants
+const kennelOccupants = await db.select().from(KennelOccupants);
+for (const occupant of kennelOccupants) {
+  // Only consider active occupancies (where endedAt is null)
+  await db
+    .update(Kennels)
+    .set({
+      status: "occupied",
+    })
+    .where(eq(Kennels.id, occupant.kennelId));
+}
+
+// Sync animal kennel assignments with kennel occupants
+const animals = await db.select().from(Animals);
+
+// First, remove all kennel assignments
+await db.update(Animals).set({ kennelId: null });
+
+// Then, update animals that have active kennel occupancies
+for (const animal of animals) {
+  const activeOccupancy = kennelOccupants.find(
+    (occupant) => occupant.animalId === animal.id && !occupant.endedAt,
+  );
+
+  if (activeOccupancy) {
+    await db
+      .update(Animals)
+      .set({
+        kennelId: activeOccupancy.kennelId,
+      })
+      .where(eq(Animals.id, animal.id));
+  }
+}
+
+// eslint-disable-next-line unicorn/no-process-exit
+process.exit(0);

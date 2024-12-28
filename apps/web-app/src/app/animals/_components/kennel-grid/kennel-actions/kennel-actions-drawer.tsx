@@ -37,6 +37,36 @@ export function KennelActionsDrawer({
     snapPoints[0] ?? null,
   );
 
+  const lastWalk = useMemo(
+    () => (animal ? getLastCompletedWalk(animal) : null),
+    [animal],
+  );
+  const lastWalkInfo = useMemo(() => {
+    if (!lastWalk) {
+      return (
+        <span className="text-xs text-muted-foreground">
+          No walks completed
+        </span>
+      );
+    }
+
+    const lastWalkDate = new Date(lastWalk.date);
+    return (
+      <span className="flex flex-col gap-1 text-xs text-muted-foreground">
+        <span>
+          Last walk{" "}
+          {formatDistanceToNow(lastWalkDate, {
+            addSuffix: true,
+          })}
+        </span>
+        <span className="flex items-center gap-1">
+          <Timer className="size-3" />
+          {formatDuration(lastWalk.duration)}
+        </span>
+      </span>
+    );
+  }, [lastWalk]);
+
   return (
     <Drawer
       open={open}
@@ -86,31 +116,7 @@ export function KennelActionsDrawer({
                 {animal && (
                   <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground">
-                      {(() => {
-                        const lastWalk = getLastCompletedWalk(animal);
-                        if (!lastWalk)
-                          return (
-                            <span className="text-xs text-muted-foreground">
-                              No walks completed
-                            </span>
-                          );
-
-                        const lastWalkDate = new Date(lastWalk.date);
-                        return (
-                          <span className="flex flex-col gap-1 text-xs text-muted-foreground">
-                            <span>
-                              Last walk{" "}
-                              {formatDistanceToNow(lastWalkDate, {
-                                addSuffix: true,
-                              })}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Timer className="size-3" />
-                              {formatDuration(lastWalk.duration)}
-                            </span>
-                          </span>
-                        );
-                      })()}
+                      {lastWalkInfo}
                     </p>
                   </div>
                 )}

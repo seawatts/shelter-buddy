@@ -1,22 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import { ViewModeToggle } from "./view-mode-toggle";
 
-interface HeaderProps {
-  dayAndMonth: string;
-  fullDate: string;
-  currentShift: {
-    label: string;
-    variant: "default" | "secondary" | "outline";
-  };
+function getCurrentShift(hour: number): {
+  label: string;
+  variant: "default" | "secondary" | "outline";
+} {
+  if (hour >= 5 && hour < 13) {
+    return { label: "AM", variant: "default" };
+  } else if (hour >= 13 && hour < 21) {
+    return { label: "Mid Day", variant: "secondary" };
+  } else {
+    return { label: "Evening", variant: "outline" };
+  }
 }
 
-export function Header({ dayAndMonth, fullDate, currentShift }: HeaderProps) {
+export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const { currentShift, dayAndMonth, fullDate } = useMemo(() => {
+    const now = new Date();
+    return {
+      currentShift: getCurrentShift(now.getHours()),
+      dayAndMonth: now.toLocaleDateString("en-US", {
+        weekday: "long",
+      }),
+      fullDate: now.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -20,7 +20,11 @@ export default async function AnimalPage({ params }: PageProps) {
       media: true,
       notes: true,
       tags: true,
-      walks: true,
+      walks: {
+        with: {
+          media: true,
+        },
+      },
     },
   });
 

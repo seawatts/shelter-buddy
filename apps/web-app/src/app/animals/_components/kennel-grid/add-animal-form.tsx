@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { Camera, ImageIcon, X } from "lucide-react";
 
+import type { DifficultyLevelEnum } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import {
   DropdownMenu,
@@ -21,11 +22,9 @@ import {
   SelectValue,
 } from "@acme/ui/select";
 
-import type { DifficultyLevel } from "../../types";
-
 interface AddAnimalFormData {
   breed: string;
-  difficultyLevel: DifficultyLevel;
+  difficultyLevel: DifficultyLevelEnum;
   headshot: string | null;
   name: string;
 }
@@ -38,7 +37,7 @@ export function AddAnimalForm() {
 
   const [formData, setFormData] = useState<AddAnimalFormData>({
     breed: "",
-    difficultyLevel: "" as DifficultyLevel,
+    difficultyLevel: "yellow" as DifficultyLevelEnum,
     headshot: null,
     name: "",
   });
@@ -207,7 +206,7 @@ export function AddAnimalForm() {
             onValueChange={(value) =>
               setFormData((previous) => ({
                 ...previous,
-                difficultyLevel: value as DifficultyLevel,
+                difficultyLevel: value as DifficultyLevelEnum,
               }))
             }
           >

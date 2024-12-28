@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Camera } from "lucide-react";
 
+import type {
+  ActivityTypeEnum,
+  AnimalType,
+  DifficultyLevelEnum,
+  WalkType,
+} from "@acme/db/schema";
+import { activityTypeEnum } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea } from "@acme/ui/textarea";
 
-import type { Animal, WalkSession } from "../../../types";
 import { formatDuration } from "../../../_components/kennel-grid/utils";
-import { DIFFICULTY_CONFIG } from "../../../difficulty-config";
 import {
   BackIcon,
   BallIcon,
@@ -28,43 +33,7 @@ import {
 } from "./icons";
 import { useAudioRecorder } from "./use-audio-recorder";
 
-type ActivityKey = keyof Pick<
-  WalkSession,
-  | "pee"
-  | "poop"
-  | "playedBall"
-  | "playedFetch"
-  | "dogReactive"
-  | "humanReactive"
-  | "likesSniffing"
-  | "likesPets"
-  | "leashTrained"
-  | "checksIn"
-  | "easyOut"
-  | "easyIn"
-  | "takesTreetsGently"
-  | "knowsSit"
-  | "knows123Treat"
-  | "calmInNewPlaces"
-  | "eatsEverything"
-  | "pullsHard"
-  | "jumpy"
-  | "mouthy"
-  | "boltingTendency"
-  | "resourceGuarding"
-  | "noTouches"
-  | "limping"
-  | "frequentUrination"
-  | "looseStool"
-  | "bloodyStool"
-  | "scratching"
-  | "hotSpots"
-  | "shakingHead"
-  | "eyeDischarge"
-  | "noseDischarge"
-  | "coughing"
-  | "sneezing"
->;
+type ActivityKey = ActivityTypeEnum;
 
 interface ActivityButton {
   key: ActivityKey;
@@ -89,54 +58,58 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   },
   {
     buttons: [
-      { icon: <BallIcon />, key: "playedBall", label: "Ball" },
-      { icon: <FetchIcon />, key: "playedFetch", label: "Fetch" },
+      { icon: <BallIcon />, key: "played_ball", label: "Ball" },
+      { icon: <FetchIcon />, key: "played_fetch", label: "Fetch" },
     ],
     title: "Activities",
     type: "basic",
   },
   {
     buttons: [
-      { icon: <ReactiveIcon />, key: "dogReactive", label: "Dog Reactive" },
-      { icon: <ReactiveIcon />, key: "humanReactive", label: "Human Reactive" },
+      { icon: <ReactiveIcon />, key: "dog_reactive", label: "Dog Reactive" },
+      {
+        icon: <ReactiveIcon />,
+        key: "human_reactive",
+        label: "Human Reactive",
+      },
     ],
     title: "Reactivity",
     type: "behavioral",
   },
   {
     buttons: [
-      { icon: <DogsIcon />, key: "likesSniffing", label: "Likes Sniffing" },
-      { icon: <PeopleIcon />, key: "likesPets", label: "Likes Pets" },
+      { icon: <DogsIcon />, key: "likes_sniffing", label: "Likes Sniffing" },
+      { icon: <PeopleIcon />, key: "likes_pets", label: "Likes Pets" },
       {
         icon: <GoodBehaviorIcon />,
-        key: "leashTrained",
+        key: "leash_trained",
         label: "Leash Trained",
       },
-      { icon: <GoodBehaviorIcon />, key: "checksIn", label: "Checks In" },
+      { icon: <GoodBehaviorIcon />, key: "checks_in", label: "Checks In" },
       {
         icon: <GoodBehaviorIcon />,
-        key: "easyOut",
+        key: "easy_out",
         label: "Easy Out",
       },
       {
         icon: <GoodBehaviorIcon />,
-        key: "easyIn",
+        key: "easy_in",
         label: "Easy In",
       },
       {
         icon: <GoodBehaviorIcon />,
-        key: "takesTreetsGently",
+        key: "takes_treats_gently",
         label: "Gentle with Treats",
       },
-      { icon: <GoodBehaviorIcon />, key: "knowsSit", label: "Knows Sit" },
+      { icon: <GoodBehaviorIcon />, key: "knows_sit", label: "Knows Sit" },
       {
         icon: <GoodBehaviorIcon />,
-        key: "knows123Treat",
+        key: "knows_123_treat",
         label: "1,2,3 Treat",
       },
       {
         icon: <GoodBehaviorIcon />,
-        key: "calmInNewPlaces",
+        key: "calm_in_new_places",
         label: "Calm Outside",
       },
     ],
@@ -147,12 +120,12 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
     buttons: [
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "eatsEverything",
+        key: "eats_everything",
         label: "Eats Everything",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "pullsHard",
+        key: "pulls_hard",
         label: "Pulls Hard",
       },
       {
@@ -167,17 +140,17 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "boltingTendency",
+        key: "bolting_tendency",
         label: "Bolting",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "resourceGuarding",
+        key: "resource_guarding",
         label: "Guards Items",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "noTouches",
+        key: "no_touches",
         label: "No Touches",
       },
     ],
@@ -193,17 +166,17 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
     buttons: [
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "frequentUrination",
+        key: "frequent_urination",
         label: "Frequent Urination",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "looseStool",
+        key: "loose_stool",
         label: "Loose Stool",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "bloodyStool",
+        key: "bloody_stool",
         label: "Bloody Stool",
       },
     ],
@@ -219,22 +192,22 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "hotSpots",
+        key: "hot_spots",
         label: "Hot Spots",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "shakingHead",
+        key: "shaking_head",
         label: "Shaking Head",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "eyeDischarge",
+        key: "eye_discharge",
         label: "Eye Discharge",
       },
       {
         icon: <AlertTriangle className="size-4" />,
-        key: "noseDischarge",
+        key: "nose_discharge",
         label: "Nose Discharge",
       },
     ],
@@ -259,37 +232,56 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
   },
 ];
 
-const DIFFICULTY_SCORES = [1, 2, 3, 4, 5] as const;
-
-interface WalkPhoto {
-  id: string;
-  url: string;
-  createdAt: Date;
-}
-
-interface WalkSessionWithPhotos extends WalkSession {
-  photos: WalkPhoto[];
-}
+const DIFFICULTY_SCORES: DifficultyLevelEnum[] = ["Yellow", "Purple", "Red"];
 
 interface WalkSessionProps {
-  animal: Animal;
-  initialData?: Partial<WalkSessionWithPhotos>;
+  animal: AnimalType;
+  walk: WalkType;
 }
 
-export function WalkSession({ animal, initialData }: WalkSessionProps) {
+export function WalkSession({ animal, walk }: WalkSessionProps) {
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [walkData, setWalkData] = useState<Partial<WalkSessionWithPhotos>>({
-    notes: "",
-    photos: [],
-    startedAt: new Date(initialData?.startedAt ?? new Date()),
-    status: "in_progress",
-    ...initialData,
+  const [activities, setActivities] = useState<
+    Record<ActivityTypeEnum, boolean>
+  >(() => {
+    const initialActivities = {} as Record<ActivityTypeEnum, boolean>;
+    for (const activity of activityTypeEnum.enumValues) {
+      initialActivities[activity] = false;
+    }
+    return initialActivities;
   });
+  const [walkData, setWalkData] = useState<Partial<WalkType>>(walk);
+  const [mounted, setMounted] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
-  const elapsedTime = walkData.startedAt
-    ? Math.floor((Date.now() - walkData.startedAt.getTime()) / (1000 * 60))
-    : 0;
+  // Only start updating time after component is mounted on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !walkData.startedAt) return;
+
+    const calculateElapsedTime = () => {
+      const startTimeMs = walkData.startedAt?.getTime() ?? 0;
+      if (startTimeMs === 0) return 0;
+      return Math.floor((Date.now() - startTimeMs) / (1000 * 60));
+    };
+
+    setElapsedTime(calculateElapsedTime());
+
+    const interval = setInterval(() => {
+      setElapsedTime(calculateElapsedTime());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [mounted, walkData.startedAt]);
+
+  const formattedDuration = useMemo(
+    () => formatDuration(elapsedTime),
+    [elapsedTime],
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -310,22 +302,14 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
       },
     });
 
-  const difficultyConfig = DIFFICULTY_CONFIG[animal.difficultyLevel];
-
   const toggleActivity = (activity: ActivityKey) => {
-    setWalkData((previous) => ({
+    setActivities((previous) => ({
       ...previous,
       [activity]: !previous[activity],
     }));
   };
 
   const renderSection = (section: ActivitySection) => {
-    // Create pairs of buttons
-    const buttonPairs: ActivityButton[][] = [];
-    for (let index = 0; index < section.buttons.length; index += 2) {
-      buttonPairs.push(section.buttons.slice(index, index + 2));
-    }
-
     return (
       <div key={section.title} className="space-y-2">
         <h2 className="font-medium">{section.title}</h2>
@@ -333,7 +317,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
           {section.buttons.map((button) => (
             <div key={button.key} className="flex flex-col items-center gap-1">
               <Button
-                variant={walkData[button.key] ? "default" : "outline"}
+                variant={activities[button.key] ? "default" : "outline"}
                 className="h-16 w-full sm:h-20"
                 onClick={() => toggleActivity(button.key)}
               >
@@ -399,7 +383,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
                 </h1>
                 {!isScrolled && (
                   <p className="text-sm text-muted-foreground">
-                    {formatDuration(elapsedTime)}
+                    {formattedDuration}
                   </p>
                 )}
               </div>
@@ -414,15 +398,15 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
                 <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
                   {animal.kennelId}
                 </div>
-                <div
-                  className="rounded-full px-3 py-1 text-center text-sm font-medium"
+                {/* <div
+                  className="rounded-full px-3 py-1 text-center text-sm font-medium text-white"
                   style={{
-                    backgroundColor: difficultyConfig.color,
-                    color: "white",
+                    backgroundColor:
+                      difficultyConfig.color ?? "hsl(var(--primary))",
                   }}
                 >
-                  {difficultyConfig.label}
-                </div>
+                  {difficultyConfig.label ?? animal.difficultyLevel}
+                </div> */}
               </div>
             </div>
           </div>
@@ -441,18 +425,18 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {walkData.photos?.length === 0 ? (
+            {walkData.media?.length === 0 ? (
               <div className="col-span-full flex h-24 items-center justify-center rounded-md border text-sm text-muted-foreground">
                 No photos added yet
               </div>
             ) : (
-              walkData.photos?.map((photo, index) => (
+              walkData.media?.map((media, index) => (
                 <div
-                  key={photo.id}
+                  key={media.id}
                   className="relative aspect-square overflow-hidden rounded-md border"
                 >
                   <Image
-                    src={photo.url}
+                    src={media.url}
                     alt={`Walk photo ${index + 1}`}
                     className="object-cover"
                     fill
@@ -470,7 +454,7 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
             className="w-full rounded-lg border p-4"
             rows={3}
             placeholder="Add any notes about the walk..."
-            value={walkData.notes}
+            value={walkData.notes ?? ""}
             onChange={(event) =>
               setWalkData((previous) => ({
                 ...previous,
@@ -516,17 +500,17 @@ export function WalkSession({ animal, initialData }: WalkSessionProps) {
               <Button
                 key={score}
                 variant={
-                  walkData.walkDifficulty === score ? "default" : "outline"
+                  walkData.difficultyLevel === score ? "default" : "outline"
                 }
                 className={cn(
                   "flex-1 text-lg font-semibold",
-                  walkData.walkDifficulty === score &&
+                  walkData.difficultyLevel === score &&
                     "bg-primary text-primary-foreground hover:bg-primary/90",
                 )}
                 onClick={() =>
                   setWalkData((previous) => ({
                     ...previous,
-                    walkDifficulty: score,
+                    difficultyLevel: score,
                   }))
                 }
               >

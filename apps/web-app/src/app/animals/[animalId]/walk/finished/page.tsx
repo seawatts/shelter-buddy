@@ -1,47 +1,43 @@
-"use client";
+import { eq } from "drizzle-orm";
 
-import { use, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { db } from "@acme/db/client";
+import { Animals, Walks } from "@acme/db/schema";
 
 import { WalkSession } from "../_components/walk-session";
-import { mockAnimals } from "../../../_mock-data/animals";
 
 interface PageProps {
   params: Promise<{
     animalId: string;
+    walkId: string;
   }>;
 }
 
-function getAnimal(animalId: string) {
-  return mockAnimals.find((animal) => animal.id === animalId) ?? null;
-}
+export default async function WalkFinishedPage({ params }: PageProps) {
+  const { animalId, walkId } = await params;
+  const animal = await db.query.Animals.findFirst({
+    where: eq(Animals.id, animalId),
+    with: {
+      activities: true,
+      media: true,
+      notes: true,
+      tags: true,
+      walks: {
+        with: {
+          media: true,
+        },
+      },
+    },
+  });
+  const walk = await db.query.Walks.findFirst({
+    where: eq(Walks.id, walkId),
+    with: {
+      media: true,
+    },
+  });
 
-export default function WalkFinishedPage({ params }: PageProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { animalId } = use(params);
-  const animal = getAnimal(animalId);
-
-  const startTime = searchParams.get("startTime");
-
-  useEffect(() => {
-    if (!animal) {
-      router.push("/animals");
-    }
-  }, [animal, router]);
-
-  if (!animal) {
+  if (!animal || !walk) {
     return null;
   }
 
-  return (
-    <WalkSession
-      animal={animal}
-      initialData={{
-        endedAt: new Date(),
-        startedAt: startTime ? new Date(startTime) : new Date(),
-        status: "completed",
-      }}
-    />
-  );
+  return <WalkSession animal={animal} walk={walk} />;
 }

@@ -21,18 +21,14 @@ export function KennelActions({
 }: KennelActionsProps) {
   const isMobile = useIsMobile();
 
-  if (isMobile) {
-    return (
-      <KennelActionsDrawer
-        animal={animal}
-        kennel={kennel}
-        open={open}
-        onOpenChange={onOpenChange}
-      />
-    );
-  }
-
-  return (
+  return isMobile ? (
+    <KennelActionsDrawer
+      animal={animal}
+      kennel={kennel}
+      open={open}
+      onOpenChange={onOpenChange}
+    />
+  ) : (
     <KennelActionsDialog
       animal={animal}
       kennel={kennel}

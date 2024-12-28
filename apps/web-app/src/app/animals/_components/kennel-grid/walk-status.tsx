@@ -1,32 +1,59 @@
 "use client";
 
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { differenceInMinutes } from "date-fns";
-import { Download, Play, Square, Timer } from "lucide-react";
+import { useServerAction } from "zsa-react";
 
 import type { AnimalType } from "@acme/db/schema";
-import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
-import { cn } from "@acme/ui/lib/utils";
+import { Icons } from "@acme/ui/icons";
+import { toast } from "@acme/ui/toast";
 
-import { formatDuration, hasWalkInProgress } from "./utils";
+import { startWalkAction, stopWalkAction } from "../actions";
+import { hasWalkInProgress } from "./utils";
 
-interface WalkStatusProps {
-  animal: AnimalType;
-  className?: string;
-}
-
-export function WalkStatus({ animal, className }: WalkStatusProps) {
+export function WalkStatus({ animal }: { animal: AnimalType }) {
   const router = useRouter();
-  const walkInProgress = hasWalkInProgress(animal);
+  const startWalkServerAction = useServerAction(startWalkAction);
+  const stopWalkServerAction = useServerAction(stopWalkAction);
+  const walkInProgress = useMemo(() => hasWalkInProgress(animal), [animal]);
 
-  const handleStartWalk = () => {
-    router.push(`/animals/${animal.id}/walk`);
-  };
+  const handleStartWalk = useCallback(async () => {
+    try {
+      const [result, error] = await startWalkServerAction.execute({
+        animalId: animal.id,
+      });
 
-  const handleStopWalk = () => {
-    router.push(`/animals/${animal.id}/walk`);
-  };
+      if (result) {
+        router.push(`/animals/${animal.id}/walk/in-progress`);
+      } else if (error) {
+        console.error("Error starting walk", error);
+        toast.error(error.message);
+      }
+    } catch {
+      toast.error("Failed to start walk");
+    }
+  }, [animal.id, startWalkServerAction, router]);
+
+  const handleStopWalk = useCallback(async () => {
+    if (!walkInProgress) return;
+
+    try {
+      const [_, error] = await stopWalkServerAction.execute({
+        animalId: animal.id,
+        walkId: walkInProgress.id,
+      });
+
+      if (error) {
+        console.error("Error stopping walk", error);
+        toast.error(error.message);
+      } else {
+        router.push(`/animals/${animal.id}/walk/finished`);
+      }
+    } catch {
+      toast.error("Failed to stop walk");
+    }
+  }, [animal.id, stopWalkServerAction, router, walkInProgress]);
 
   if (!walkInProgress) {
     if (animal.isOutOfKennel) {
@@ -38,40 +65,41 @@ export function WalkStatus({ animal, className }: WalkStatusProps) {
             console.log("Mark in kennel clicked");
           }}
         >
-          <Download className="size-3" />
+          <Icons.ArrowLeft className="size-3" />
           Mark In Kennel
         </Button>
       );
     }
     return (
-      <Button variant="default" className="gap-2" onClick={handleStartWalk}>
-        <Play className="size-3" />
+      <Button
+        variant="default"
+        className="gap-2"
+        onClick={handleStartWalk}
+        disabled={startWalkServerAction.isPending}
+      >
+        {startWalkServerAction.isPending ? (
+          <Icons.Spinner className="size-3" />
+        ) : (
+          <Icons.Play className="size-3" />
+        )}
         Start Walk
       </Button>
     );
   }
 
-  const durationInMinutes = differenceInMinutes(
-    new Date(),
-    walkInProgress.startedAt,
-  );
-
   return (
-    <div className="flex flex-col items-end gap-2">
-      <Button variant="destructive" className="gap-2" onClick={handleStopWalk}>
-        <Square className="size-3" />
-        Stop Walk
-      </Button>
-      <Badge
-        variant="outline"
-        className={cn(
-          "flex items-center gap-1 rounded-full border-2 border-primary px-2 py-0.5 text-xs font-medium text-primary",
-          className,
-        )}
-      >
-        <Timer className="size-3" />
-        {formatDuration(durationInMinutes)}
-      </Badge>
-    </div>
+    <Button
+      variant="destructive"
+      className="gap-2"
+      onClick={handleStopWalk}
+      disabled={stopWalkServerAction.isPending}
+    >
+      {stopWalkServerAction.isPending ? (
+        <Icons.Spinner className="size-3" />
+      ) : (
+        <Icons.X className="size-3" />
+      )}
+      Stop Walk
+    </Button>
   );
 }

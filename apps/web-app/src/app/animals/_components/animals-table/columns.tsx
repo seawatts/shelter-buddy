@@ -1,6 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
 import { ArrowUpDown, Clock, MoreHorizontal } from "lucide-react";
 
 import type { AnimalType, WalkType } from "@acme/db/schema";
@@ -21,10 +22,22 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 
-import { DIFFICULTY_CONFIG } from "../difficulty-config";
-import { formatDuration } from "./kennel-grid/utils";
+import { DIFFICULTY_CONFIG } from "../../_utils/difficulty-config";
+import { formatDuration } from "../kennel-grid/utils";
 
 const WalkBadge = ({ session }: { session?: WalkType }) => {
+  const durationInMinutes = useMemo(() => {
+    if (!session?.endedAt) return 0;
+    return Math.floor(
+      (session.endedAt.getTime() - session.startedAt.getTime()) / (1000 * 60),
+    );
+  }, [session]);
+
+  const formattedDuration = useMemo(
+    () => formatDuration(durationInMinutes),
+    [durationInMinutes],
+  );
+
   if (!session) {
     return (
       <Badge variant="outline" className="bg-muted/50">
@@ -55,12 +68,6 @@ const WalkBadge = ({ session }: { session?: WalkType }) => {
     );
   }
 
-  const durationInMinutes = session.endedAt
-    ? Math.floor(
-        (session.endedAt.getTime() - session.startedAt.getTime()) / (1000 * 60),
-      )
-    : 0;
-
   return (
     <TooltipProvider>
       <Tooltip>
@@ -69,7 +76,7 @@ const WalkBadge = ({ session }: { session?: WalkType }) => {
             <div className="flex items-center gap-2">
               <Badge variant="default" className="bg-green-600">
                 <Clock className="mr-1 size-3" />
-                {formatDuration(durationInMinutes)}
+                {formattedDuration}
               </Badge>
             </div>
             {session.userId && (

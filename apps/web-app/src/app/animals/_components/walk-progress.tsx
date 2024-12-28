@@ -7,8 +7,8 @@ import { useQueryState } from "nuqs";
 import type { AnimalType } from "@acme/db/schema";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { DifficultyLevel } from "../difficulty-config";
-import { DIFFICULTY_CONFIG } from "../difficulty-config";
+import type { DifficultyLevel } from "../_utils/difficulty-config";
+import { DIFFICULTY_CONFIG } from "../_utils/difficulty-config";
 
 interface WalkProgressProps {
   animals: AnimalType[];

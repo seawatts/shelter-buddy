@@ -4,7 +4,7 @@ import { useQueryState } from "nuqs";
 
 import type { AnimalType, KennelType } from "@acme/db/schema";
 
-import { AnimalsTable } from "./animals-table";
+import { AnimalsTable } from "./animals-table/table";
 import { KennelGrid } from "./kennel-grid";
 
 export function AnimalsView(props: {
