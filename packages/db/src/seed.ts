@@ -1,4 +1,3 @@
-/* eslint-disable drizzle/enforce-update-with-where */
 /* eslint-disable drizzle/enforce-delete-with-where */
 import { eq } from "drizzle-orm";
 import { seed } from "drizzle-seed";
@@ -206,40 +205,6 @@ for (const [index, kennel] of kennels.entries()) {
       name: String(kennelNumber),
     })
     .where(eq(Kennels.id, kennel.id));
-}
-
-// Update kennel status based on occupants
-const kennelOccupants = await db.select().from(KennelOccupants);
-for (const occupant of kennelOccupants) {
-  // Only consider active occupancies (where endedAt is null)
-  await db
-    .update(Kennels)
-    .set({
-      status: "occupied",
-    })
-    .where(eq(Kennels.id, occupant.kennelId));
-}
-
-// Sync animal kennel assignments with kennel occupants
-const animals = await db.select().from(Animals);
-
-// First, remove all kennel assignments
-await db.update(Animals).set({ kennelId: null });
-
-// Then, update animals that have active kennel occupancies
-for (const animal of animals) {
-  const activeOccupancy = kennelOccupants.find(
-    (occupant) => occupant.animalId === animal.id && !occupant.endedAt,
-  );
-
-  if (activeOccupancy) {
-    await db
-      .update(Animals)
-      .set({
-        kennelId: activeOccupancy.kennelId,
-      })
-      .where(eq(Animals.id, animal.id));
-  }
 }
 
 // eslint-disable-next-line unicorn/no-process-exit

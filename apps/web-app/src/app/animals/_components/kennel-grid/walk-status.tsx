@@ -56,7 +56,7 @@ export function WalkStatus({ animal }: { animal: AnimalType }) {
   }, [animal.id, stopWalkServerAction, router, walkInProgress]);
 
   if (!walkInProgress) {
-    if (animal.isOutOfKennel) {
+    if (animal.kennelOccupants.some((k) => k.isOutOfKennel)) {
       return (
         <Button
           className="gap-2"

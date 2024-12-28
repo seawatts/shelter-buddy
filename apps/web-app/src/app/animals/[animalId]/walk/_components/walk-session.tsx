@@ -396,7 +396,7 @@ export function WalkSession({ animal, walk }: WalkSessionProps) {
                 )}
               >
                 <div className="rounded-full bg-secondary px-3 py-1 text-center text-sm font-medium">
-                  {animal.kennelId}
+                  {animal.kennelOccupants[0]?.id}
                 </div>
                 {/* <div
                   className="rounded-full px-3 py-1 text-center text-sm font-medium text-white"

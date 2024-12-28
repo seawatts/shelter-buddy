@@ -59,7 +59,9 @@ export function DndContextWrapper({
     ? animals.find((a) => a.id === activeId)
     : undefined;
   const activeKennel = activeAnimal
-    ? kennels.find((k) => k.id === activeAnimal.kennelId)
+    ? activeAnimal.kennelOccupants.find(
+        (k) => k.kennelId === activeId && !k.endedAt,
+      )
     : null;
   const id = useId();
 
@@ -78,7 +80,7 @@ export function DndContextWrapper({
         {activeId && activeKennel && activeAnimal && (
           <KennelCell
             showKennelId={false}
-            kennel={activeKennel}
+            kennel={activeKennel.kennel}
             animal={activeAnimal}
             difficultyFilter={difficultyFilter}
             tagFilter={tagFilter}

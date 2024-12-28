@@ -45,7 +45,7 @@ export const addAnimalNoteAction = authenticatedAction
       throw new Error("Animal not found");
     }
 
-    const animalNote = await db.insert(AnimalNotes).values({
+    await db.insert(AnimalNotes).values({
       animalId: input.animalId,
       createdByUserId: ctx.user.id,
       isActive: true,
@@ -55,7 +55,7 @@ export const addAnimalNoteAction = authenticatedAction
       type: input.type,
     });
 
-    return { data: animalNote, success: true };
+    return { success: true };
   });
 
 // Reassign Kennel Action
@@ -65,6 +65,16 @@ export const reassignKennelAction = authenticatedAction
   .handler(async ({ ctx, input }) => {
     const animal = await db.query.Animals.findFirst({
       where: eq(Animals.id, input.animalId),
+      with: {
+        kennelOccupants: {
+          limit: 1,
+          orderBy: (kennel, { desc }) => desc(kennel.startedAt),
+          where: (kennel, { isNull }) => isNull(kennel.endedAt),
+          with: {
+            kennel: true,
+          },
+        },
+      },
     });
 
     if (!animal) {
@@ -72,7 +82,7 @@ export const reassignKennelAction = authenticatedAction
     }
 
     // End current kennel occupancy
-    if (animal.kennelId) {
+    if (animal.kennelOccupants[0]?.kennelId) {
       await db
         .update(KennelOccupants)
         .set({
@@ -81,7 +91,7 @@ export const reassignKennelAction = authenticatedAction
         .where(
           and(
             eq(KennelOccupants.animalId, input.animalId),
-            eq(KennelOccupants.kennelId, animal.kennelId),
+            eq(KennelOccupants.kennelId, animal.kennelOccupants[0]?.kennelId),
             isNull(KennelOccupants.endedAt),
           ),
         );
@@ -95,14 +105,6 @@ export const reassignKennelAction = authenticatedAction
       shelterId: animal.shelterId,
       startedAt: new Date(),
     });
-
-    // Update animal's current kennel
-    await db
-      .update(Animals)
-      .set({
-        kennelId: input.newKennelId,
-      })
-      .where(eq(Animals.id, input.animalId));
   });
 
 // Mark Out of Kennel Action
@@ -112,19 +114,34 @@ export const toggleOutOfKennelAction = authenticatedAction
   .handler(async ({ ctx, input }) => {
     const animal = await db.query.Animals.findFirst({
       where: eq(Animals.id, input.animalId),
+      with: {
+        kennelOccupants: {
+          limit: 1,
+          orderBy: (kennel, { desc }) => desc(kennel.startedAt),
+          where: (kennel, { isNull }) => isNull(kennel.endedAt),
+        },
+      },
     });
 
     if (!animal) {
       throw new Error("Animal not found");
     }
 
-    // Update animal's out of kennel status
-    await db
-      .update(Animals)
-      .set({
-        isOutOfKennel: input.isOutOfKennel,
-      })
-      .where(eq(Animals.id, input.animalId));
+    // Update the current kennel occupant's isOutOfKennel status
+    if (animal.kennelOccupants[0]?.id) {
+      await db
+        .update(KennelOccupants)
+        .set({
+          isOutOfKennel: input.isOutOfKennel,
+        })
+        .where(
+          and(
+            eq(KennelOccupants.animalId, input.animalId),
+            eq(KennelOccupants.id, animal.kennelOccupants[0].id),
+            isNull(KennelOccupants.endedAt),
+          ),
+        );
+    }
 
     // Add a note about the status change
     await db.insert(AnimalNotes).values({

@@ -189,12 +189,12 @@ export function KennelCell({
     zIndex: isDragging ? 50 : undefined,
   };
 
-  const isAvailable = kennel.status === "available";
-  const isUnderMaintenance = kennel.status === "maintenance";
   const tags = animal?.tags ?? [];
 
   const shouldReduceOpacity = isFiltered || (isWalked && !hasActiveWalk);
-  const isValidDropTarget = !animal && !isUnderMaintenance && isAvailable;
+  const currentKennelOccupant = animal?.kennelOccupants.find((k) => !k.endedAt);
+  const isValidDropTarget = Boolean(currentKennelOccupant?.isOutOfKennel);
+  const isOutOfKennel = Boolean(currentKennelOccupant?.isOutOfKennel);
 
   // Compute variants
   const cursorVariant = (() => {
@@ -208,13 +208,11 @@ export function KennelCell({
   })();
 
   const kennelStatusVariant = (() => {
-    if (isAvailable) return "available";
-    if (animal?.isOutOfKennel) return "outOfKennel";
+    if (isOutOfKennel) return "outOfKennel";
     return undefined;
   })();
 
   const stateVariant = (() => {
-    if (isUnderMaintenance) return "maintenance";
     if (shouldReduceOpacity) return "filtered";
     return "active";
   })();
@@ -237,7 +235,7 @@ export function KennelCell({
             | "yellow"
             | undefined,
           dropTarget: dropTargetVariant,
-          isOutOfKennel: animal?.isOutOfKennel ?? false,
+          isOutOfKennel,
           kennelStatus: kennelStatusVariant,
           state: stateVariant,
           walkStatus: walkStatusVariant,

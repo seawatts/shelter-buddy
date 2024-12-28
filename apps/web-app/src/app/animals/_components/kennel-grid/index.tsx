@@ -43,7 +43,9 @@ export function KennelGrid(props: KennelGridProps) {
 
     // Find the first visible kennel that matches the filter and hasn't been walked
     const firstMatchingKennel = sortedKennels.find((kennel) => {
-      const animal = props.animals.find((a) => a.kennelId === kennel.id);
+      const animal = props.animals.find((a) =>
+        a.kennelOccupants.some((k) => k.kennelId === kennel.id && !k.endedAt),
+      );
       if (!animal || !selectedFilters.includes(animal.difficultyLevel))
         return false;
 
@@ -91,10 +93,15 @@ export function KennelGrid(props: KennelGridProps) {
       const activeAnimal = props.animals.find((a) => a.id === activeAnimalId);
       if (!activeAnimal) return;
 
-      const fromKennelId = activeAnimal.kennelId;
+      const currentKennelOccupant = activeAnimal.kennelOccupants.find(
+        (k) => !k.endedAt,
+      );
+      if (!currentKennelOccupant) return;
+
+      const fromKennelId = currentKennelOccupant.kennelId;
       if (fromKennelId === overKennelId) return;
 
-      props.onAnimalMove?.(activeAnimalId, fromKennelId ?? "", overKennelId);
+      props.onAnimalMove?.(activeAnimalId, fromKennelId, overKennelId);
     },
     [props],
   );
@@ -129,7 +136,11 @@ export function KennelGrid(props: KennelGridProps) {
               >
                 <KennelCell
                   kennel={kennel}
-                  animal={props.animals.find((a) => a.kennelId === kennel.id)}
+                  animal={props.animals.find((a) =>
+                    a.kennelOccupants.some(
+                      (k) => k.kennelId === kennel.id && !k.endedAt,
+                    ),
+                  )}
                   difficultyFilter={difficultyFilter}
                   tagFilter={tagFilter}
                   isDraggingAnimal={Boolean(activeId)}
@@ -144,7 +155,11 @@ export function KennelGrid(props: KennelGridProps) {
       {selectedKennel && (
         <KennelActions
           kennel={selectedKennel}
-          animal={props.animals.find((a) => a.kennelId === selectedKennel.id)}
+          animal={props.animals.find((a) =>
+            a.kennelOccupants.some(
+              (k) => k.kennelId === selectedKennel.id && !k.endedAt,
+            ),
+          )}
           open={Boolean(selectedKennel)}
           onOpenChange={(open) => {
             if (!open) setSelectedKennel(null);

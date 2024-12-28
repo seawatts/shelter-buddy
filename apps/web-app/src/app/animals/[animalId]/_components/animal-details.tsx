@@ -82,12 +82,14 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Kennel {animal.kennelId}</span>
+                <span>Kennel {animal.kennelOccupants[0]?.id}</span>
                 <span>{animal.breed}</span>
                 <span>{animal.weight} lbs</span>
                 <span>{animalAge}</span>
                 <span>
-                  {animal.isOutOfKennel ? "Out of Kennel" : "In Kennel"}
+                  {animal.kennelOccupants[0]?.isOutOfKennel
+                    ? "Out of Kennel"
+                    : "In Kennel"}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

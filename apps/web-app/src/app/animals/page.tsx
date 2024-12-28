@@ -18,6 +18,14 @@ export default async function AnimalsPage(props: {
   const animals = await db.query.Animals.findMany({
     with: {
       activities: true,
+      kennelOccupants: {
+        limit: 1,
+        orderBy: (kennel, { desc }) => desc(kennel.startedAt),
+        where: (kennel, { isNull }) => isNull(kennel.endedAt),
+        with: {
+          kennel: true,
+        },
+      },
       media: true,
       notes: true,
       tags: true,
@@ -28,6 +36,7 @@ export default async function AnimalsPage(props: {
       },
     },
   });
+
   const kennels = await db.query.Kennels.findMany();
 
   return (

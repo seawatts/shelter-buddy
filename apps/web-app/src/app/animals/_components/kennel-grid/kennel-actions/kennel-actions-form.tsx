@@ -86,6 +86,11 @@ export function KennelActionsForm({
   };
 
   const handleToggleOutOfKennel = () => {
+    const currentKennelOccupant = animal.kennelOccupants.find(
+      (k) => !k.endedAt,
+    );
+    if (!currentKennelOccupant) return;
+
     startTransition(() => {
       (
         toggleOutOfKennelAction as unknown as (input: {
@@ -94,13 +99,13 @@ export function KennelActionsForm({
         }) => Promise<ActionResult>
       )({
         animalId: animal.id,
-        isOutOfKennel: !animal.isOutOfKennel,
+        isOutOfKennel: !currentKennelOccupant.isOutOfKennel,
       })
         .then((result) => {
           if (result.success) {
             toast.success(
               `${animal.name} marked ${
-                animal.isOutOfKennel ? "in" : "out of"
+                currentKennelOccupant.isOutOfKennel ? "in" : "out of"
               } kennel`,
             );
             onOpenChange(false);
@@ -112,6 +117,8 @@ export function KennelActionsForm({
         });
     });
   };
+
+  const currentKennelOccupant = animal.kennelOccupants.find((k) => !k.endedAt);
 
   return (
     <div className="flex flex-col gap-2">
@@ -145,19 +152,21 @@ export function KennelActionsForm({
         variant="outline"
         className="w-full justify-start"
         onClick={handleToggleOutOfKennel}
-        disabled={isPending}
+        disabled={isPending || !currentKennelOccupant}
       >
         {(() => {
           if (isPending) {
             return <Icons.Spinner className="mr-2" />;
           }
-          return animal.isOutOfKennel ? (
+          return currentKennelOccupant?.isOutOfKennel ? (
             <Icons.ArrowLeft className="mr-2" />
           ) : (
             <Icons.ArrowRight className="mr-2" />
           );
         })()}
-        {animal.isOutOfKennel ? "Mark In Kennel" : "Mark Out of Kennel"}
+        {currentKennelOccupant?.isOutOfKennel
+          ? "Mark In Kennel"
+          : "Mark Out of Kennel"}
       </Button>
     </div>
   );

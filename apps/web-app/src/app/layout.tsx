@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { ClerkProvider } from "@clerk/nextjs";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { PostHogProvider } from "@acme/analytics/posthog/client";
+import { AnalyticsProviders } from "@acme/analytics/providers";
 import { cn } from "@acme/ui/lib/utils";
 
 import "@acme/ui/globals.css";
@@ -61,19 +63,27 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <NuqsAdapter>
-          <TooltipProvider>
-            <PostHogProvider>
-              <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-                <SidebarProvider defaultOpen={defaultOpen}>
-                  <AppSidebar shelter={shelter} />
-                  <main className="flex-1">{props.children}</main>
-                </SidebarProvider>
-                <Toaster />
-              </ThemeProvider>
-            </PostHogProvider>
-          </TooltipProvider>
-        </NuqsAdapter>
+        <ClerkProvider>
+          <AnalyticsProviders identifyUser>
+            <NuqsAdapter>
+              <TooltipProvider>
+                <PostHogProvider>
+                  <ThemeProvider
+                    attribute="class"
+                    defaultTheme="dark"
+                    enableSystem
+                  >
+                    <SidebarProvider defaultOpen={defaultOpen}>
+                      <AppSidebar shelter={shelter} />
+                      <main className="flex-1">{props.children}</main>
+                    </SidebarProvider>
+                    <Toaster />
+                  </ThemeProvider>
+                </PostHogProvider>
+              </TooltipProvider>
+            </NuqsAdapter>
+          </AnalyticsProviders>
+        </ClerkProvider>
       </body>
     </html>
   );

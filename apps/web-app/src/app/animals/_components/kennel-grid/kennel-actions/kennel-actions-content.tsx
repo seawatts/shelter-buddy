@@ -141,7 +141,9 @@ export function KennelActionsContent({
             <div className="flex items-center justify-between">
               <span>Status</span>
               <span>
-                {animal.isOutOfKennel ? "Out of Kennel" : "In Kennel"}
+                {animal.kennelOccupants[0]?.isOutOfKennel
+                  ? "Out of Kennel"
+                  : "In Kennel"}
               </span>
             </div>
           </div>

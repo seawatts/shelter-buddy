@@ -34,6 +34,7 @@ export const env = createEnv({
   server: {
     CLERK_SECRET_KEY: z.string(),
     POSTGRES_URL: z.string().url(),
+    POSTHOG_KEY: z.string(),
     WEBHOOK_SECRET: z.string(),
   },
 

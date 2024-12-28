@@ -4,7 +4,6 @@ import {
   decimal,
   integer,
   json,
-  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -267,6 +266,10 @@ export const Users = pgTable("user", {
   email: text("email").notNull().unique(),
   firstName: text("firstName"),
   id: varchar("id", { length: 48 }).notNull().primaryKey(),
+  lastLoggedInAt: timestamp("lastLoggedInAt", {
+    mode: "date",
+    withTimezone: true,
+  }),
   lastName: text("lastName"),
   online: boolean("online").default(false).notNull(),
   updatedAt: timestamp("updatedAt", {
@@ -424,7 +427,6 @@ export const Kennels = pgTable("kennel", {
     mode: "date",
     withTimezone: true,
   }).defaultNow(),
-  features: jsonb("features").$type<string[]>().default([]).notNull(),
   gridX: integer("gridX").default(0).notNull(),
   gridY: integer("gridY").default(0).notNull(),
   id: varchar("id", { length: 48 })
@@ -442,8 +444,6 @@ export const Kennels = pgTable("kennel", {
       onDelete: "cascade",
     })
     .notNull(),
-  size: kennelSizeEnum("size").default("medium").notNull(),
-  status: kennelStatusEnum("status").default("available").notNull(),
   type: kennelTypeEnum("type").default("standard").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
@@ -510,6 +510,7 @@ export const KennelOccupants = pgTable("kennel_occupant", {
     .$defaultFn(() => createId({ prefix: "occupant" }))
     .notNull()
     .primaryKey(),
+  isOutOfKennel: boolean("isOutOfKennel").default(false).notNull(),
   kennelId: varchar("kennelId")
     .references(() => Kennels.id, {
       onDelete: "cascade",
@@ -532,10 +533,6 @@ export const KennelOccupants = pgTable("kennel_occupant", {
 
 // Relations
 export const KennelsRelations = relations(Kennels, ({ one, many }) => ({
-  currentAnimal: one(Animals, {
-    fields: [Kennels.id],
-    references: [Animals.kennelId],
-  }),
   maintenanceRecords: many(KennelMaintenance),
   notes: many(KennelNotes),
   occupants: many(KennelOccupants),
@@ -605,8 +602,6 @@ export const Animals = pgTable("animal", {
     .notNull()
     .primaryKey(),
   isFido: boolean("isFido").default(false).notNull(),
-  isOutOfKennel: boolean("isOutOfKennel").default(false).notNull(),
-  kennelId: varchar("kennelId").references(() => Kennels.id),
   name: text("name").notNull(),
   shelterId: varchar("shelterId")
     .references(() => Shelters.id, {
@@ -623,6 +618,9 @@ export const Animals = pgTable("animal", {
 export type AnimalType = typeof Animals.$inferSelect & {
   tags: AnimalTagType[];
   media: AnimalMediaType[];
+  kennelOccupants: (KennelOccupantType & {
+    kennel: KennelType;
+  })[];
   notes: AnimalNoteType[];
   walks: WalkType[];
   activities: AnimalActivityType[];
@@ -827,11 +825,7 @@ export const AnimalsRelations = relations(Animals, ({ one, many }) => ({
     fields: [Animals.createdByUserId],
     references: [Users.id],
   }),
-  kennel: one(Kennels, {
-    fields: [Animals.kennelId],
-    references: [Kennels.id],
-  }),
-  kennelHistory: many(KennelOccupants),
+  kennelOccupants: many(KennelOccupants),
   media: many(AnimalMedia),
   notes: many(AnimalNotes),
   shelter: one(Shelters, {
@@ -945,12 +939,6 @@ export const KennelMaintenance = pgTable("kennel_maintenance", {
       onDelete: "cascade",
     })
     .notNull(),
-  description: text("description").notNull(),
-  dueDate: timestamp("dueDate", {
-    mode: "date",
-    withTimezone: true,
-  }),
-  estimatedCost: decimal("estimatedCost", { precision: 10, scale: 2 }),
   id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "maintenance" }))
     .notNull()
@@ -960,17 +948,12 @@ export const KennelMaintenance = pgTable("kennel_maintenance", {
       onDelete: "cascade",
     })
     .notNull(),
-  priority: kennelMaintenancePriorityEnum("priority")
-    .default("medium")
-    .notNull(),
-  resolution: text("resolution"),
   shelterId: varchar("shelterId")
     .references(() => Shelters.id, {
       onDelete: "cascade",
     })
     .notNull(),
   status: kennelMaintenanceStatusEnum("status").default("pending").notNull(),
-  title: text("title").notNull(),
   type: kennelMaintenanceTypeEnum("type").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",

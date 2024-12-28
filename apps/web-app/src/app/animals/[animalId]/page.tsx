@@ -17,6 +17,14 @@ export default async function AnimalPage({ params }: PageProps) {
     where: eq(Animals.id, animalId),
     with: {
       activities: true,
+      kennelOccupants: {
+        limit: 1,
+        orderBy: (kennel, { desc }) => desc(kennel.startedAt),
+        where: (kennel, { isNotNull }) => isNotNull(kennel.endedAt),
+        with: {
+          kennel: true,
+        },
+      },
       media: true,
       notes: true,
       tags: true,
