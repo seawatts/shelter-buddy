@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 
+import { env } from "./env.client";
 import { WebVitals } from "./nextjs/web-vitals";
 import {
   PostHogIdentifyUser,
@@ -13,7 +14,7 @@ import {
   PosthogWebVitals,
 } from "./posthog/client";
 
-const isProduction = process.env.NEXT_PUBLIC_APP_ENV === "production";
+const isProduction = env.NEXT_PUBLIC_APP_ENV === "production";
 
 const PostHogPageView = dynamic(
   () => import("./posthog/client").then((module_) => module_.PostHogPageView),
