@@ -12,6 +12,7 @@ const nextConfig = {
     scrollRestoration: true,
     typedRoutes: true,
   },
+  serverExternalPackages: ["@boundaryml/baml"],
   images: {
     remotePatterns: [
       { hostname: "images.unsplash.com" },
@@ -32,6 +33,20 @@ const nextConfig = {
   },
   poweredByHeader: false,
   typescript: { ignoreBuildErrors: true },
+  webpack: (config, { dev, isServer, webpack, nextRuntime }) => {
+    config.module.rules.push({
+      test: /\.node$/,
+      use: [
+        {
+          loader: "nextjs-node-loader",
+          options: {
+            outputPath: config.output.path,
+          },
+        },
+      ],
+    });
+    return config;
+  },
 };
 
 export default withBundleAnalyzer({

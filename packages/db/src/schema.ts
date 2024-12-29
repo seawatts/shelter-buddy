@@ -596,6 +596,7 @@ export const Animals = pgTable("animal", {
     })
     .notNull(),
   difficultyLevel: difficultyLevelEnum("difficultyLevel").notNull(),
+  externalId: text("externalId"),
   gender: genderEnum("gender").notNull(),
   id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "animal" }))
@@ -612,7 +613,7 @@ export const Animals = pgTable("animal", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
-  weight: decimal("weight", { precision: 5, scale: 2 }),
+  weight: decimal("weight", { precision: 5, scale: 2 }).$type<number>(),
 });
 
 export type AnimalType = typeof Animals.$inferSelect;

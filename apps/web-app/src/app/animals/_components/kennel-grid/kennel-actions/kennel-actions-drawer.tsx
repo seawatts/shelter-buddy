@@ -126,7 +126,11 @@ export function KennelActionsDrawer({
           </DrawerHeader>
 
           <div className="p-4">
-            <KennelActionsContent animal={animal} onOpenChange={onOpenChange} />
+            <KennelActionsContent
+              animal={animal}
+              kennelId={kennel.id}
+              onOpenChange={onOpenChange}
+            />
           </div>
         </div>
       </DrawerContent>

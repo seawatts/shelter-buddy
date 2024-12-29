@@ -6,21 +6,30 @@ import type { AnimalNoteType, AnimalTypeWithRelations } from "@acme/db/schema";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { cn } from "@acme/ui/lib/utils";
 
-import { AddAnimalForm } from "../add-animal-form";
 import { AnimalImages } from "../animal-images";
+import { AddAnimalForm } from "./add-animal-form";
 import { KennelActionsForm } from "./kennel-actions-form";
 
 interface KennelActionsContentProps {
   animal?: AnimalTypeWithRelations | undefined;
   onOpenChange: (open: boolean) => void;
+  kennelId: string;
 }
 
 export function KennelActionsContent({
   animal,
+  kennelId,
   onOpenChange,
 }: KennelActionsContentProps) {
   if (!animal) {
-    return <AddAnimalForm />;
+    return (
+      <AddAnimalForm
+        kennelId={kennelId}
+        onSubmit={() => {
+          onOpenChange(false);
+        }}
+      />
+    );
   }
 
   const hasActiveNotes = animal.notes.some(

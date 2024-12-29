@@ -84,7 +84,11 @@ export function KennelActionsDialog({
         </DialogHeader>
         <div className="flex-1 overflow-y-auto">
           <div className="p-4">
-            <KennelActionsContent animal={animal} onOpenChange={onOpenChange} />
+            <KennelActionsContent
+              animal={animal}
+              kennelId={kennel.id}
+              onOpenChange={onOpenChange}
+            />
           </div>
         </div>
       </DialogContent>
