@@ -5,7 +5,7 @@ import { PostHog } from "posthog-node";
 import { Webhook } from "svix";
 
 import { db } from "@acme/db/client";
-import { Users } from "@acme/db/schema";
+import { ShelterMembers, Shelters, Users } from "@acme/db/schema";
 
 import { env } from "~/env.server";
 
@@ -108,6 +108,20 @@ export async function POST(request: Request) {
     if (!user) {
       return new Response("User not found on user.created", { status: 400 });
     }
+
+    // Find first shelter and create shelter member
+    const [shelter] = await db.select().from(Shelters).limit(1);
+
+    if (!shelter) {
+      return new Response("No shelter found", { status: 400 });
+    }
+
+    await db.insert(ShelterMembers).values({
+      createdByUserId: user.id,
+      role: "user",
+      shelterId: shelter.id,
+      userId: user.id,
+    });
 
     posthog.capture({
       distinctId: user.id,
