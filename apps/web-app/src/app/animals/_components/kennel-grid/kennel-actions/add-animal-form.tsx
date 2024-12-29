@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Camera, Trash2 } from "lucide-react";
 import { useServerAction } from "zsa-react";
 
-import type { DifficultyLevelEnum, GenderEnum, GenderEnum } from "@acme/db/schema";
+import type { DifficultyLevelEnum, GenderEnum } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { Input } from "@acme/ui/input";
@@ -176,9 +176,9 @@ export function AddAnimalForm({
               <Camera className="mr-2 size-4" />
               {isAnalyzing
                 ? "Analyzing..."
-                : (formData.headshot
+                : formData.headshot
                   ? "Change Photo"
-                  : "Upload Form")}
+                  : "Upload Form"}
             </Button>
             <input
               type="file"

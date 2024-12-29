@@ -84,9 +84,9 @@ export function AnimalPhotoUpload({
             <Camera className="mr-2 size-4" />
             {isLoading
               ? "Processing..."
-              : (photos.length > 0
+              : photos.length > 0
                 ? "Change Photo"
-                : "Take Photo")}
+                : "Take Photo"}
           </Button>
           <input
             type="file"
@@ -104,7 +104,7 @@ export function AnimalPhotoUpload({
         <div className="relative mx-auto">
           <div className="relative size-32">
             <Image
-              src={photos[0].url}
+              src={photos[0]?.url ?? ""}
               alt="Animal photo"
               fill
               className="rounded-md object-cover"

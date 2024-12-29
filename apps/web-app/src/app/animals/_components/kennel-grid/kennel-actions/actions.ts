@@ -217,11 +217,12 @@ export const createAnimalAction = authenticatedAction
         breed: input.breed,
         createdByUserId: ctx.user.id,
         difficultyLevel: input.difficultyLevel,
+        externalId: input.id,
         gender: input.gender,
         isFido: input.isFido ?? false,
         name: input.name,
         shelterId: shelterMember.shelterId,
-        weight: input.weight ? input.weight.toString() : null,
+        weight: input.weight ?? null,
       })
       .returning();
 
