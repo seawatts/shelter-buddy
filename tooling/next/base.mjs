@@ -11,6 +11,9 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
     typedRoutes: true,
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
   },
   serverExternalPackages: ["@boundaryml/baml"],
   images: {
