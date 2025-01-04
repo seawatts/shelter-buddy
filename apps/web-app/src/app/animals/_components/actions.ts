@@ -15,6 +15,7 @@ export const startWalkAction = authenticatedAction
   .input(
     z.object({
       animalId: z.string(),
+      isNewWalk: z.boolean().optional(),
     }),
   )
   .handler(async ({ ctx, input }) => {
@@ -56,7 +57,12 @@ export const startWalkAction = authenticatedAction
     }
 
     revalidatePath("/animals");
-    redirect(`/animals/walks/${walk.id}/in-progress`);
+
+    if (input.isNewWalk) {
+      redirect(`/animals/walks/${walk.id}/in-progress`);
+    } else {
+      redirect(`/animals/walks/${walk.id}/finished`);
+    }
   });
 
 export const stopWalkAction = authenticatedAction

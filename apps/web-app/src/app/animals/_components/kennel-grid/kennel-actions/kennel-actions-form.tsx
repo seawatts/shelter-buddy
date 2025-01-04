@@ -47,6 +47,7 @@ export function KennelActionsForm({
     try {
       await startWalkServerAction.execute({
         animalId: animal.id,
+        isNewWalk: false,
       });
     } catch (error) {
       toast.error("Failed to start walk");
