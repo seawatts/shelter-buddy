@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@acme/db/client";
 import { Walks } from "@acme/db/schema";
 
+import { PhotoUpload } from "~/components/photo-upload/photo-upload";
 import { WalkHeader } from "../_components/walk-header";
 import { WalkTimer } from "../_components/walk-timer";
 
@@ -35,7 +36,7 @@ export default async function WalkInProgressPage({ params }: PageProps) {
         },
       },
       media: true,
-      notes: true
+      notes: true,
     },
   });
 
@@ -47,7 +48,7 @@ export default async function WalkInProgressPage({ params }: PageProps) {
     <>
       <WalkHeader walk={walk} />
 
-      <div className="container flex min-h-[calc(100vh-96px)] max-w-3xl items-center justify-center pb-24">
+      <div className="container flex min-h-[calc(100vh-96px)] max-w-3xl flex-col items-center justify-center gap-8 pb-24">
         <WalkTimer walk={walk} />
       </div>
     </>

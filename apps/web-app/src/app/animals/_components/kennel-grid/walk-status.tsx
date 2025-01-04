@@ -13,23 +13,17 @@ import { toggleOutOfKennelAction } from "./kennel-actions/actions";
 import { hasWalkInProgress } from "./utils";
 
 export function WalkStatus({ animal }: { animal: AnimalTypeWithRelations }) {
-  const startWalkServerAction = useServerAction(startWalkAction);
+  const startWalkServerAction = useServerAction(startWalkAction, {
+    onError: (error) => {
+      toast.error("Failed to start walk");
+      console.error("Error starting walk", error);
+    },
+  });
   const stopWalkServerAction = useServerAction(stopWalkAction);
   const toggleOutOfKennelServerAction = useServerAction(
     toggleOutOfKennelAction,
   );
   const walkInProgress = useMemo(() => hasWalkInProgress(animal), [animal]);
-
-  const handleStartWalk = useCallback(async () => {
-    try {
-      await startWalkServerAction.execute({
-        animalId: animal.id,
-      });
-    } catch (error) {
-      toast.error("Failed to start walk");
-      console.error("Error starting walk", error);
-    }
-  }, [animal.id, startWalkServerAction]);
 
   const handleStopWalk = useCallback(async () => {
     if (!walkInProgress) return;
@@ -96,7 +90,7 @@ export function WalkStatus({ animal }: { animal: AnimalTypeWithRelations }) {
       <Button
         variant="default"
         className="gap-2"
-        onClick={handleStartWalk}
+        onClick={() => startWalkServerAction.execute({ animalId: animal.id })}
         disabled={startWalkServerAction.isPending}
       >
         {startWalkServerAction.isPending ? (

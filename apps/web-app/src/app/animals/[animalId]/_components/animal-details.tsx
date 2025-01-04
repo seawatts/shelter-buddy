@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { differenceInYears, formatDistanceToNow } from "date-fns";
+import { differenceInYears, formatDistance } from "date-fns";
 import { Check, Timer, X } from "lucide-react";
 
 import type { AnimalTypeWithRelations } from "@acme/db/schema";
@@ -21,7 +20,6 @@ interface AnimalDetailsProps {
 }
 
 export function AnimalDetails({ animal }: AnimalDetailsProps) {
-  const router = useRouter();
   const difficultyConfig = DIFFICULTY_CONFIG[animal.difficultyLevel];
 
   const lastWalk = useMemo(() => getLastCompletedWalk(animal), [animal]);
@@ -34,7 +32,9 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
     if (!lastWalk) return null;
     return {
       duration: formatDuration(lastWalk.duration),
-      timeAgo: formatDistanceToNow(lastWalk.endedAt, { addSuffix: true }),
+      timeAgo: formatDistance(new Date(), lastWalk.endedAt, {
+        addSuffix: true,
+      }),
     };
   }, [lastWalk]);
 

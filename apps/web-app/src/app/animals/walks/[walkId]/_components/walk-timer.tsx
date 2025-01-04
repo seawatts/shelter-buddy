@@ -8,6 +8,7 @@ import type { WalkTypeWithRelations } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 
+import { PhotoUpload } from "~/components/photo-upload/photo-upload";
 import { endWalkAction } from "./actions";
 
 interface WalkTimerProps {
@@ -69,7 +70,11 @@ export function WalkTimer({ walk }: WalkTimerProps) {
         </div>
       </div>
 
-      {/* <PhotoCapture photos={photos} onPhotosTaken={setPhotos} /> */}
+      <PhotoUpload
+        animalId={walk.animal.id}
+        walkId={walk.id}
+        shelterId={walk.animal.shelterId}
+      />
 
       <div className="flex w-full max-w-sm flex-col gap-4">
         <Button

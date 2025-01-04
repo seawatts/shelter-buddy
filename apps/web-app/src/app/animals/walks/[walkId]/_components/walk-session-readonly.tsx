@@ -10,6 +10,7 @@ import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
+import { AnimalImages } from "../../../_components/kennel-grid/animal-images";
 import { formatDuration } from "../../../_components/kennel-grid/utils";
 import {
   BackIcon,
@@ -361,6 +362,14 @@ export function WalkSessionReadOnly({ walk }: WalkSessionReadOnlyProps) {
       </div>
 
       <div className="container flex max-w-3xl flex-col gap-8 pb-24 pt-4">
+        {/* Animal Images Section */}
+        <AnimalImages
+          animalId={animal.id}
+          shelterId={animal.shelterId}
+          name={animal.name}
+          media={animal.media}
+        />
+
         {/* Notes Section */}
         {walk.notes.length > 0 && (
           <div className="space-y-2">

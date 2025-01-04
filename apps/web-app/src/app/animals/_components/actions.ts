@@ -58,7 +58,7 @@ export const startWalkAction = authenticatedAction
 
     revalidatePath("/animals");
 
-    if (input.isNewWalk) {
+    if (input.isNewWalk ?? true) {
       redirect(`/animals/walks/${walk.id}/in-progress`);
     } else {
       redirect(`/animals/walks/${walk.id}/finished`);

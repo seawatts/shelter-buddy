@@ -3,15 +3,17 @@
 import type { EmblaCarouselType } from "embla-carousel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { formatDistanceToNow } from "date-fns";
-import { Camera, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { formatDistance } from "date-fns";
+import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 
 import type { AnimalMediaType } from "@acme/db/schema";
 import { Avatar, AvatarFallback } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Carousel, CarouselContent, CarouselItem } from "@acme/ui/carousel";
+import { useIsMobile } from "@acme/ui/hooks/use-mobile";
 import { cn } from "@acme/ui/lib/utils";
 
+import { PhotoUpload } from "~/components/photo-upload/photo-upload";
 import { env } from "~/env.client";
 import { createClient } from "~/supabase/client";
 
@@ -142,9 +144,10 @@ function VideoPlayer({ url, thumbnailUrl, onPlay }: VideoPlayerProps) {
 }
 
 interface AnimalImagesProps {
+  animalId: string;
+  shelterId: string;
   name?: string;
   media?: AnimalMediaType[];
-  isMobile?: boolean;
 }
 
 interface MediaMetadata extends Record<string, unknown> {
@@ -163,7 +166,13 @@ function hasValidMetadata(
   );
 }
 
-export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
+export function AnimalImages({
+  animalId,
+  shelterId,
+  name,
+  media,
+}: AnimalImagesProps) {
+  const isMobile = useIsMobile();
   const [carouselApi, setCarouselApi] = useState<EmblaCarouselType>();
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number | null>(
     null,
@@ -230,70 +239,82 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
             setApi={setCarouselApi}
           >
             <CarouselContent>
-              {Object.values(mediaUrls).map((item, index) => (
-                <CarouselItem key={index}>
-                  <div className="relative aspect-square w-full">
-                    {item.type === "image" ? (
-                      <Image
-                        src={item.url}
-                        alt={`Photo ${index + 1} of ${name}`}
-                        fill
-                        className="object-cover"
-                        priority={index === 0}
-                      />
-                    ) : (
-                      <VideoPlayer
-                        url={item.url}
-                        thumbnailUrl={
-                          item.thumbnailUrl
-                            ? mediaUrls[item.thumbnailUrl]?.url
-                            : null
-                        }
-                        onPlay={() => handleVideoPlay(index)}
-                      />
-                    )}
-                    {item.metadata !== null &&
-                      hasValidMetadata(item.metadata) && (
-                        <div className="absolute left-0 right-0 top-0 p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Avatar className="size-6">
-                                <AvatarFallback>
-                                  {item.metadata.uploadedById[0]?.toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium text-white drop-shadow-md">
-                                  {item.metadata.uploadedById}
-                                </span>
-                                <span className="text-xs text-white/90 drop-shadow-md">
-                                  {formatDistanceToNow(
-                                    new Date(item.metadata.uploadedAt),
-                                    {
-                                      addSuffix: true,
-                                    },
-                                  )}
-                                </span>
+              {Object.values(mediaUrls)
+                .sort((a, b) => {
+                  const dateA = a.createdAt
+                    ? new Date(a.createdAt)
+                    : new Date(0);
+                  const dateB = b.createdAt
+                    ? new Date(b.createdAt)
+                    : new Date(0);
+                  return dateB.getTime() - dateA.getTime();
+                })
+                .map((item, index) => (
+                  <CarouselItem key={index}>
+                    <div className="relative aspect-square w-full">
+                      {item.type.includes("image") ? (
+                        <Image
+                          src={item.url}
+                          alt={`Photo ${index + 1} of ${name}`}
+                          fill
+                          className="object-cover"
+                          priority={index === 0}
+                        />
+                      ) : (
+                        <VideoPlayer
+                          url={item.url}
+                          thumbnailUrl={
+                            item.thumbnailUrl
+                              ? mediaUrls[item.thumbnailUrl]?.url
+                              : null
+                          }
+                          onPlay={() => handleVideoPlay(index)}
+                        />
+                      )}
+                      {item.metadata !== null &&
+                        hasValidMetadata(item.metadata) && (
+                          <div className="absolute left-0 right-0 top-0 p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Avatar className="size-6">
+                                  <AvatarFallback>
+                                    {item.metadata.uploadedById[0]?.toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-white drop-shadow-md">
+                                    {item.metadata.uploadedById}
+                                  </span>
+                                  <span className="text-xs text-white/90 drop-shadow-md">
+                                    {formatDistance(
+                                      new Date(),
+                                      new Date(item.metadata.uploadedAt),
+                                      {
+                                        addSuffix: true,
+                                      },
+                                    )}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      {(item.type === "image" ||
-                        currentVideoIndex !== index) && (
-                        <Button
-                          variant="ghost"
-                          className="gap-2 bg-transparent backdrop-blur-sm"
-                        >
-                          <Camera className="size-4" />
-                          Add More
-                        </Button>
-                      )}
+                        )}
+                      <div className="absolute bottom-4 left-4 right-4">
+                        {(item.type === "image" ||
+                          currentVideoIndex !== index) && (
+                          <PhotoUpload
+                            animalId={animalId}
+                            shelterId={shelterId}
+                            includePreview={false}
+                            label="Add Photos"
+                            className="w-full bg-transparent backdrop-blur-sm"
+                            variant="ghost"
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CarouselItem>
-              ))}
+                  </CarouselItem>
+                ))}
             </CarouselContent>
           </Carousel>
           <CarouselDots api={carouselApi} />
@@ -332,13 +353,13 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
           </svg>
         </div>
         <div className="absolute bottom-4 left-4 right-4">
-          <Button
-            variant="ghost"
-            className="w-full gap-2 bg-transparent backdrop-blur-sm"
-          >
-            <Camera className="size-4" />
-            Add Photos
-          </Button>
+          <PhotoUpload
+            animalId={animalId}
+            shelterId={shelterId}
+            includePreview={false}
+            label="Add Photos"
+            className="w-full bg-transparent backdrop-blur-sm"
+          />
         </div>
       </div>
     </div>

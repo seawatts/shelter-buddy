@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatDistance } from "date-fns";
 import { AlertTriangle, Check, ChevronRight, Info, X } from "lucide-react";
 
 import type {
@@ -138,7 +139,12 @@ export function KennelActionsContent({
         kennels={kennels}
       />
 
-      <AnimalImages name={animal.name} media={animal.media} isMobile />
+      <AnimalImages
+        name={animal.name}
+        media={animal.media}
+        animalId={animal.id}
+        shelterId={animal.shelterId}
+      />
 
       {/* Additional Details */}
       <div className="grid gap-4">
@@ -214,12 +220,22 @@ export function KennelActionsContent({
               animal.walks.map((walk, index) => (
                 <Link
                   key={index}
-                  href={`/animals/walks/${walk.id}`}
+                  href={
+                    walk.status === "in_progress"
+                      ? `/animals/walks/${walk.id}/in-progress`
+                      : `/animals/walks/${walk.id}`
+                  }
                   className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0 hover:bg-accent/50"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-sm">
-                      {new Date(walk.startedAt).toLocaleDateString()}
+                      {formatDistance(
+                        new Date(walk.endedAt ?? walk.startedAt),
+                        new Date(),
+                        {
+                          addSuffix: true,
+                        },
+                      )}
                     </span>
                     <span
                       className={cn(

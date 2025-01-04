@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import { Textarea } from "@acme/ui/textarea";
 
 import { NumberInput } from "~/components/number-input";
+import { PhotoUpload } from "~/components/photo-upload/photo-upload";
 import { formatDuration } from "../../../_components/kennel-grid/utils";
 import { finishWalkAction } from "./actions";
 import {
@@ -29,8 +30,6 @@ import {
   PeeIcon,
   PeopleIcon,
   ReactiveIcon,
-  StartRecordingIcon,
-  StopRecordingIcon,
 } from "./icons";
 import { useAudioRecorder } from "./use-audio-recorder";
 
@@ -462,7 +461,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
             onChange={(event) => setNoteText(event.target.value)}
           />
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Button
+            {/* <Button
               type="button"
               variant={isRecording ? "destructive" : "default"}
               onClick={isRecording ? stopRecording : startRecording}
@@ -482,13 +481,19 @@ export function WalkSession({ walk }: WalkSessionProps) {
                   <span className="sm:hidden">Record</span>
                 </>
               )}
-            </Button>
+            </Button> */}
             {recordingStatus && (
               <span className="text-sm text-muted-foreground">
                 {recordingStatus}
               </span>
             )}
           </div>
+          <PhotoUpload
+            label="Add Walk Photos"
+            animalId={walk.animal.id}
+            walkId={walk.id}
+            shelterId={walk.animal.shelterId}
+          />
         </div>
 
         {/* Walk Date/Time Controls */}
