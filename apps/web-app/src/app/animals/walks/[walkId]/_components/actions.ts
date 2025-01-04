@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { and, eq, isNull } from "drizzle-orm";
@@ -126,16 +127,18 @@ export async function transcribeAudio(audioFile: File) {
   }
 }
 
-const finishWalkSchema = z.object({
-  activities: z.record(z.enum(activityTypeEnum.enumValues), z.boolean()),
-  notes: z.string().optional(),
-  walkDifficultyLevel: z.number().min(1).max(5).optional(),
-  walkId: z.string(),
-});
-
 export const finishWalkAction = authenticatedAction
   .createServerAction()
-  .input(finishWalkSchema)
+  .input(
+    z.object({
+      activities: z.record(z.enum(activityTypeEnum.enumValues), z.boolean()),
+      endedAt: z.date(),
+      notes: z.string().optional(),
+      startedAt: z.date(),
+      walkDifficultyLevel: z.number().min(1).max(5),
+      walkId: z.string(),
+    }),
+  )
   .handler(async ({ ctx, input }) => {
     const walk = await db.query.Walks.findFirst({
       where: eq(Walks.id, input.walkId),
@@ -145,10 +148,12 @@ export const finishWalkAction = authenticatedAction
       throw new Error("Walk not found");
     }
 
-    // Update walk with end time and other details
     await db
       .update(Walks)
       .set({
+        endedAt: input.endedAt,
+        startedAt: input.startedAt,
+        status: "completed",
         walkDifficultyLevel: input.walkDifficultyLevel,
       })
       .where(eq(Walks.id, input.walkId));
@@ -185,7 +190,7 @@ export const finishWalkAction = authenticatedAction
     }
 
     revalidatePath(`/animals`);
-    // redirect(`/animals`);
+    redirect(`/animals`);
     return { success: true };
   });
 
@@ -216,5 +221,6 @@ export const endWalkAction = authenticatedAction
 
     revalidatePath(`/animals/walks/${input.walkId}/finished`);
     revalidatePath(`/animals`);
+    redirect(`/animals/walks/${input.walkId}/finished`);
     return { success: true };
   });

@@ -1,12 +1,16 @@
 "use client";
 
+import type { Route } from "next";
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useServerAction } from "zsa-react";
 
 import type { AnimalTypeWithRelations } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { toast } from "@acme/ui/toast";
 
+import { startWalkAction } from "../../actions";
 import {
   addAnimalNoteAction,
   reassignKennelAction,
@@ -27,7 +31,27 @@ export function KennelActionsForm({
   animal,
   onOpenChange,
 }: KennelActionsFormProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const startWalkServerAction = useServerAction(startWalkAction);
+
+  const handleStartWalk = async () => {
+    try {
+      const [result, error] = await startWalkServerAction.execute({
+        animalId: animal.id,
+      });
+
+      if (result) {
+        router.push(`/animals/walks/${result.id}/finished` as Route);
+        onOpenChange(false);
+      } else if (error) {
+        console.error("Error starting walk", error);
+        toast.error(error.message);
+      }
+    } catch {
+      toast.error("Failed to start walk");
+    }
+  };
 
   const handleAddNote = () => {
     startTransition(() => {
@@ -125,13 +149,26 @@ export function KennelActionsForm({
       <Button
         variant="outline"
         className="w-full justify-start"
+        onClick={handleStartWalk}
+        disabled={isPending || startWalkServerAction.isPending}
+      >
+        {isPending || startWalkServerAction.isPending ? (
+          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
+        ) : (
+          <Icons.Play className="mr-2" size="sm" variant="primary" />
+        )}
+        Add Walk
+      </Button>
+      <Button
+        variant="outline"
+        className="w-full justify-start"
         onClick={handleAddNote}
         disabled={isPending}
       >
         {isPending ? (
-          <Icons.Spinner className="mr-2" />
+          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
-          <Icons.Plus className="mr-2" />
+          <Icons.Plus className="mr-2" size="sm" variant="primary" />
         )}
         Add Note
       </Button>
@@ -142,9 +179,9 @@ export function KennelActionsForm({
         disabled={isPending}
       >
         {isPending ? (
-          <Icons.Spinner className="mr-2" />
+          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
-          <Icons.ArrowRight className="mr-2" />
+          <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
         )}
         Reassign Kennel
       </Button>
@@ -156,12 +193,14 @@ export function KennelActionsForm({
       >
         {(() => {
           if (isPending) {
-            return <Icons.Spinner className="mr-2" />;
+            return (
+              <Icons.Spinner className="mr-2" size="sm" variant="primary" />
+            );
           }
           return currentKennelOccupant?.isOutOfKennel ? (
-            <Icons.ArrowLeft className="mr-2" />
+            <Icons.ArrowLeft className="mr-2" size="sm" variant="primary" />
           ) : (
-            <Icons.ArrowRight className="mr-2" />
+            <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
           );
         })()}
         {currentKennelOccupant?.isOutOfKennel

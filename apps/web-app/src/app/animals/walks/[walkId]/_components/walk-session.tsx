@@ -9,10 +9,14 @@ import { useServerAction } from "zsa-react";
 import type { ActivityTypeEnum, WalkTypeWithRelations } from "@acme/db/schema";
 import { activityTypeEnum } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
+import { Calendar } from "@acme/ui/calendar";
 import { Icons } from "@acme/ui/icons";
+import { Label } from "@acme/ui/label";
 import { cn } from "@acme/ui/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import { Textarea } from "@acme/ui/textarea";
 
+import { NumberInput } from "~/components/number-input";
 import { formatDuration } from "../../../_components/kennel-grid/utils";
 import { finishWalkAction } from "./actions";
 import {
@@ -250,6 +254,8 @@ export function WalkSession({ walk }: WalkSessionProps) {
   const [walkDifficultyLevel, setWalkDifficultyLevel] = useState<number>(
     walk.walkDifficultyLevel > 0 ? walk.walkDifficultyLevel : 1,
   );
+  const [startedAt, setStartedAt] = useState<Date>(walk.startedAt);
+  const [endedAt, setEndedAt] = useState<Date>(walk.endedAt ?? new Date());
   const [noteText, setNoteText] = useState<string>("");
 
   useEffect(() => {
@@ -258,12 +264,11 @@ export function WalkSession({ walk }: WalkSessionProps) {
   }, [walk.notes]);
 
   const formattedDuration = useMemo(() => {
-    const endTime = walk.endedAt ?? new Date();
     const durationInMinutes = Math.floor(
-      (endTime.getTime() - walk.startedAt.getTime()) / (1000 * 60),
+      (endedAt.getTime() - startedAt.getTime()) / (1000 * 60),
     );
     return formatDuration(durationInMinutes);
-  }, [walk.startedAt, walk.endedAt]);
+  }, [startedAt, endedAt]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -335,24 +340,20 @@ export function WalkSession({ walk }: WalkSessionProps) {
 
   const handleSubmitWalk = async () => {
     try {
-      const [data, error] = await finishWalkServerAction.execute({
+      const [result] = await finishWalkServerAction.execute({
         activities,
+        endedAt,
         notes: noteText || undefined,
+        startedAt,
         walkDifficultyLevel,
         walkId: walk.id,
       });
 
-      if (data?.success) {
+      if (result?.success) {
         router.push("/animals");
-      } else if (error) {
-        console.error("Failed to submit walk:", error.message);
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Failed to submit walk:", error.message);
-      } else {
-        console.error("Failed to submit walk:", error);
-      }
+      console.error("Failed to submit walk:", error);
     }
   };
 
@@ -487,6 +488,48 @@ export function WalkSession({ walk }: WalkSessionProps) {
                 {recordingStatus}
               </span>
             )}
+          </div>
+        </div>
+
+        {/* Walk Date/Time Controls */}
+        <div className="space-y-4">
+          <h2 className="font-medium">Walk Date & Time</h2>
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="startedAt">Start Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                >
+                  <Icons.Calendar className="mr-2 size-4" />
+                  <span>{startedAt.toLocaleDateString()}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={startedAt}
+                  onSelect={(date) => {
+                    if (date) {
+                      const duration = endedAt.getTime() - startedAt.getTime();
+                      setStartedAt(date);
+                      setEndedAt(new Date(date.getTime() + duration));
+                    }
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
+            <NumberInput
+              id="startedAt"
+              name="startedAt"
+              type="number"
+              placeholder="Walk Duration (minutes)"
+              quickFillValues={[15, 20, 25, 30]}
+              onChange={(event) => {
+                setEndedAt(new Date(startedAt.getTime() + event * 60 * 1000));
+              }}
+            />
           </div>
         </div>
 
