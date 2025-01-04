@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertTriangle, Check, Info, X } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Check, ChevronRight, Info, X } from "lucide-react";
 
 import type {
   AnimalNoteType,
@@ -157,14 +158,6 @@ export function KennelActionsContent({
               <span>Age</span>
               <span>{animal.birthDate?.toLocaleString()} years</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span>Status</span>
-              <span>
-                {animal.kennelOccupants[0]?.isOutOfKennel
-                  ? "Out of Kennel"
-                  : "In Kennel"}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -182,7 +175,9 @@ export function KennelActionsContent({
                   <X className="size-3" />
                 )}
               </span>
-              <p className="text-sm">FIDO Certified</p>
+              <p className="text-sm">
+                {animal.isFido ? "FIDO Certified" : "Not FIDO Certified"}
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {animal.notes.some(
@@ -213,26 +208,36 @@ export function KennelActionsContent({
         <div className="rounded-lg border bg-card p-4">
           <h2 className="mb-3 text-lg font-semibold">Walking History</h2>
           <div className="space-y-2">
-            {animal.walks.map((walk, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
-              >
-                <span className="text-sm">
-                  {new Date(walk.startedAt).toLocaleDateString()}
-                </span>
-                <span
-                  className={cn(
-                    "rounded-full px-2 py-0.5 text-xs",
-                    walk.status === "completed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800",
-                  )}
+            {animal.walks.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No walks recorded</p>
+            ) : (
+              animal.walks.map((walk, index) => (
+                <Link
+                  key={index}
+                  href={`/animals/walks/${walk.id}`}
+                  className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0 hover:bg-accent/50"
                 >
-                  {walk.status === "completed" ? "Completed" : "In Progress"}
-                </span>
-              </div>
-            ))}
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm">
+                      {new Date(walk.startedAt).toLocaleDateString()}
+                    </span>
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-xs",
+                        walk.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800",
+                      )}
+                    >
+                      {walk.status === "completed"
+                        ? "Completed"
+                        : "In Progress"}
+                    </span>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </div>

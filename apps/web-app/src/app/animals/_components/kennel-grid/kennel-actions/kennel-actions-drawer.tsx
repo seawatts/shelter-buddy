@@ -1,9 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
-import { ArrowRight, Timer } from "lucide-react";
+import { formatDistance } from "date-fns";
+import { Timer } from "lucide-react";
 
 import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Badge } from "@acme/ui/badge";
@@ -52,12 +51,11 @@ export function KennelActionsDrawer({
       );
     }
 
-    const lastWalkDate = new Date(lastWalk.date);
     return (
       <span className="flex flex-col gap-1 text-xs text-muted-foreground">
         <span>
           Last walk{" "}
-          {formatDistanceToNow(lastWalkDate, {
+          {formatDistance(new Date(), lastWalk.endedAt, {
             addSuffix: true,
           })}
         </span>
@@ -92,12 +90,7 @@ export function KennelActionsDrawer({
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <DrawerTitle>
-                    <Link href={`/animals/${animal?.id}`}>
-                      <span className="flex items-center gap-2 underline underline-offset-4">
-                        {kennel.name} {animal && `${animal.name}`}
-                        {animal && <ArrowRight className="size-4" />}
-                      </span>
-                    </Link>
+                    {kennel.name} {animal && `${animal.name}`}
                   </DrawerTitle>
                   {animal?.tags && animal.tags.length > 0 && (
                     <div className="flex gap-1">

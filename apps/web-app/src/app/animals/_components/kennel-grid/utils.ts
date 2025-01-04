@@ -136,7 +136,7 @@ export function formatDuration(minutes: number): string {
 
 export function getLastCompletedWalk(
   animal: AnimalTypeWithRelations,
-): { date: Date; duration: number } | undefined {
+): { endedAt: Date; duration: number } | undefined {
   const completedWalks = animal.walks.filter((walk) => walk.endedAt);
   if (completedWalks.length === 0) return undefined;
 
@@ -154,7 +154,7 @@ export function getLastCompletedWalk(
   );
 
   return {
-    date: lastWalk.endedAt,
     duration: durationInMinutes,
+    endedAt: lastWalk.endedAt,
   };
 }

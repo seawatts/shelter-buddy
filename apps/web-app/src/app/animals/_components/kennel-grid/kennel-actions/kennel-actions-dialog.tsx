@@ -38,7 +38,7 @@ export function KennelActionsDialog({
   );
   const lastWalkText = useMemo(() => {
     if (!lastWalk) return "No walks completed";
-    return `Last walk: ${format(lastWalk.date, "h:mm a")} (${lastWalk.duration} min)`;
+    return `Last walk: ${format(lastWalk.endedAt, "h:mm a")} (${lastWalk.duration} min)`;
   }, [lastWalk]);
 
   return (

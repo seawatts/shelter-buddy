@@ -30,6 +30,7 @@ export default async function AnimalsPage(props: {
       notes: true,
       tags: true,
       walks: {
+        orderBy: (walk, { desc }) => desc(walk.startedAt),
         with: {
           media: true,
         },

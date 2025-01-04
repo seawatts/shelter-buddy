@@ -34,7 +34,7 @@ export function AnimalDetails({ animal }: AnimalDetailsProps) {
     if (!lastWalk) return null;
     return {
       duration: formatDuration(lastWalk.duration),
-      timeAgo: formatDistanceToNow(lastWalk.date, { addSuffix: true }),
+      timeAgo: formatDistanceToNow(lastWalk.endedAt, { addSuffix: true }),
     };
   }, [lastWalk]);
 
