@@ -96,6 +96,7 @@ export const addAnimalNoteAction = authenticatedAction
       type: input.type,
     });
 
+    revalidatePath("/animals");
     return { success: true };
   });
 
@@ -196,6 +197,7 @@ export const toggleOutOfKennelAction = authenticatedAction
       type: input.isOutOfKennel ? "outKennel" : "inKennel",
     });
 
+    revalidatePath("/animals");
     return { success: true };
   });
 
@@ -389,6 +391,7 @@ export const markAdoptedAction = authenticatedAction
       type: "adopted",
     });
 
+    revalidatePath("/animals");
     return { success: true };
   });
 
@@ -427,5 +430,6 @@ export const markInFosterAction = authenticatedAction
       type: "started_foster",
     });
 
+    revalidatePath("/animals");
     return { success: true };
   });
