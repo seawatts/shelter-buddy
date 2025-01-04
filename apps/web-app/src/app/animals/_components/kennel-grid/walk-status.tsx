@@ -100,9 +100,9 @@ export function WalkStatus({ animal }: { animal: AnimalTypeWithRelations }) {
         disabled={startWalkServerAction.isPending}
       >
         {startWalkServerAction.isPending ? (
-          <Icons.Spinner size="xs" variant="primary" />
+          <Icons.Spinner size="xs" />
         ) : (
-          <Icons.Play size="xs" variant="primary" />
+          <Icons.Footprints size="xs" />
         )}
         Start Walk
       </Button>

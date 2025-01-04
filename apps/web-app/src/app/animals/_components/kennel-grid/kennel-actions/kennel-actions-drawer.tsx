@@ -34,7 +34,7 @@ export function KennelActionsDrawer({
   open,
   onOpenChange,
 }: KennelActionsDrawerProps) {
-  const snapPoints = useMemo(() => [0.5, 1], []);
+  const snapPoints = useMemo(() => [1], []);
   const [activeSnapPoint, setActiveSnapPoint] = useState<number | null>(
     snapPoints[0] ?? null,
   );

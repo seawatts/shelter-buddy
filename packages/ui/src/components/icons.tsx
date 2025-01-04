@@ -51,6 +51,7 @@ import {
   ExternalLink,
   Eye,
   Flame,
+  Footprints,
   GalleryVerticalEnd,
   Heart,
   Home,
@@ -67,6 +68,7 @@ import {
   MessageSquareText,
   Moon,
   MoreVertical,
+  Notebook,
   Option,
   PanelLeft,
   Paperclip,
@@ -78,6 +80,7 @@ import {
   Search,
   Settings,
   Share,
+  Shuffle,
   SlidersHorizontal,
   Sparkles,
   SquarePen,
@@ -205,9 +208,6 @@ export const Icons = {
     "size",
     "variant",
   ])<IconProps>(({ size, variant }) => iconVariants({ size, variant })),
-  Droplets: twx(Droplets).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
   ChevronDown: twx(ChevronDown).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -276,6 +276,9 @@ export const Icons = {
   Download: twx(Download).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
+  Droplets: twx(Droplets).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   ExternalLink: twx(ExternalLink).transientProps([
     "size",
     "variant",
@@ -284,6 +287,9 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   Flame: twx(Flame).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  Footprints: twx(Footprints).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   GalleryVerticalEnd: twx(GalleryVerticalEnd).transientProps([
@@ -370,6 +376,9 @@ export const Icons = {
     "size",
     "variant",
   ])<IconProps>(({ size, variant }) => iconVariants({ size, variant })),
+  Note: twx(Notebook).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   Option: twx(Option).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -403,6 +412,9 @@ export const Icons = {
   Share: twx(Share).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
+  Shuffle: twx(Shuffle).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   SlidersHorizontal: twx(SlidersHorizontal).transientProps([
     "size",
     "variant",
@@ -433,9 +445,6 @@ export const Icons = {
   Triangle: twx(Triangle).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
-  Utensils: twx(Utensils).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
   TwitterX: twx(SiX).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -449,6 +458,9 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   UsersRound: twx(UsersRound).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  Utensils: twx(Utensils).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   X: twx(X).transientProps(["size", "variant"])<IconProps>(

@@ -163,9 +163,9 @@ export function KennelActionsForm({
         {startWalkServerAction.isPending ? (
           <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
-          <Icons.Play className="mr-2" size="sm" variant="primary" />
+          <Icons.Footprints className="mr-2" size="sm" variant="primary" />
         )}
-        Add Walk
+        Add Existing Walk
       </Button>
       <Button
         variant="outline"
@@ -176,7 +176,7 @@ export function KennelActionsForm({
         {addNoteServerAction.isPending ? (
           <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
-          <Icons.Plus className="mr-2" size="sm" variant="primary" />
+          <Icons.Pencil className="mr-2" size="sm" variant="primary" />
         )}
         Add Note
       </Button>
@@ -189,7 +189,7 @@ export function KennelActionsForm({
             {reassignKennelServerAction.isPending ? (
               <Icons.Spinner className="mr-2" size="sm" variant="primary" />
             ) : (
-              <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
+              <Icons.Shuffle className="mr-2" size="sm" variant="primary" />
             )}
             <SelectValue placeholder="Reassign Kennel" />
           </div>
@@ -217,9 +217,9 @@ export function KennelActionsForm({
             );
           }
           return currentKennelOccupant?.isOutOfKennel ? (
-            <Icons.ArrowLeft className="mr-2" size="sm" variant="primary" />
+            <Icons.Download className="mr-2" size="sm" variant="primary" />
           ) : (
-            <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
+            <Icons.Upload className="mr-2" size="sm" variant="primary" />
           );
         })()}
         {currentKennelOccupant?.isOutOfKennel
