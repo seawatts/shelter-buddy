@@ -526,6 +526,9 @@ export function WalkSession({ walk }: WalkSessionProps) {
               type="number"
               placeholder="Walk Duration (minutes)"
               quickFillValues={[15, 20, 25, 30]}
+              defaultValue={Math.floor(
+                (endedAt.getTime() - startedAt.getTime()) / (1000 * 60),
+              )}
               onChange={(event) => {
                 setEndedAt(new Date(startedAt.getTime() + event * 60 * 1000));
               }}

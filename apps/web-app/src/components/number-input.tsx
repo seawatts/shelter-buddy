@@ -14,7 +14,13 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   quickFillValues,
   ...props
 }) => {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>(
+    props.value
+      ? props.value.toString()
+      : props.defaultValue
+        ? props.defaultValue.toString()
+        : "",
+  );
 
   const handleChange = useCallback(
     (newValue: string | number) => {
@@ -50,6 +56,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         {...props}
         type="text"
         value={value}
+        defaultValue={props.value}
         onChange={handleInputChange}
         onFocus={(event) => event.target.select()}
       />
