@@ -61,6 +61,39 @@ Key Conventions
 - Use <Icons.Spinner/> (import @acme/ui/icons) for loading icons.
 - Do not include the className height or width on Icons unless it's using margin.
 - Use packages/ui/src/icons.tsx (import @acme/ui/icons) for any icons. If icons are not available in the ui package, use the lucide icons (https://lucide.dev/) or @icons-pack/react-simple-icons and create a new icon component in packages/ui/src/icons.tsx
+- For When using <Icons.\* />, make sure to use the size and variant props.
+
+  ```tsx
+  import { cva } from "class-variance-authority";
+
+  export const iconVariants = cva("shrink-0", {
+    defaultVariants: {
+      size: "default",
+    },
+    variants: {
+      size: {
+        "2xl": "size-8",
+        default: "size-5",
+        lg: "size-6",
+        sm: "size-4",
+        xl: "size-7",
+        xs: "size-3",
+      },
+
+      variant: {
+        destructive: "text-destructive",
+        loading: "text-muted",
+        muted: "text-muted-foreground",
+        primary: "text-primary",
+        "primary-darker": "text-primary-darker",
+        secondary: "text-secondary",
+        warning: "text-warning",
+      },
+    },
+  });
+  <Icons.Spinner size="sm" variant="primary" />;
+  ```
+
 - When creating Dialogs / Modals with forms and actions, use apps/web-app-v2/src/components/prompt-feedback-buttons/dialog.tsx as a starting point. Make sure to use the @acme/ui/dialog for desktop and @acme/ui/drawer for mobile using the @acme/ui/hooks/use-media-query isDesktop hook.
 - When creating forms with actions, use apps/web-app-v2/src/components/prompt-feedback-buttons/form.tsx as a starting point.
 - Optimize Web Vitals (LCP, CLS, FID).

@@ -10,6 +10,7 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+    NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET: z.string(),
     NEXT_PUBLIC_SUPABASE_URL: z.string(),
   },
 
@@ -22,6 +23,8 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET:
+      process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },

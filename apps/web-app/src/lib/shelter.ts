@@ -1,3 +1,5 @@
+"use server";
+
 import { eq } from "drizzle-orm";
 
 import type { ThemeConfig } from "@acme/db/schema";

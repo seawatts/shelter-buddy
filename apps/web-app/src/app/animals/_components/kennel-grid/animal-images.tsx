@@ -12,6 +12,9 @@ import { Button } from "@acme/ui/button";
 import { Carousel, CarouselContent, CarouselItem } from "@acme/ui/carousel";
 import { cn } from "@acme/ui/lib/utils";
 
+import { env } from "~/env.client";
+import { createClient } from "~/supabase/client";
+
 interface CarouselDotsProps {
   api: EmblaCarouselType | undefined;
 }
@@ -165,6 +168,32 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState<number | null>(
     null,
   );
+  const [mediaUrls, setMediaUrls] = useState<
+    Record<string, AnimalMediaType & { url: string }>
+  >({});
+
+  useEffect(() => {
+    function getPublicUrls() {
+      if (!media?.length) return;
+
+      const supabase = createClient();
+      const urls: Record<string, AnimalMediaType & { url: string }> = {};
+
+      for (const item of media) {
+        const { data } = supabase.storage
+          .from(env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET)
+          .getPublicUrl(item.s3Path);
+        urls[item.s3Path] = {
+          ...item,
+          url: data.publicUrl,
+        };
+      }
+
+      setMediaUrls(urls);
+    }
+
+    getPublicUrls();
+  }, [media]);
 
   const handleVideoPlay = useCallback(
     (index: number) => {
@@ -201,7 +230,7 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
             setApi={setCarouselApi}
           >
             <CarouselContent>
-              {media.map((item, index) => (
+              {Object.values(mediaUrls).map((item, index) => (
                 <CarouselItem key={index}>
                   <div className="relative aspect-square w-full">
                     {item.type === "image" ? (
@@ -215,7 +244,11 @@ export function AnimalImages({ name, media, isMobile }: AnimalImagesProps) {
                     ) : (
                       <VideoPlayer
                         url={item.url}
-                        thumbnailUrl={item.thumbnailUrl}
+                        thumbnailUrl={
+                          item.thumbnailUrl
+                            ? mediaUrls[item.thumbnailUrl]?.url
+                            : null
+                        }
                         onPlay={() => handleVideoPlay(index)}
                       />
                     )}

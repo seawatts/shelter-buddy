@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Camera, Trash2 } from "lucide-react";
 import { useServerAction } from "zsa-react";
 
 import type { DifficultyLevelEnum, GenderEnum } from "@acme/db/schema";
+import { createId } from "@acme/id";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { Input } from "@acme/ui/input";
@@ -21,16 +22,19 @@ import { Switch } from "@acme/ui/switch";
 import { Textarea } from "@acme/ui/textarea";
 import { toast } from "@acme/ui/toast";
 
+import { env } from "~/env.client";
+import { createClient } from "~/supabase/client";
 import { analyzeIntakeFormAction, createAnimalAction } from "./actions";
 
 interface AddAnimalFormData {
-  id: string;
+  animalId: string;
+  externalId: string;
   name: string;
   breed: string;
   gender: "male" | "female";
   difficultyLevel: DifficultyLevelEnum;
   isFido: boolean;
-  headshot: string | null;
+  intakeFormImagePath: string | null;
   generalNotes: string;
   approvedActivities: {
     activity: string;
@@ -75,6 +79,7 @@ export function AddAnimalForm({
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [formData, setFormData] = useState<AddAnimalFormData>({
+    animalId: "",
     approvedActivities: [],
     breed: "",
     difficultyLevel: "Yellow",
@@ -82,15 +87,17 @@ export function AddAnimalForm({
       inKennel: "",
       outOfKennel: "",
     },
+    externalId: "",
     gender: "male",
     generalNotes: "",
-    headshot: null,
-    id: "",
+    intakeFormImagePath: null,
     isFido: false,
     name: "",
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -99,27 +106,49 @@ export function AddAnimalForm({
     if (file) {
       setIsAnalyzing(true);
       try {
-        // Convert file to base64
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(file);
-        });
+        // Create a local preview URL
+        const localPreviewUrl = URL.createObjectURL(file);
+        setPreviewUrl(localPreviewUrl);
 
-        // Analyze the form
+        const supabase = createClient();
+        const animalId = createId({ prefix: "animal" });
+
+        // Generate a unique file path for the intake form
+        const fileExtension = file.name.split(".").pop() ?? "png";
+        const fileName = file.name.split(".")[0];
+        const filePath = `${animalId}/${fileName}.${fileExtension}`;
+
+        // Upload the file to Supabase storage
+        const { data, error: uploadError } = await supabase.storage
+          .from(env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET)
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Failed to upload image", uploadError);
+          toast.error("Failed to upload image");
+          throw new Error("Failed to upload image", {
+            cause: uploadError,
+          });
+        }
+
+        // Analyze the form using the public URL
         const result = await executeAnalyzeAction({
-          imageUrl: base64,
+          imageUrl: data.path,
         });
 
         const response = result[0];
         if (!response) {
+          console.error("Failed to analyze form", response);
           toast.error("Failed to analyze form");
-          return;
+          throw new Error("Failed to analyze form", {
+            cause: response,
+          });
         }
 
         if (response.success && response.data) {
           setFormData({
             ...response.data,
+            animalId,
             difficultyLevel: (response.data.difficultyLevel
               .charAt(0)
               .toUpperCase() +
@@ -136,13 +165,12 @@ export function AddAnimalForm({
                 ? response.data.equipmentNotes.outOfKennel.join("\n")
                 : response.data.equipmentNotes.outOfKennel,
             },
+            externalId: response.data.id,
             gender: response.data.gender.toLowerCase() as "male" | "female",
             generalNotes: response.data.generalNotes ?? "",
-            headshot: base64,
+            intakeFormImagePath: data.path,
           });
           toast.success("Form analyzed successfully");
-        } else {
-          toast.error(response.error ?? "Failed to analyze form");
         }
       } catch (error) {
         console.error("Error processing form:", error);
@@ -155,6 +183,15 @@ export function AddAnimalForm({
       fileInputRef.current.value = "";
     }
   };
+
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleSubmit = async (formData: FormData) => {
     formData.append("kennelId", kennelId);
@@ -174,11 +211,10 @@ export function AddAnimalForm({
               disabled={isAnalyzing}
             >
               <Camera className="mr-2 size-4" />
-              {isAnalyzing
-                ? "Analyzing..."
-                : formData.headshot
-                  ? "Change Photo"
-                  : "Upload Form"}
+              {(() => {
+                if (isAnalyzing) return "Analyzing...";
+                return previewUrl ? "Change Photo" : "Upload Form";
+              })()}
             </Button>
             <input
               type="file"
@@ -192,11 +228,11 @@ export function AddAnimalForm({
           </div>
         </div>
 
-        {formData.headshot && (
+        {previewUrl && (
           <div className="relative mx-auto">
             <div className="relative size-64">
               <Image
-                src={formData.headshot}
+                src={previewUrl}
                 alt="Intake form"
                 fill
                 className="rounded-md object-contain"
@@ -206,9 +242,14 @@ export function AddAnimalForm({
               variant="outline"
               size="icon"
               className="absolute -right-2 -top-2 size-6 rounded-full p-1"
-              onClick={() =>
-                setFormData((previous) => ({ ...previous, headshot: null }))
-              }
+              onClick={() => {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+                setFormData((previous) => ({
+                  ...previous,
+                  intakeFormImagePath: null,
+                }));
+              }}
             >
               <Trash2 className="size-4" />
             </Button>
@@ -221,11 +262,11 @@ export function AddAnimalForm({
             <Input
               id="id"
               name="id"
-              value={formData.id}
+              value={formData.externalId}
               onChange={(event) =>
                 setFormData((previous) => ({
                   ...previous,
-                  id: event.target.value,
+                  externalId: event.target.value,
                 }))
               }
             />
@@ -423,8 +464,12 @@ export function AddAnimalForm({
             </Button>
           </div>
 
-          {formData.headshot && (
-            <input type="hidden" name="headshot" value={formData.headshot} />
+          {formData.intakeFormImagePath && (
+            <input
+              type="hidden"
+              name="intakeFormImagePath"
+              value={formData.intakeFormImagePath}
+            />
           )}
 
           <Button

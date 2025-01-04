@@ -24,6 +24,7 @@ export const env = createEnv({
     POSTGRES_URL: z.string().url(),
     POSTHOG_KEY: z.string(),
     SUPABASE_ANON_KEY: z.string(),
+    SUPABASE_STORAGE_BUCKET: z.string(),
     SUPABASE_URL: z.string().url(),
   },
 

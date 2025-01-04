@@ -67,11 +67,11 @@ await seed(db, {
     columns: {
       default: funcs.boolean(),
       metadata: funcs.default({ defaultValue: {} }),
+      s3Path: funcs.default({ defaultValue: "https://picsum.photos/800/600" }),
       thumbnailUrl: funcs.default({
         defaultValue: "https://picsum.photos/200/300",
       }),
       type: funcs.default({ defaultValue: "image" }),
-      url: funcs.default({ defaultValue: "https://picsum.photos/800/600" }),
     },
     count: 60,
   },

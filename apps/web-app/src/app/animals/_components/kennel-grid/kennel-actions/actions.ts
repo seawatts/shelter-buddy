@@ -14,7 +14,9 @@ import {
   ShelterMembers,
 } from "@acme/db/schema";
 
+import { env } from "~/env.server";
 import { authenticatedAction } from "~/safe-action";
+import { createClient } from "~/supabase/server";
 import { b } from "../../../../../../../../baml_client";
 
 const animalNoteSchema = z.object({
@@ -42,6 +44,7 @@ const toggleOutOfKennelSchema = z.object({
 });
 
 const createAnimalSchema = z.object({
+  animalId: z.string().optional(),
   approvedActivities: z
     .array(
       z.object({
@@ -59,10 +62,10 @@ const createAnimalSchema = z.object({
       outOfKennel: z.string().optional(),
     })
     .optional(),
+  externalId: z.string().optional(),
   gender: z.enum(["male", "female"]),
   generalNotes: z.string().optional(),
-  headshot: z.string().optional(),
-  id: z.string().optional(),
+  intakeFormImagePath: z.string().optional(),
   isFido: z.boolean().optional(),
   kennelId: z.string(),
   name: z.string(),
@@ -217,8 +220,9 @@ export const createAnimalAction = authenticatedAction
         breed: input.breed,
         createdByUserId: ctx.user.id,
         difficultyLevel: input.difficultyLevel,
-        externalId: input.id,
+        externalId: input.externalId,
         gender: input.gender,
+        id: input.animalId,
         isFido: input.isFido ?? false,
         name: input.name,
         shelterId: shelterMember.shelterId,
@@ -294,14 +298,15 @@ export const createAnimalAction = authenticatedAction
     }
 
     // Create headshot media if provided
-    if (input.headshot) {
+    if (input.intakeFormImagePath) {
       await db.insert(AnimalMedia).values({
         animalId: animal.id,
         createdByUserId: ctx.user.id,
         default: true,
         metadata: {},
+        s3Path: input.intakeFormImagePath,
+        shelterId: shelterMember.shelterId,
         type: "image",
-        url: input.headshot,
       });
     }
 
@@ -314,7 +319,20 @@ export const analyzeIntakeFormAction = authenticatedAction
   .input(z.object({ imageUrl: z.string() }))
   .handler(async ({ input }) => {
     try {
-      const image = Image.fromBase64("image/png", input.imageUrl);
+      const supabase = await createClient();
+
+      const { data, error } = await supabase.storage
+        .from(env.SUPABASE_STORAGE_BUCKET)
+        .download(input.imageUrl);
+      if (error) {
+        throw new Error("Failed to fetch image from Supabase", {
+          cause: error,
+        });
+      }
+
+      const arrayBuffer = await data.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
+      const image = Image.fromBase64("image/png", base64);
 
       const formData = await b.ExtractIntakeForm(image);
 

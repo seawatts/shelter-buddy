@@ -70,3 +70,10 @@ export interface IntakeForm {
   equipmentNotes: Equipment
   
 }
+
+export interface TestResponse {
+  message: string
+  timestamp: string
+  isSuccess: boolean
+  
+}

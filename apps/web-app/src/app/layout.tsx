@@ -5,7 +5,6 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { PostHogProvider } from "@acme/analytics/posthog/client";
 import { AnalyticsProviders } from "@acme/analytics/providers";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -67,19 +66,17 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <AnalyticsProviders identifyUser>
             <NuqsAdapter>
               <TooltipProvider>
-                <PostHogProvider>
-                  <ThemeProvider
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                  >
-                    <SidebarProvider defaultOpen={defaultOpen}>
-                      <AppSidebar shelter={shelter} />
-                      <main className="flex-1">{props.children}</main>
-                    </SidebarProvider>
-                    <Toaster />
-                  </ThemeProvider>
-                </PostHogProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="dark"
+                  enableSystem
+                >
+                  <SidebarProvider defaultOpen={defaultOpen}>
+                    <AppSidebar shelter={shelter} />
+                    <main className="flex-1">{props.children}</main>
+                  </SidebarProvider>
+                  <Toaster />
+                </ThemeProvider>
               </TooltipProvider>
             </NuqsAdapter>
           </AnalyticsProviders>

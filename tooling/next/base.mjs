@@ -11,6 +11,7 @@ const nextConfig = {
   experimental: {
     scrollRestoration: true,
     typedRoutes: true,
+    // dynamicIO: true,
     serverActions: {
       bodySizeLimit: "20mb",
     },
@@ -27,6 +28,7 @@ const nextConfig = {
       { hostname: "img.clerk.com" },
       { hostname: "image.tmdb.org" },
       { hostname: "picsum.photos" },
+      { hostname: "ayruaolkindkmrmvlaso.supabase.co" },
     ],
   },
   logging: {

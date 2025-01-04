@@ -688,13 +688,18 @@ export const AnimalMedia = pgTable("animal_media", {
     .notNull()
     .primaryKey(),
   metadata: json("metadata").$type<Record<string, unknown>>(),
+  s3Path: text("s3Path").notNull(),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   thumbnailUrl: text("thumbnailUrl"),
   type: text("type").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => new Date()),
-  url: text("url").notNull(),
   walkId: varchar("walkId").references(() => Walks.id, {
     onDelete: "cascade",
   }),

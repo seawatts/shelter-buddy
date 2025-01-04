@@ -1,33 +1,28 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 
 import { env } from "~/env.server";
 
-export const createClient = (request: NextRequest) => {
-  // Create an unmodified response
-  let supabaseResponse = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+export async function createClient() {
+  const cookieStore = await cookies();
 
-  const supabase = createServerClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+  // Create a server's supabase client with newly configured cookie,
+  // which could be used to maintain user's session
+  return createServerClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
-        return request.cookies.getAll();
+        return cookieStore.getAll();
       },
       setAll(cookiesToSet) {
-        for (const { name, value, options } of cookiesToSet)
-          request.cookies.set(name, value);
-        supabaseResponse = NextResponse.next({
-          request,
-        });
-        for (const { name, value, options } of cookiesToSet)
-          supabaseResponse.cookies.set(name, value, options);
+        try {
+          for (const { name, value, options } of cookiesToSet)
+            cookieStore.set(name, value, options);
+        } catch {
+          // The `setAll` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
       },
     },
   });
-
-  return supabaseResponse;
-};
+}
