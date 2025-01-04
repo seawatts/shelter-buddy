@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
@@ -50,8 +51,12 @@ export const startWalkAction = authenticatedAction
       })
       .returning();
 
+    if (!walk) {
+      throw new Error("Failed to create walk");
+    }
+
     revalidatePath("/animals");
-    return walk;
+    redirect(`/animals/walks/${walk.id}/in-progress`);
   });
 
 export const stopWalkAction = authenticatedAction
@@ -95,4 +100,5 @@ export const stopWalkAction = authenticatedAction
       .where(eq(Walks.id, input.walkId));
 
     revalidatePath("/animals");
+    redirect(`/animals/walks/${walk.id}/finished`);
   });

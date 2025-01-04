@@ -59,6 +59,11 @@ export const walkStatusEnum = pgEnum("walkStatus", [
 ]);
 
 export const activityTypeEnum = pgEnum("activityType", [
+  "started_foster",
+  "ended_foster",
+  "started_in_kennel",
+  "ended_in_kennel",
+  "adopted",
   // Bathroom
   "pee",
   "poop",
@@ -120,6 +125,9 @@ export const activityTypeEnum = pgEnum("activityType", [
 ]);
 
 export const activityCategoryEnum = pgEnum("activityCategory", [
+  "foster",
+  "adopted",
+  "kennel",
   "bathroom",
   "play",
   "training",
@@ -827,6 +835,11 @@ export const AnimalActivities = pgTable("animal_activity", {
   metadata: json("metadata").$type<Record<string, unknown>>(),
   notes: text("notes"),
   severity: activitySeverityEnum("severity").default("info").notNull(),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   type: activityTypeEnum("type").notNull(),
   updatedAt: timestamp("updatedAt", {
     mode: "date",
@@ -851,6 +864,7 @@ export const AnimalsRelations = relations(Animals, ({ one, many }) => ({
     fields: [Animals.shelterId],
     references: [Shelters.id],
   }),
+
   tags: many(AnimalTags),
   walks: many(Walks),
 }));
@@ -874,20 +888,27 @@ export const WalksRelations = relations(Walks, ({ one, many }) => ({
   }),
 }));
 
-export const ActivitiesRelations = relations(AnimalActivities, ({ one }) => ({
-  animal: one(Animals, {
-    fields: [AnimalActivities.animalId],
-    references: [Animals.id],
+export const AnimalActivitiesRelations = relations(
+  AnimalActivities,
+  ({ one }) => ({
+    animal: one(Animals, {
+      fields: [AnimalActivities.animalId],
+      references: [Animals.id],
+    }),
+    createdByUser: one(Users, {
+      fields: [AnimalActivities.createdByUserId],
+      references: [Users.id],
+    }),
+    shelter: one(Shelters, {
+      fields: [AnimalActivities.shelterId],
+      references: [Shelters.id],
+    }),
+    walk: one(Walks, {
+      fields: [AnimalActivities.walkId],
+      references: [Walks.id],
+    }),
   }),
-  createdByUser: one(Users, {
-    fields: [AnimalActivities.createdByUserId],
-    references: [Users.id],
-  }),
-  walk: one(Walks, {
-    fields: [AnimalActivities.walkId],
-    references: [Walks.id],
-  }),
-}));
+);
 
 export const AnimalMediaRelations = relations(AnimalMedia, ({ one }) => ({
   animal: one(Animals, {
@@ -897,6 +918,10 @@ export const AnimalMediaRelations = relations(AnimalMedia, ({ one }) => ({
   createdByUser: one(Users, {
     fields: [AnimalMedia.createdByUserId],
     references: [Users.id],
+  }),
+  shelter: one(Shelters, {
+    fields: [AnimalMedia.shelterId],
+    references: [Shelters.id],
   }),
   walk: one(Walks, {
     fields: [AnimalMedia.walkId],

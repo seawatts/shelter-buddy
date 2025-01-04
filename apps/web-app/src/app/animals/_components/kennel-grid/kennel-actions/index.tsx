@@ -9,6 +9,7 @@ import { KennelActionsDrawer } from "./kennel-actions-drawer";
 interface KennelActionsProps {
   animal?: AnimalTypeWithRelations;
   kennel: KennelType;
+  kennels: KennelType[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -16,6 +17,7 @@ interface KennelActionsProps {
 export function KennelActions({
   animal,
   kennel,
+  kennels,
   open,
   onOpenChange,
 }: KennelActionsProps) {
@@ -25,6 +27,7 @@ export function KennelActions({
     <KennelActionsDrawer
       animal={animal}
       kennel={kennel}
+      kennels={kennels}
       open={open}
       onOpenChange={onOpenChange}
     />
@@ -32,6 +35,7 @@ export function KennelActions({
     <KennelActionsDialog
       animal={animal}
       kennel={kennel}
+      kennels={kennels}
       open={open}
       onOpenChange={onOpenChange}
     />

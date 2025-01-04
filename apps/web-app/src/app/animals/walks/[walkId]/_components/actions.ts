@@ -22,9 +22,18 @@ interface TranscriptionResult {
   activities: string[];
 }
 
+type WalkActivityType = Exclude<
+  (typeof activityTypeEnum.enumValues)[number],
+  | "adopted"
+  | "started_foster"
+  | "ended_foster"
+  | "started_in_kennel"
+  | "ended_in_kennel"
+>;
+
 // Activity type to category mapping
 const ACTIVITY_CATEGORIES: Record<
-  (typeof activityTypeEnum.enumValues)[number],
+  WalkActivityType,
   {
     category:
       | "bathroom"
@@ -88,7 +97,7 @@ const ACTIVITY_CATEGORIES: Record<
   training: { category: "training", severity: "info" },
   treats: { category: "training", severity: "info" },
   vomit: { category: "health", severity: "high" },
-};
+} as const;
 
 export async function transcribeAudio(audioFile: File) {
   try {
@@ -170,6 +179,7 @@ export const finishWalkAction = authenticatedAction
           category: ACTIVITY_CATEGORIES[activity].category,
           createdByUserId: ctx.user.id,
           severity: ACTIVITY_CATEGORIES[activity].severity,
+          shelterId: walk.shelterId,
           type: activity,
           walkId: walk.id,
         })),

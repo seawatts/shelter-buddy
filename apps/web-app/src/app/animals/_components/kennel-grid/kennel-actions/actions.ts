@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { db } from "@acme/db/client";
 import {
+  AnimalActivities,
   AnimalMedia,
   AnimalNotes,
   Animals,
@@ -145,6 +146,8 @@ export const reassignKennelAction = authenticatedAction
       shelterId: animal.shelterId,
       startedAt: new Date(),
     });
+
+    revalidatePath("/animals");
   });
 
 // Mark Out of Kennel Action
@@ -350,4 +353,79 @@ export const analyzeIntakeFormAction = authenticatedAction
         success: false,
       };
     }
+  });
+
+// Mark Adopted Action
+export const markAdoptedAction = authenticatedAction
+  .createServerAction()
+  .input(z.object({ animalId: z.string() }))
+  .handler(async ({ ctx, input }) => {
+    const animal = await db.query.Animals.findFirst({
+      where: eq(Animals.id, input.animalId),
+    });
+
+    if (!animal) {
+      throw new Error("Animal not found");
+    }
+
+    // End current kennel occupancy
+    await db
+      .update(KennelOccupants)
+      .set({
+        endedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(KennelOccupants.animalId, input.animalId),
+          isNull(KennelOccupants.endedAt),
+        ),
+      );
+
+    await db.insert(AnimalActivities).values({
+      animalId: input.animalId,
+      category: "adopted",
+      createdByUserId: ctx.user.id,
+      shelterId: animal.shelterId,
+      type: "adopted",
+    });
+
+    return { success: true };
+  });
+
+// Mark In Foster Action
+export const markInFosterAction = authenticatedAction
+  .createServerAction()
+  .input(z.object({ animalId: z.string() }))
+  .handler(async ({ ctx, input }) => {
+    const animal = await db.query.Animals.findFirst({
+      where: eq(Animals.id, input.animalId),
+    });
+
+    if (!animal) {
+      throw new Error("Animal not found");
+    }
+
+    // End current kennel occupancy
+    await db
+      .update(KennelOccupants)
+      .set({
+        endedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(KennelOccupants.animalId, input.animalId),
+          isNull(KennelOccupants.endedAt),
+        ),
+      );
+
+    // Add a note about the foster status
+    await db.insert(AnimalActivities).values({
+      animalId: input.animalId,
+      category: "foster",
+      createdByUserId: ctx.user.id,
+      shelterId: animal.shelterId,
+      type: "started_foster",
+    });
+
+    return { success: true };
   });

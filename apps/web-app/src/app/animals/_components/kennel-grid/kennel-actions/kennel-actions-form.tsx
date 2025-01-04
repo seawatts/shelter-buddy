@@ -1,18 +1,24 @@
 "use client";
 
-import type { Route } from "next";
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
 
-import type { AnimalTypeWithRelations } from "@acme/db/schema";
+import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@acme/ui/select";
 import { toast } from "@acme/ui/toast";
 
 import { startWalkAction } from "../../actions";
 import {
   addAnimalNoteAction,
+  markAdoptedAction,
+  markInFosterAction,
   reassignKennelAction,
   toggleOutOfKennelAction,
 } from "./actions";
@@ -20,129 +26,130 @@ import {
 interface KennelActionsFormProps {
   animal: AnimalTypeWithRelations;
   onOpenChange: (open: boolean) => void;
-}
-
-interface ActionResult {
-  success: boolean;
-  data?: unknown;
+  kennels: KennelType[];
 }
 
 export function KennelActionsForm({
   animal,
   onOpenChange,
+  kennels,
 }: KennelActionsFormProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const startWalkServerAction = useServerAction(startWalkAction);
+  const addNoteServerAction = useServerAction(addAnimalNoteAction);
+  const reassignKennelServerAction = useServerAction(reassignKennelAction);
+  const toggleOutOfKennelServerAction = useServerAction(
+    toggleOutOfKennelAction,
+  );
+  const markAdoptedServerAction = useServerAction(markAdoptedAction);
+  const markInFosterServerAction = useServerAction(markInFosterAction);
 
   const handleStartWalk = async () => {
     try {
-      const [result, error] = await startWalkServerAction.execute({
+      await startWalkServerAction.execute({
         animalId: animal.id,
       });
-
-      if (result) {
-        router.push(`/animals/walks/${result.id}/finished` as Route);
-        onOpenChange(false);
-      } else if (error) {
-        console.error("Error starting walk", error);
-        toast.error(error.message);
-      }
-    } catch {
+    } catch (error) {
       toast.error("Failed to start walk");
+      console.error("Failed to start walk", error);
     }
   };
 
-  const handleAddNote = () => {
-    startTransition(() => {
-      (
-        addAnimalNoteAction as unknown as (input: {
-          animalId: string;
-          notes: string;
-          type:
-            | "medical"
-            | "behavioral"
-            | "general"
-            | "inKennel"
-            | "outKennel"
-            | "approvedActivities";
-        }) => Promise<ActionResult>
-      )({
+  const handleAddNote = async () => {
+    try {
+      const [result] = await addNoteServerAction.execute({
         animalId: animal.id,
         notes: "Added a note",
         type: "general",
-      })
-        .then((result) => {
-          if (result.success) {
-            toast.success("Note added successfully");
-            onOpenChange(false);
-          }
-        })
-        .catch((error: Error) => {
-          console.error("Error adding note:", error);
-          toast.error("Failed to add note");
-        });
-    });
+      });
+
+      if (result?.success) {
+        toast.success("Note added successfully");
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error("Error adding note:", error);
+      toast.error("Failed to add note");
+    }
   };
 
-  const handleReassignKennel = (newKennelId: string) => {
-    startTransition(() => {
-      (
-        reassignKennelAction as unknown as (input: {
-          animalId: string;
-          newKennelId: string;
-        }) => Promise<ActionResult>
-      )({
+  const handleReassignKennel = async (newKennelId: string) => {
+    try {
+      await reassignKennelServerAction.execute({
         animalId: animal.id,
         newKennelId,
-      })
-        .then((result) => {
-          if (result.success) {
-            toast.success("Kennel reassigned successfully");
-            onOpenChange(false);
-          }
-        })
-        .catch((error: Error) => {
-          console.error("Error reassigning kennel:", error);
-          toast.error("Failed to reassign kennel");
-        });
-    });
+      });
+
+      toast.success("Kennel reassigned successfully");
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error reassigning kennel:", error);
+      toast.error("Failed to reassign kennel");
+    }
   };
 
-  const handleToggleOutOfKennel = () => {
+  const handleToggleOutOfKennel = async () => {
     const currentKennelOccupant = animal.kennelOccupants.find(
       (k) => !k.endedAt,
     );
     if (!currentKennelOccupant) return;
 
-    startTransition(() => {
-      (
-        toggleOutOfKennelAction as unknown as (input: {
-          animalId: string;
-          isOutOfKennel: boolean;
-        }) => Promise<ActionResult>
-      )({
+    try {
+      const [result] = await toggleOutOfKennelServerAction.execute({
         animalId: animal.id,
         isOutOfKennel: !currentKennelOccupant.isOutOfKennel,
-      })
-        .then((result) => {
-          if (result.success) {
-            toast.success(
-              `${animal.name} marked ${
-                currentKennelOccupant.isOutOfKennel ? "in" : "out of"
-              } kennel`,
-            );
-            onOpenChange(false);
-          }
-        })
-        .catch((error: Error) => {
-          console.error("Error toggling out of kennel status:", error);
-          toast.error("Failed to update kennel status");
-        });
-    });
+      });
+
+      if (result?.success) {
+        toast.success(
+          `${animal.name} marked ${
+            currentKennelOccupant.isOutOfKennel ? "in" : "out of"
+          } kennel`,
+        );
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error("Error toggling out of kennel status:", error);
+      toast.error("Failed to update kennel status");
+    }
+  };
+
+  const handleMarkAdopted = async () => {
+    try {
+      const [result] = await markAdoptedServerAction.execute({
+        animalId: animal.id,
+      });
+
+      if (result?.success) {
+        toast.success(`${animal.name} marked as adopted`);
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error("Error marking as adopted:", error);
+      toast.error("Failed to mark as adopted");
+    }
+  };
+
+  const handleMarkInFoster = async () => {
+    try {
+      const [result] = await markInFosterServerAction.execute({
+        animalId: animal.id,
+      });
+
+      if (result?.success) {
+        toast.success(`${animal.name} marked as in foster`);
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error("Error marking as in foster:", error);
+      toast.error("Failed to mark as in foster");
+    }
   };
 
   const currentKennelOccupant = animal.kennelOccupants.find((k) => !k.endedAt);
+  const currentKennelId = currentKennelOccupant?.kennelId;
+
+  // Filter out the current kennel and get available kennels
+  const availableKennels = kennels.filter((k) => k.id !== currentKennelId);
 
   return (
     <div className="flex flex-col gap-2">
@@ -150,9 +157,9 @@ export function KennelActionsForm({
         variant="outline"
         className="w-full justify-start"
         onClick={handleStartWalk}
-        disabled={isPending || startWalkServerAction.isPending}
+        disabled={startWalkServerAction.isPending}
       >
-        {isPending || startWalkServerAction.isPending ? (
+        {startWalkServerAction.isPending ? (
           <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
           <Icons.Play className="mr-2" size="sm" variant="primary" />
@@ -163,36 +170,47 @@ export function KennelActionsForm({
         variant="outline"
         className="w-full justify-start"
         onClick={handleAddNote}
-        disabled={isPending}
+        disabled={addNoteServerAction.isPending}
       >
-        {isPending ? (
+        {addNoteServerAction.isPending ? (
           <Icons.Spinner className="mr-2" size="sm" variant="primary" />
         ) : (
           <Icons.Plus className="mr-2" size="sm" variant="primary" />
         )}
         Add Note
       </Button>
-      <Button
-        variant="outline"
-        className="w-full justify-start"
-        onClick={() => handleReassignKennel("new-kennel-id")}
-        disabled={isPending}
+      <Select
+        onValueChange={handleReassignKennel}
+        disabled={reassignKennelServerAction.isPending}
       >
-        {isPending ? (
-          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
-        ) : (
-          <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
-        )}
-        Reassign Kennel
-      </Button>
+        <SelectTrigger className="w-full">
+          <div className="ml-1 flex items-center gap-2">
+            {reassignKennelServerAction.isPending ? (
+              <Icons.Spinner className="mr-2" size="sm" variant="primary" />
+            ) : (
+              <Icons.ArrowRight className="mr-2" size="sm" variant="primary" />
+            )}
+            <SelectValue placeholder="Reassign Kennel" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {availableKennels.map((kennel) => (
+            <SelectItem key={kennel.id} value={kennel.id}>
+              {kennel.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <Button
         variant="outline"
         className="w-full justify-start"
         onClick={handleToggleOutOfKennel}
-        disabled={isPending || !currentKennelOccupant}
+        disabled={
+          toggleOutOfKennelServerAction.isPending || !currentKennelOccupant
+        }
       >
         {(() => {
-          if (isPending) {
+          if (toggleOutOfKennelServerAction.isPending) {
             return (
               <Icons.Spinner className="mr-2" size="sm" variant="primary" />
             );
@@ -206,6 +224,32 @@ export function KennelActionsForm({
         {currentKennelOccupant?.isOutOfKennel
           ? "Mark In Kennel"
           : "Mark Out of Kennel"}
+      </Button>
+      <Button
+        variant="outline"
+        className="w-full justify-start"
+        onClick={handleMarkAdopted}
+        disabled={markAdoptedServerAction.isPending}
+      >
+        {markAdoptedServerAction.isPending ? (
+          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
+        ) : (
+          <Icons.Heart className="mr-2" size="sm" variant="primary" />
+        )}
+        Mark Adopted
+      </Button>
+      <Button
+        variant="outline"
+        className="w-full justify-start"
+        onClick={handleMarkInFoster}
+        disabled={markInFosterServerAction.isPending}
+      >
+        {markInFosterServerAction.isPending ? (
+          <Icons.Spinner className="mr-2" size="sm" variant="primary" />
+        ) : (
+          <Icons.Home className="mr-2" size="sm" variant="primary" />
+        )}
+        Mark In Foster
       </Button>
     </div>
   );

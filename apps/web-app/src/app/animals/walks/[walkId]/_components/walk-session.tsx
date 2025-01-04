@@ -369,7 +369,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
         <div className="container h-full max-w-3xl">
           <div className="flex h-full items-center gap-4">
             <Link
-              href={`/animals/${animal.id}`}
+              href={`/animals`}
               className="text-muted-foreground hover:text-foreground"
             >
               <BackIcon />

@@ -20,6 +20,7 @@ import { KennelActionsContent } from "./kennel-actions-content";
 interface KennelActionsDialogProps {
   animal?: AnimalTypeWithRelations;
   kennel: KennelType;
+  kennels: KennelType[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -27,6 +28,7 @@ interface KennelActionsDialogProps {
 export function KennelActionsDialog({
   animal,
   kennel,
+  kennels,
   open,
   onOpenChange,
 }: KennelActionsDialogProps) {
@@ -87,6 +89,7 @@ export function KennelActionsDialog({
             <KennelActionsContent
               animal={animal}
               kennelId={kennel.id}
+              kennels={kennels}
               onOpenChange={onOpenChange}
             />
           </div>

@@ -155,6 +155,24 @@ export function KennelGrid(props: KennelGridProps) {
       {selectedKennel && (
         <KennelActions
           kennel={selectedKennel}
+          kennels={sortedKennels
+            .filter((kennel) => {
+              // Check if any animal currently occupies this kennel
+              const isOccupied = props.animals.some((animal) =>
+                animal.kennelOccupants.some(
+                  (occupant) =>
+                    occupant.kennelId === kennel.id && !occupant.endedAt,
+                ),
+              );
+              // Only include kennels that are not occupied
+              return !isOccupied;
+            })
+            .sort((a, b) => {
+              // Extract numbers from kennel names and compare numerically
+              const aNumber = Number.parseInt(a.name);
+              const bNumber = Number.parseInt(b.name);
+              return aNumber - bNumber;
+            })}
           animal={props.animals.find((a) =>
             a.kennelOccupants.some(
               (k) => k.kennelId === selectedKennel.id && !k.endedAt,

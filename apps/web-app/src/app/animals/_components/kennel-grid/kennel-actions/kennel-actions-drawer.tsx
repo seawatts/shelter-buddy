@@ -15,13 +15,14 @@ import {
 } from "@acme/ui/drawer";
 import { cn } from "@acme/ui/lib/utils";
 
-import { formatDuration, getLastCompletedWalk } from "../utils";
+import { getLastCompletedWalk } from "../utils";
 import { WalkStatus } from "../walk-status";
 import { KennelActionsContent } from "./kennel-actions-content";
 
 interface KennelActionsDrawerProps {
   animal?: AnimalTypeWithRelations;
   kennel: KennelType;
+  kennels: KennelType[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -29,6 +30,7 @@ interface KennelActionsDrawerProps {
 export function KennelActionsDrawer({
   animal,
   kennel,
+  kennels,
   open,
   onOpenChange,
 }: KennelActionsDrawerProps) {
@@ -61,7 +63,7 @@ export function KennelActionsDrawer({
         </span>
         <span className="flex items-center gap-1">
           <Timer className="size-3" />
-          {formatDuration(lastWalk.duration)}
+          {lastWalk.duration} min
         </span>
       </span>
     );
@@ -129,6 +131,7 @@ export function KennelActionsDrawer({
             <KennelActionsContent
               animal={animal}
               kennelId={kennel.id}
+              kennels={kennels}
               onOpenChange={onOpenChange}
             />
           </div>

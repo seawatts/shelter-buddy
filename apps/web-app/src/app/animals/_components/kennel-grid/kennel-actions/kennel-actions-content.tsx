@@ -2,7 +2,11 @@
 
 import { AlertTriangle, Check, Info, X } from "lucide-react";
 
-import type { AnimalNoteType, AnimalTypeWithRelations } from "@acme/db/schema";
+import type {
+  AnimalNoteType,
+  AnimalTypeWithRelations,
+  KennelType,
+} from "@acme/db/schema";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -14,12 +18,14 @@ interface KennelActionsContentProps {
   animal?: AnimalTypeWithRelations | undefined;
   onOpenChange: (open: boolean) => void;
   kennelId: string;
+  kennels: KennelType[];
 }
 
 export function KennelActionsContent({
   animal,
   kennelId,
   onOpenChange,
+  kennels,
 }: KennelActionsContentProps) {
   if (!animal) {
     return (
@@ -125,7 +131,11 @@ export function KennelActionsContent({
       )}
 
       {/* Quick Actions */}
-      <KennelActionsForm animal={animal} onOpenChange={onOpenChange} />
+      <KennelActionsForm
+        animal={animal}
+        onOpenChange={onOpenChange}
+        kennels={kennels}
+      />
 
       <AnimalImages name={animal.name} media={animal.media} isMobile />
 
