@@ -49,7 +49,7 @@ export function KennelStatus({ animals }: KennelStatusProps) {
                   {animals.map((animal) => (
                     <Link
                       key={animal.id}
-                      href={`/animals/${animal.id}`}
+                      href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                       className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                     >
                       <div className="flex flex-col">

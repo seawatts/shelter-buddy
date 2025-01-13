@@ -18,9 +18,12 @@ export const uploadPhotoAction = authenticatedAction
       animalId: z.string(),
       defaultPhoto: z.boolean().optional(),
       filePath: z.string(),
+      height: z.number(),
       shelterId: z.string(),
+      size: z.number(),
       type: z.string(),
       walkId: z.string().optional(),
+      width: z.number(),
     }),
   )
   .handler(async ({ ctx, input }) => {
@@ -29,11 +32,14 @@ export const uploadPhotoAction = authenticatedAction
       animalId: input.animalId,
       createdByUserId: ctx.user.id,
       default: input.defaultPhoto ?? false,
+      height: input.height,
       s3Path: input.filePath,
       shelterId: input.shelterId,
+      sizeBytes: input.size,
       thumbnailUrl: null,
       type: input.type,
       walkId: input.walkId ?? null,
+      width: input.width,
     });
 
     revalidatePath("/animals");

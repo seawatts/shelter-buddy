@@ -1,26 +1,7 @@
 {
-  "name": "@acme/ui",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "exports": {
-    "./globals.css": "./src/styles/globals.css",
-    "./lib/*": "./src/lib/*.tsx",
-    "./*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.tsx",
-    "./magicui/*": "./src/magicui/*.tsx"
-  },
-  "license": "MIT",
-  "scripts": {
-    "clean": "rm -rf .turbo node_modules",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
-  },
   "dependencies": {
-    "@hookform/resolvers": "3.9.1",
-    "@icons-pack/react-simple-icons": "10.2.0",
+    "@hookform/resolvers": "3.10.0",
+    "@icons-pack/react-simple-icons": "11.0.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-avatar": "1.1.2",
@@ -50,8 +31,8 @@
     "cmdk": "1.0.4",
     "cobe": "^0.6.3",
     "date-fns": "^4.1.0",
-    "embla-carousel-react": "^8.5.1",
-    "lucide-react": "0.469.0",
+    "embla-carousel-react": "^8.5.2",
+    "lucide-react": "0.471.0",
     "next-themes": "0.4.4",
     "react-day-picker": "9.5.0",
     "react-hook-form": "7.54.2",
@@ -62,7 +43,9 @@
     "sonner": "1.7.1",
     "tailwind-merge": "2.6.0",
     "tailwindcss-animate": "1.0.7",
-    "vaul": "1.1.2"
+    "tus-js-client": "4.2.3",
+    "vaul": "1.1.2",
+    "zustand": "5.0.3"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
@@ -70,13 +53,35 @@
     "@acme/prettier-config": "workspace:*",
     "@acme/tailwind-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@types/react": "19.0.2",
-    "eslint": "9.17.0",
+    "@types/react": "19.0.4",
+    "eslint": "9.18.0",
     "prettier": "3.4.2",
     "react": "19.0.0",
     "tailwindcss": "3.4.17",
-    "typescript": "5.7.2",
+    "typescript": "5.7.3",
     "zod": "3.24.1"
   },
-  "prettier": "@acme/prettier-config"
+  "exports": {
+    "./*": "./src/components/*.tsx",
+    "./globals.css": "./src/styles/globals.css",
+    "./hooks/*": "./src/hooks/*.tsx",
+    "./lib/*": "./src/lib/*.tsx",
+    "./magicui/*": "./src/magicui/*.tsx",
+    "./providers": "./src/providers/index.ts",
+    "./providers/*": "./src/providers/*.tsx",
+    "./stores/*": "./src/stores/*.ts"
+  },
+  "license": "MIT",
+  "name": "@acme/ui",
+  "prettier": "@acme/prettier-config",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
+  },
+  "type": "module",
+  "version": "0.1.0"
 }

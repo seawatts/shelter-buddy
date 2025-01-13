@@ -36,7 +36,7 @@ export function BehavioralInsights({ data }: BehavioralInsightsProps) {
                 {data.redFlags.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>
@@ -56,7 +56,7 @@ export function BehavioralInsights({ data }: BehavioralInsightsProps) {
                 {data.purpleToYellow.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>
@@ -76,7 +76,7 @@ export function BehavioralInsights({ data }: BehavioralInsightsProps) {
                 {data.goodBehavior.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>

@@ -29,6 +29,8 @@ const nextConfig = {
       { hostname: "image.tmdb.org" },
       { hostname: "picsum.photos" },
       { hostname: "ayruaolkindkmrmvlaso.supabase.co" },
+      { hostname: "storage.supabase.co" },
+      { hostname: "127.0.0.1" },
     ],
   },
   logging: {

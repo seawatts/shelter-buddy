@@ -1,11 +1,11 @@
 import React from "react";
 
-import { Alert, AlertDescription, AlertTitle } from "@co-founder/ui/alert";
-import { Icons } from "@co-founder/ui/icons";
+import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
+import { Icons } from "@acme/ui/icons";
 
-import { formatTimeReadable } from "~/utils/format-time";
 import { useAudioRecorderContext } from "./context/audio-recorder-context";
 import { useVolumeMonitorContext } from "./context/volume-monitor-context";
+import { formatTimeReadable } from "./format-time";
 
 export interface AlertsProps {
   maxRecordingTimeSeconds?: number;

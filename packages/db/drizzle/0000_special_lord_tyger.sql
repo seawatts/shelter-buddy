@@ -1,0 +1,2 @@
+-- Migration file for initial schema that was already pushed directly
+-- This file is intentionally empty since the schema was created using drizzle push

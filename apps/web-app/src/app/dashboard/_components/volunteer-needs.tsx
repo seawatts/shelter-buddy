@@ -45,7 +45,7 @@ export function VolunteerNeeds({ data }: VolunteerNeedsProps) {
                 {data.notWalkedToday.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>
@@ -61,7 +61,7 @@ export function VolunteerNeeds({ data }: VolunteerNeedsProps) {
                 {data.highEnergyPriority.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>
@@ -77,7 +77,7 @@ export function VolunteerNeeds({ data }: VolunteerNeedsProps) {
                 {data.needsSocialization.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex items-center justify-between rounded-md border border-border p-2 hover:bg-muted"
                   >
                     <span className="font-medium">{animal.name}</span>

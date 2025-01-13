@@ -347,11 +347,15 @@ export const Shelters = pgTable("shelter", {
 });
 
 export type ShelterType = typeof Shelters.$inferSelect;
+export type ShelterWithRoomsType = typeof Shelters.$inferSelect & {
+  kennelRooms: KennelRoomType[];
+};
 
 export const SheltersRelations = relations(Shelters, ({ many }) => ({
   animals: many(Animals),
   kennelMaintenanceRecords: many(KennelMaintenance),
   kennelNotes: many(KennelNotes),
+  kennelRooms: many(KennelRooms),
   kennels: many(Kennels),
   shelterMembers: many(ShelterMembers),
 }));
@@ -429,6 +433,37 @@ export const ShortUrl = pgTable("short_url", {
   }).$onUpdateFn(() => new Date()),
 });
 
+// Kennel Rooms Table
+export const KennelRooms = pgTable("kennel_room", {
+  createdAt: timestamp("createdAt", {
+    mode: "date",
+    withTimezone: true,
+  }).defaultNow(),
+  createdByUserId: varchar("createdByUserId")
+    .references(() => Users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  gridX: integer("gridX").default(0).notNull(),
+  gridY: integer("gridY").default(0).notNull(),
+  id: varchar("id", { length: 48 })
+    .$defaultFn(() => createId({ prefix: "room" }))
+    .notNull()
+    .primaryKey(),
+  name: text("name").notNull(),
+  shelterId: varchar("shelterId")
+    .references(() => Shelters.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  updatedAt: timestamp("updatedAt", {
+    mode: "date",
+    withTimezone: true,
+  }).$onUpdateFn(() => new Date()),
+});
+
+export type KennelRoomType = typeof KennelRooms.$inferSelect;
+
 // Kennels Table
 export const Kennels = pgTable("kennel", {
   createdAt: timestamp("createdAt", {
@@ -447,6 +482,11 @@ export const Kennels = pgTable("kennel", {
   }),
   maintenanceStatus: maintenanceStatusEnum("maintenanceStatus").default("good"),
   name: text("name").notNull(),
+  roomId: varchar("roomId")
+    .references(() => KennelRooms.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   shelterId: varchar("shelterId")
     .references(() => Shelters.id, {
       onDelete: "cascade",
@@ -544,6 +584,10 @@ export const KennelsRelations = relations(Kennels, ({ one, many }) => ({
   maintenanceRecords: many(KennelMaintenance),
   notes: many(KennelNotes),
   occupants: many(KennelOccupants),
+  room: one(KennelRooms, {
+    fields: [Kennels.roomId],
+    references: [KennelRooms.id],
+  }),
   shelter: one(Shelters, {
     fields: [Kennels.shelterId],
     references: [Shelters.id],
@@ -630,7 +674,9 @@ export type AnimalTypeWithRelations = typeof Animals.$inferSelect & {
   tags: AnimalTagType[];
   media: AnimalMediaType[];
   kennelOccupants: (KennelOccupantType & {
-    kennel: KennelType;
+    kennel: KennelType & {
+      room: KennelRoomType;
+    };
   })[];
   notes: AnimalNoteType[];
   walks: WalkType[];
@@ -691,6 +737,7 @@ export const AnimalMedia = pgTable("animal_media", {
     })
     .notNull(),
   default: boolean("default").default(false).notNull(),
+  height: integer("height").notNull(),
   id: varchar("id", { length: 48 })
     .$defaultFn(() => createId({ prefix: "media" }))
     .notNull()
@@ -702,6 +749,7 @@ export const AnimalMedia = pgTable("animal_media", {
       onDelete: "cascade",
     })
     .notNull(),
+  sizeBytes: integer("sizeBytes").notNull(),
   thumbnailUrl: text("thumbnailUrl"),
   type: text("type").notNull(),
   updatedAt: timestamp("updatedAt", {
@@ -711,6 +759,7 @@ export const AnimalMedia = pgTable("animal_media", {
   walkId: varchar("walkId").references(() => Walks.id, {
     onDelete: "cascade",
   }),
+  width: integer("width").notNull(),
 });
 
 // Animal Notes Table
@@ -957,6 +1006,7 @@ export type ShortUrlType = typeof ShortUrl.$inferSelect;
 export type KennelType = typeof Kennels.$inferSelect & {
   gridX: number;
   gridY: number;
+  room: KennelRoomType;
 };
 export type KennelOccupantType = typeof KennelOccupants.$inferSelect;
 
@@ -1037,3 +1087,16 @@ export const KennelMaintenanceRelations = relations(
 );
 
 export type KennelMaintenanceType = typeof KennelMaintenance.$inferSelect;
+
+// Add KennelRooms relations
+export const KennelRoomsRelations = relations(KennelRooms, ({ one, many }) => ({
+  createdByUser: one(Users, {
+    fields: [KennelRooms.createdByUserId],
+    references: [Users.id],
+  }),
+  kennels: many(Kennels),
+  shelter: one(Shelters, {
+    fields: [KennelRooms.shelterId],
+    references: [Shelters.id],
+  }),
+}));

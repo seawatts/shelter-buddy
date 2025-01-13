@@ -2,12 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import type { IconNode, LucideProps } from "lucide-react";
 import type { TwcComponentProps } from "react-twc";
 import React from "react";
-import {
-  SiLinkedin,
-  SiOpenai,
-  SiOpenaiHex,
-  SiX,
-} from "@icons-pack/react-simple-icons";
+import { SiOpenai, SiOpenaiHex, SiX } from "@icons-pack/react-simple-icons";
 import { cva } from "class-variance-authority";
 import {
   Activity,
@@ -66,6 +61,7 @@ import {
   Menu,
   MessageCircleQuestion,
   MessageSquareText,
+  Mic,
   Moon,
   MoreVertical,
   Notebook,
@@ -337,9 +333,6 @@ export const Icons = {
   Info: twx(Info).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
-  LinkedIn: twx(SiLinkedin).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
   ListFilter: twx(ListFilter).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -369,6 +362,9 @@ export const Icons = {
     "size",
     "variant",
   ])<IconProps>(({ size, variant }) => iconVariants({ size, variant })),
+  Mic: twx(Mic).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   Moon: twx(Moon).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),

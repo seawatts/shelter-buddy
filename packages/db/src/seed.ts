@@ -16,6 +16,7 @@ import {
   difficultyLevelEnum,
   genderEnum,
   KennelOccupants,
+  KennelRooms,
   Kennels,
   ShelterMembers,
   Shelters,
@@ -32,6 +33,7 @@ await db.delete(AnimalTags);
 await db.delete(KennelOccupants);
 await db.delete(Animals);
 await db.delete(Kennels);
+await db.delete(KennelRooms);
 await db.delete(ShelterMembers);
 await db.delete(Users);
 await db.delete(Shelters);
@@ -43,6 +45,7 @@ await seed(db, {
   AnimalTags,
   Animals,
   KennelOccupants,
+  KennelRooms,
   Kennels,
   ShelterMembers,
   Shelters,
@@ -122,6 +125,16 @@ await seed(db, {
       }),
     },
     count: 25,
+  },
+  KennelRooms: {
+    columns: {
+      gridX: funcs.int(),
+      gridY: funcs.int(),
+      name: funcs.valuesFromArray({
+        values: ["ISO", "Main", "Medical"],
+      }),
+    },
+    count: 3,
   },
   Kennels: {
     columns: {

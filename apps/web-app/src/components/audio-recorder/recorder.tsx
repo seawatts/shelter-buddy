@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useUser } from "@clerk/chrome-extension";
 
-import { speechToText } from "~/utils/speech-to-text";
-import { useCompany } from "../company/context";
-import { useDocument } from "../document/context";
 import { Alerts } from "./alerts";
 import { useAudioRecorderContext } from "./context/audio-recorder-context";
 import { RecordingControls } from "./controls";
+import { speechToText } from "./speech-to-text";
 
 interface AudioRecorderProps {
   onComplete: ({ text }: { text?: string }) => void;
@@ -21,8 +19,6 @@ export function AudioRecorder({
   maxRecordingTimeSeconds = 120,
   warningRecordingTimeSeconds = 60,
 }: AudioRecorderProps) {
-  const { application, company } = useCompany();
-  const { document } = useDocument();
   const user = useUser();
   const [isGeneratingText, setIsGeneratingText] = useState(false);
 
@@ -55,10 +51,7 @@ export function AudioRecorder({
       setIsGeneratingText(true);
       try {
         const text = await speechToText({
-          application,
           audioBlob: blob,
-          company,
-          document,
           user,
         });
         onComplete({ text });
@@ -69,7 +62,7 @@ export function AudioRecorder({
         setIsGeneratingText(false);
       }
     },
-    [application, company, document, user, onComplete],
+    [user, onComplete],
   );
 
   useEffect(() => {

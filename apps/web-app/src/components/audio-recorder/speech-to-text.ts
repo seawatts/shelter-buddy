@@ -1,37 +1,27 @@
-import type { useUser } from "@clerk/chrome-extension";
+import type { useUser } from "@clerk/nextjs";
 
-import type { Application, Company } from "~/components/company/context";
-import type { Document } from "~/components/document/context";
+import { env } from "~/env.server";
 
 export async function speechToText({
   audioBlob,
-  application,
-  company,
-  document,
   user,
 }: {
   audioBlob: Blob;
-  company?: Company;
-  application?: Application;
-  document?: Document;
   user: ReturnType<typeof useUser>;
 }): Promise<string> {
-  if (!application || !company) {
-    throw new Error("Application or company is required");
+  if (!user) {
+    throw new Error("User is required");
   }
 
   const endpoint = "/api/speech-to-text";
   const apiUrl =
-    process.env.NODE_ENV === "production"
+    env.NODE_ENV === "production"
       ? `https://app.co-founder.ai${endpoint}`
       : `http://localhost:3000${endpoint}`;
 
   const formData = new FormData();
   formData.append("audio", audioBlob);
-  formData.append("documentId", document?.id || "");
-  formData.append("companyId", company.id || "");
-  formData.append("applicationId", application.id || "");
-  formData.append("userId", user.user?.id || "");
+  formData.append("userId", user.user?.id ?? "");
 
   const response = await fetch(apiUrl, {
     body: formData,

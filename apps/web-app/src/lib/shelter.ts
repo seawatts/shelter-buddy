@@ -7,7 +7,11 @@ import { db } from "@acme/db/client";
 import { Shelters } from "@acme/db/schema";
 
 export async function getCurrentShelter() {
-  const shelter = await db.query.Shelters.findFirst({});
+  const shelter = await db.query.Shelters.findFirst({
+    with: {
+      kennelRooms: true,
+    },
+  });
 
   return shelter;
 }

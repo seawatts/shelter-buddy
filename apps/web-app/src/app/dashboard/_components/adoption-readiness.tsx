@@ -41,7 +41,7 @@ export function AdoptionReadiness({ data }: AdoptionReadinessProps) {
                 {data.ready.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex flex-col gap-2 rounded-md border border-border p-3 hover:bg-muted"
                   >
                     <div className="flex items-center justify-between">
@@ -85,7 +85,7 @@ export function AdoptionReadiness({ data }: AdoptionReadinessProps) {
                 {data.needsWork.map((animal) => (
                   <Link
                     key={animal.id}
-                    href={`/animals/${animal.id}`}
+                    href={`/shelters/${animal.shelterId}/animals/${animal.id}`}
                     className="group flex flex-col gap-2 rounded-md border border-border p-3 hover:bg-muted"
                   >
                     <div className="flex items-center justify-between">

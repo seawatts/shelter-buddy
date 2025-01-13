@@ -6,7 +6,7 @@ import { createAudioVisualizer } from "./utils/draw-audio-visualizer";
 export function AudioCanvas() {
   const { analyzerNode, isRecording } = useAudioRecorderContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const visualizerRef = useRef(createAudioVisualizer());
 
   useEffect(() => {

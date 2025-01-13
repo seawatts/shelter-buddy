@@ -1,11 +1,11 @@
 import React from "react";
 
-import { Button } from "@co-founder/ui/button";
-import { Icons } from "@co-founder/ui/icons";
+import { Button } from "@acme/ui/button";
+import { Icons } from "@acme/ui/icons";
 
-import { formatTime } from "~/utils/format-time";
 import { AudioCanvas } from "./canvas";
 import { useAudioRecorderContext } from "./context/audio-recorder-context";
+import { formatTime } from "./format-time";
 
 interface RecordingControlsProps {
   onCancel: () => void;
@@ -48,7 +48,7 @@ export function RecordingControls({
         {isGeneratingText ? (
           <Icons.Spinner />
         ) : (
-          <Icons.Circle className="animate-pulse fill-red-500 text-red-500" />
+          <Icons.Circle className="fill-red-500 text-red-500 animate-pulse" />
         )}
       </Button>
     </div>

@@ -1,6 +1,12 @@
-import { sql } from "@vercel/postgres";
-import { drizzle } from "drizzle-orm/vercel-postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
+import { env } from "./env";
 import * as schema from "./schema";
 
-export const db = drizzle(sql, { schema });
+// For migrations
+export const migrationClient = postgres(env.POSTGRES_URL, { max: 1 });
+
+// For query purposes
+export const queryClient = postgres(env.POSTGRES_URL);
+export const db = drizzle(queryClient, { schema });
