@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { Image } from "@boundaryml/baml";
 import { z } from "zod";
 
@@ -8,7 +9,13 @@ import { b } from "../../../../../baml_client";
 
 export const analyzeIntakeFormAction = authenticatedAction
   .createServerAction()
-  .input(z.object({ imageUrl: z.string() }))
+  .input(
+    z.object({
+      imageUrl: z.string(),
+      roomId: z.string(),
+      shelterId: z.string(),
+    }),
+  )
   .handler(async ({ input }) => {
     try {
       // Ensure the URL doesn't have any trailing periods
@@ -16,6 +23,10 @@ export const analyzeIntakeFormAction = authenticatedAction
       const image = Image.fromUrl(cleanUrl);
 
       const formData = await b.ExtractIntakeForm(image);
+
+      revalidatePath(
+        `/shelters/${input.shelterId}/rooms/${input.roomId}/kennels`,
+      );
 
       return {
         data: formData,

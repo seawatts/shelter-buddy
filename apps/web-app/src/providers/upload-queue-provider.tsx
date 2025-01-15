@@ -1,67 +1,165 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useCallback, useContext } from "react";
 import { useAuth } from "@clerk/clerk-react";
-import { useStore } from "zustand";
+import { Upload } from "tus-js-client";
 
-import type { UploadQueueStore } from "../stores/upload-queue";
-import { UploadQueueStatus } from "~/components/upload-queue-status";
-import { UploadService } from "../services/upload-service";
-import {
-  createUploadQueueStore,
-  defaultInitState,
-} from "../stores/upload-queue";
+import { createId } from "@acme/id";
+
+import type { UploadItem } from "~/types/upload";
+import { env } from "~/env.client";
 import { useIndexedDB } from "./indexed-db-provider";
 
-export type UploadQueueStoreApi = ReturnType<typeof createUploadQueueStore>;
+interface UploadQueueContextValue {
+  addToQueue: (
+    items: Omit<
+      UploadItem,
+      "id" | "status" | "progress" | "retryCount" | "createdAt" | "uploadedUrl"
+    >[],
+  ) => Promise<UploadItem[]>;
+}
 
-export const UploadQueueStoreContext =
-  createContext<UploadQueueStoreApi | null>(null);
+const UploadQueueContext = createContext<UploadQueueContextValue | null>(null);
 
 export interface UploadQueueProviderProps {
   children: ReactNode;
 }
 
-export const UploadQueueProvider = ({ children }: UploadQueueProviderProps) => {
-  const storeRef = useMemo(() => createUploadQueueStore(defaultInitState), []);
-
-  const { getToken } = useAuth();
+export function UploadQueueProvider({ children }: UploadQueueProviderProps) {
   const db = useIndexedDB();
+  const { getToken } = useAuth();
 
-  const serviceRef = useMemo(
-    () =>
-      new UploadService(storeRef, () => getToken({ template: "supabase" }), db),
-    [storeRef, getToken, db],
+  const processUpload = useCallback(
+    async (item: UploadItem) => {
+      if (!navigator.onLine) return;
+
+      try {
+        await db.updateUpload(item.id, { status: "uploading" });
+
+        const token = await getToken({ template: "supabase" });
+        if (!token) throw new Error("No auth session");
+        if (!item.file.name) throw new Error("File name is required");
+
+        const fileExtension = item.file.name.split(".").pop() ?? "png";
+        const fileBaseName = item.file.name.split(".")[0] ?? "unknown";
+        const filePath = `${item.animalId}/${fileBaseName}.${fileExtension}`;
+
+        await new Promise<void>((resolve, reject) => {
+          const upload = new Upload(item.file, {
+            chunkSize: 6 * 1024 * 1024,
+            endpoint: `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/upload/resumable`,
+            headers: {
+              authorization: `Bearer ${token}`,
+              "x-upsert": "true",
+            },
+            metadata: {
+              bucketName: env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET,
+              cacheControl: "3600",
+              contentType: item.file.type || "application/octet-stream",
+              objectName: filePath,
+            },
+            onError: (error) => {
+              console.error("Upload error:", error);
+              reject(error);
+            },
+            onProgress: (bytesUploaded, bytesTotal) => {
+              const percentage = (bytesUploaded / bytesTotal) * 100;
+              void db.updateUpload(item.id, { progress: percentage });
+            },
+            onSuccess: () => {
+              resolve();
+            },
+            removeFingerprintOnSuccess: true,
+            retryDelays: [0, 3000, 5000, 10_000, 20_000],
+            uploadDataDuringCreation: true,
+          });
+
+          void upload
+            .findPreviousUploads()
+            .then((previousUploads) => {
+              if (previousUploads.length > 0 && previousUploads[0]) {
+                upload.resumeFromPreviousUpload(previousUploads[0]);
+              }
+              upload.start();
+            })
+            .catch((error) => {
+              console.error("Failed to find previous uploads:", error);
+              upload.start();
+            });
+        });
+
+        const uploadedUrl = new URL(
+          `/storage/v1/object/public/${env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET}/${filePath}`,
+          env.NEXT_PUBLIC_SUPABASE_URL,
+        ).toString();
+
+        await db.updateUpload(item.id, {
+          status: "success",
+          uploadedUrl,
+        });
+      } catch (error) {
+        console.error("Upload error:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Upload failed";
+        await db.updateUpload(item.id, {
+          error: errorMessage,
+          retryCount: item.retryCount + 1,
+          status: "error",
+        });
+      }
+    },
+    [db, getToken],
   );
-  // Initialize upload service
-  useEffect(() => {
-    // Start processing the queue if we're online
-    if (navigator.onLine) {
-      serviceRef.startProcessing();
-    }
 
-    return () => {
-      serviceRef.cleanup();
-    };
-  }, [serviceRef]);
+  const addToQueue = useCallback(
+    async (
+      items: Omit<
+        UploadItem,
+        | "id"
+        | "status"
+        | "progress"
+        | "retryCount"
+        | "createdAt"
+        | "uploadedUrl"
+      >[],
+    ) => {
+      const newItems = items.map((item) => ({
+        ...item,
+        createdAt: new Date(),
+        id: createId({ prefix: "upload_" }),
+        progress: 0,
+        retryCount: 0,
+        status: "pending" as const,
+      }));
+
+      await db.addUploads(newItems);
+
+      // Start uploading each item
+      for (const item of newItems) {
+        void processUpload(item);
+      }
+
+      return newItems;
+    },
+    [db, processUpload],
+  );
 
   return (
-    <UploadQueueStoreContext.Provider value={storeRef}>
+    <UploadQueueContext.Provider
+      value={{
+        addToQueue,
+      }}
+    >
       {children}
-      <UploadQueueStatus />
-    </UploadQueueStoreContext.Provider>
+    </UploadQueueContext.Provider>
   );
-};
+}
 
-export const useUploadQueue = <T,>(
-  selector: (store: UploadQueueStore) => T,
-): T => {
-  const store = useContext(UploadQueueStoreContext);
-
-  if (!store) {
+export function useUploadQueue() {
+  const context = useContext(UploadQueueContext);
+  if (!context) {
     throw new Error("useUploadQueue must be used within UploadQueueProvider");
   }
-
-  return useStore(store, selector);
-};
+  return context;
+}

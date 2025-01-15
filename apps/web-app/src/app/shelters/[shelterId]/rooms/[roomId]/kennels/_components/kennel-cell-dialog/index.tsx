@@ -3,6 +3,7 @@
 import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { useIsMobile } from "@acme/ui/hooks/use-mobile";
 
+import { DrawerProvider } from "../../../../../../../../providers/drawer-provider";
 import { KennelCellDialogDialog } from "./dialog";
 import { KennelCellDialogDrawer } from "./drawer";
 
@@ -23,21 +24,27 @@ export function KennelCellDialog({
 }: KennelActionsProps) {
   const isMobile = useIsMobile();
 
-  return isMobile ? (
-    <KennelCellDialogDrawer
-      animal={animal}
-      kennel={kennel}
-      kennels={kennels}
+  return (
+    <DrawerProvider
+      snapPoints={[animal ? 0.9 : "395px"]}
       open={open}
       onOpenChange={onOpenChange}
-    />
-  ) : (
-    <KennelCellDialogDialog
-      animal={animal}
-      kennel={kennel}
-      kennels={kennels}
-      open={open}
-      onOpenChange={onOpenChange}
-    />
+    >
+      {isMobile ? (
+        <KennelCellDialogDrawer
+          animal={animal}
+          kennel={kennel}
+          kennels={kennels}
+        />
+      ) : (
+        <KennelCellDialogDialog
+          animal={animal}
+          kennel={kennel}
+          kennels={kennels}
+          open={open}
+          onOpenChange={onOpenChange}
+        />
+      )}
+    </DrawerProvider>
   );
 }

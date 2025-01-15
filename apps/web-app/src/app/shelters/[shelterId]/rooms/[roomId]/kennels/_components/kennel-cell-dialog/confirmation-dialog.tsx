@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@acme/ui/dialog";
@@ -12,6 +13,7 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@acme/ui/drawer";
@@ -39,7 +41,7 @@ export function KennelActionConfirmationDialog({
 
   const Content = (
     <>
-      <div className="flex gap-2 p-4">
+      <div className="flex gap-6">
         <Button
           variant="outline"
           className="flex-1"
@@ -65,13 +67,13 @@ export function KennelActionConfirmationDialog({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange} snapPoints={[0.25]}>
+      <Drawer open={open} onOpenChange={onOpenChange} snapPoints={["220px"]}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
-          {Content}
+          <DrawerFooter>{Content}</DrawerFooter>
         </DrawerContent>
       </Drawer>
     );
@@ -84,7 +86,7 @@ export function KennelActionConfirmationDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        {Content}
+        <DialogFooter>{Content}</DialogFooter>
       </DialogContent>
     </Dialog>
   );

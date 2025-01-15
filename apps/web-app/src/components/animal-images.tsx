@@ -147,6 +147,8 @@ interface AnimalImagesProps {
   animalId: string;
   shelterId: string;
   name?: string;
+  roomId: string;
+  kennelId: string;
   media?: AnimalMediaType[];
 }
 
@@ -170,6 +172,8 @@ export function AnimalImages({
   animalId,
   shelterId,
   name,
+  roomId,
+  kennelId,
   media,
 }: AnimalImagesProps) {
   const isMobile = useIsMobile();
@@ -305,6 +309,8 @@ export function AnimalImages({
                           currentVideoIndex !== index) && (
                           <PhotoUpload
                             animalId={animalId}
+                            roomId={roomId}
+                            kennelId={kennelId}
                             shelterId={shelterId}
                             includePreview={false}
                             label="Add Photos"
@@ -356,6 +362,8 @@ export function AnimalImages({
         <div className="absolute bottom-4 left-4 right-4">
           <PhotoUpload
             animalId={animalId}
+            roomId=""
+            kennelId=""
             shelterId={shelterId}
             includePreview={false}
             label="Add Photos"

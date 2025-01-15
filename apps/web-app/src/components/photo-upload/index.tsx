@@ -10,9 +10,9 @@ import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { toast } from "@acme/ui/toast";
 
-import type { UploadQueueStore } from "~/stores/upload-queue";
+import type { UploadItem } from "~/types/upload";
 import { useUploadQueue } from "~/providers/upload-queue-provider";
-import { ImageProcessor } from "~/services/image-processor";
+import { ImageProcessor } from "~/utils/image-processor";
 
 interface PhotoUploadProps {
   animalId: string;
@@ -20,6 +20,9 @@ interface PhotoUploadProps {
   walkId?: string;
   shelterId: string;
   includePreview?: boolean;
+  roomId: string;
+  kennelId: string;
+  isIntakeForm?: boolean;
   className?: string;
   variant?: ButtonProps["variant"];
 }
@@ -29,6 +32,9 @@ export function PhotoUpload({
   walkId,
   shelterId,
   includePreview = true,
+  roomId,
+  kennelId,
+  isIntakeForm = false,
   className,
   label,
   variant,
@@ -36,9 +42,7 @@ export function PhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const addToQueue = useUploadQueue(
-    (state: UploadQueueStore) => state.addToQueue,
-  );
+  const { addToQueue } = useUploadQueue();
 
   const handleFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +51,15 @@ export function PhotoUpload({
 
       setIsUploading(true);
       const newPreviewUrls: string[] = [];
-      const uploadItems = [];
+      const uploadItems: Omit<
+        UploadItem,
+        | "id"
+        | "status"
+        | "progress"
+        | "retryCount"
+        | "createdAt"
+        | "uploadedUrl"
+      >[] = [];
 
       try {
         for (const file of files) {
@@ -61,13 +73,17 @@ export function PhotoUpload({
           uploadItems.push({
             animalId,
             file: processedImage.file,
-            shelterId,
-            walkId,
+            isIntakeForm,
+            kennelId,
+            previewUrl: processedImage.preview,
+            roomId: roomId,
+            shelterId: shelterId,
+            walkId: walkId,
           });
         }
 
         // Add all items to the upload queue
-        addToQueue(uploadItems);
+        await addToQueue(uploadItems);
 
         setPreviewUrls((previous) => [...previous, ...newPreviewUrls]);
         toast.success("Photos queued for upload");
@@ -81,7 +97,7 @@ export function PhotoUpload({
         }
       }
     },
-    [animalId, shelterId, walkId, addToQueue],
+    [animalId, isIntakeForm, kennelId, roomId, shelterId, walkId, addToQueue],
   );
 
   // Cleanup preview URLs when component unmounts

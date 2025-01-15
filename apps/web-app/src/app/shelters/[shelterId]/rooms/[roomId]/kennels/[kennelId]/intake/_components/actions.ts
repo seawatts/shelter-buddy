@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -52,9 +51,7 @@ const createAnimalSchema = z.object({
 // Create Animal Action
 export const createAnimalAction = authenticatedAction
   .createServerAction()
-  .input(createAnimalSchema, {
-    type: "formData",
-  })
+  .input(createAnimalSchema)
   .handler(async ({ ctx, input }) => {
     // Get the user's shelter ID
     const shelterMember = await db.query.ShelterMembers.findFirst({
@@ -75,7 +72,6 @@ export const createAnimalAction = authenticatedAction
         difficultyLevel: input.difficultyLevel,
         externalId: input.externalId,
         gender: input.gender,
-        id: input.animalId,
         isFido: Boolean(input.isFido),
         name: input.name,
         shelterId: shelterMember.shelterId,
@@ -179,9 +175,6 @@ export const createAnimalAction = authenticatedAction
     }
 
     revalidatePath(
-      `/shelters/${shelterMember.shelterId}/rooms/${kennel.room.id}/kennels`,
-    );
-    redirect(
       `/shelters/${shelterMember.shelterId}/rooms/${kennel.room.id}/kennels`,
     );
   });

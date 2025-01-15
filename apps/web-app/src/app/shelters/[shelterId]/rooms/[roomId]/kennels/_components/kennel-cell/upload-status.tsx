@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useLiveQuery } from "dexie-react-hooks";
+import { AlertCircle, ArrowRight, Loader2 } from "lucide-react";
 
-import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import { useIntakeFormService } from "~/providers/intake-form-provider";
+import { useIndexedDB } from "~/providers/indexed-db-provider";
 
 interface KennelUploadStatusProps {
   kennelId: string;
@@ -17,51 +17,95 @@ export function KennelUploadStatus({
   kennelId,
   className,
 }: KennelUploadStatusProps) {
-  const intakeFormService = useIntakeFormService();
-  const [status, setStatus] = useState<
-    "pending" | "analyzing" | "analyzed" | "error" | null
-  >(null);
+  const db = useIndexedDB();
 
-  useEffect(() => {
-    void (async () => {
-      const form = await intakeFormService.getFormByKennelId(kennelId);
-      if (form) {
-        setStatus(form.status);
-      }
-    })();
-  }, [kennelId, intakeFormService]);
+  const form = useLiveQuery(
+    async () => {
+      if (!db.isInitialized) return null;
+      return db.getIntakeFormByKennelId(kennelId);
+    },
+    [kennelId, db],
+    null,
+  );
 
-  if (!status) return null;
+  const upload = useLiveQuery(
+    async () => {
+      if (!db.isInitialized) return null;
+      return db.getUploadByKennelId(kennelId);
+    },
+    [kennelId, db],
+    null,
+  );
+
+  if (!form?.status && !upload?.status) return null;
 
   return (
-    <div
-      className={cn(
-        "absolute right-2 top-2 flex items-center gap-2 rounded-md bg-background/80 p-1 text-xs backdrop-blur-sm",
-        className,
-      )}
-    >
-      {status === "pending" && (
+    <div className={cn("flex items-center gap-1", className)}>
+      {upload?.status === "pending" && (
         <>
-          <Icons.Spinner size="sm" variant="muted" />
-          <span className="text-muted-foreground">Uploading...</span>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            Preparing Upload...
+          </span>
         </>
       )}
-      {status === "analyzing" && (
+      {upload?.status === "uploading" && (
         <>
-          <Loader2 className="size-4 animate-spin text-muted-foreground" />
-          <span className="text-muted-foreground">Analyzing...</span>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            Uploading... {Math.round(upload.progress)}%
+          </span>
         </>
       )}
-      {status === "analyzed" && (
+      {upload?.status === "error" && (
         <>
-          <Icons.Check size="sm" variant="primary" />
-          <span className="text-primary">Ready</span>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="size-4 text-destructive" />
+            Upload Error. Try again.
+          </span>
         </>
       )}
-      {status === "error" && (
+      {form?.status === "pending" && (
         <>
-          <Icons.AlertCircle size="sm" variant="destructive" />
-          <span className="text-destructive">Error</span>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            Uploading...
+          </span>
+        </>
+      )}
+      {form?.status === "analyzing" && (
+        <>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            Analyzing...
+          </span>
+        </>
+      )}
+      {form?.status === "analyzed" && (
+        <>
+          <Link
+            href={`/shelters/${form.shelterId}/rooms/${form.roomId}/kennels/${form.kennelId}/intake`}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-muted-foreground/80"
+          >
+            Complete Animal Details
+            <ArrowRight className="size-4" />
+          </Link>
+        </>
+      )}
+      {form?.status === "editing" && (
+        <>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            Editing...
+          </span>
+        </>
+      )}
+      {form?.status === "error" && (
+        <>
+          <span className="flex items-center gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="size-4 text-destructive" />
+            Error Analyzing. Try again.
+          </span>
         </>
       )}
     </div>

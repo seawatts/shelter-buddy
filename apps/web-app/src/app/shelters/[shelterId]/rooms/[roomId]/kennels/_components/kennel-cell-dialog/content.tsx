@@ -36,9 +36,7 @@ export function KennelCellDialogContent({
       <AddAnimalForm
         kennelId={kennelId}
         roomId={roomId}
-        onSubmit={() => {
-          onOpenChange(false);
-        }}
+        onOpenChange={onOpenChange}
       />
     );
   }
@@ -144,6 +142,8 @@ export function KennelCellDialogContent({
 
       <AnimalImages
         name={animal.name}
+        roomId={roomId}
+        kennelId={kennelId}
         media={animal.media}
         animalId={animal.id}
         shelterId={animal.shelterId}

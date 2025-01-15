@@ -491,9 +491,11 @@ export function WalkSession({ walk }: WalkSessionProps) {
           </div>
           <PhotoUpload
             label="Add Walk Photos"
-            animalId={walk.animal.id}
+            roomId={animal.kennelOccupants[0]?.kennel.roomId ?? ""}
+            kennelId={animal.kennelOccupants[0]?.kennelId ?? ""}
+            animalId={animal.id}
             walkId={walk.id}
-            shelterId={walk.animal.shelterId}
+            shelterId={animal.shelterId}
           />
         </div>
 

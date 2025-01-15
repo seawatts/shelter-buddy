@@ -4,6 +4,7 @@ import type { AnimalTypeWithRelations, KennelType } from "@acme/db/schema";
 import { Drawer, DrawerContent, DrawerHeader } from "@acme/ui/drawer";
 import { cn } from "@acme/ui/lib/utils";
 
+import { useDrawer } from "~/providers/drawer-provider";
 import { KennelCellDialogContent } from "./content";
 import { KennelCellDialogHeader } from "./header";
 
@@ -11,19 +12,29 @@ interface KennelActionsDrawerProps {
   animal?: AnimalTypeWithRelations;
   kennel: KennelType;
   kennels: KennelType[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
 export function KennelCellDialogDrawer({
   animal,
   kennel,
   kennels,
-  open,
-  onOpenChange,
 }: KennelActionsDrawerProps) {
+  const {
+    snapPoints,
+    activeSnapPoint,
+    setActiveSnapPoint,
+    open,
+    onOpenChange,
+  } = useDrawer();
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} snapPoints={[0.9]}>
+    <Drawer
+      open={open}
+      onOpenChange={onOpenChange}
+      snapPoints={snapPoints}
+      activeSnapPoint={activeSnapPoint}
+      setActiveSnapPoint={setActiveSnapPoint}
+    >
       <DrawerContent
         className={cn({
           "border-t-4 border-t-purple": animal?.difficultyLevel === "Purple",
@@ -40,7 +51,7 @@ export function KennelCellDialogDrawer({
             />
           </DrawerHeader>
 
-          <div className="p-4">
+          <div className="px-4">
             <KennelCellDialogContent
               animal={animal}
               roomId={kennel.room.id}

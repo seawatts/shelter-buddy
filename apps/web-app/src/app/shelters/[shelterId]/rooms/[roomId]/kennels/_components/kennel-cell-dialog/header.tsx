@@ -65,7 +65,7 @@ export function KennelCellDialogHeader({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <Title>
-            {!animal && `Add animal to kennel ${kennel.name}`}
+            {!animal && `Add dog to kennel ${kennel.name}`}
             {animal && kennel.name}{" "}
             {animal && `${variant === "drawer" ? "" : "- "}${animal.name}`}
           </Title>

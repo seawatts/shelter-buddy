@@ -72,6 +72,8 @@ export function WalkTimer({ walk }: WalkTimerProps) {
       </div>
 
       <PhotoUpload
+        roomId={walk.animal.kennelOccupants[0]?.kennel.roomId ?? ""}
+        kennelId={walk.animal.kennelOccupants[0]?.kennelId ?? ""}
         animalId={walk.animal.id}
         walkId={walk.id}
         shelterId={walk.animal.shelterId}

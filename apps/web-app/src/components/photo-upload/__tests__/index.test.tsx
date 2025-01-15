@@ -58,6 +58,8 @@ vi.mock("next/image", () => ({
 describe("PhotoUpload", () => {
   const mockProps = {
     animalId: "123",
+    kennelId: "102",
+    roomId: "101",
     shelterId: "456",
     walkId: "789",
   };

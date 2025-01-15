@@ -366,6 +366,8 @@ export function WalkSessionReadOnly({ walk }: WalkSessionReadOnlyProps) {
         {/* Animal Images Section */}
         <AnimalImages
           animalId={animal.id}
+          kennelId={animal.kennelOccupants[0]?.kennelId ?? ""}
+          roomId={animal.kennelOccupants[0]?.kennel.roomId ?? ""}
           shelterId={animal.shelterId}
           name={animal.name}
           media={animal.media}

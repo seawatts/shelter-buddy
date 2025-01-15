@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
 
 import type { DifficultyLevelEnum, GenderEnum } from "@acme/db/schema";
+import { createId } from "@acme/id";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { Input } from "@acme/ui/input";
@@ -19,18 +21,21 @@ import { Switch } from "@acme/ui/switch";
 import { Textarea } from "@acme/ui/textarea";
 import { toast } from "@acme/ui/toast";
 
+import type { IntakeFormAnalysis } from "~/providers/indexed-db-provider";
+import { useIndexedDB } from "~/providers/indexed-db-provider";
+import { useIntakeForm } from "~/providers/intake-form-provider";
 import { createAnimalAction } from "./actions";
 
 interface AnimalFormData {
   animalId: string;
-  externalId: string;
+  externalId?: string;
   name: string;
-  breed: string;
-  gender: GenderEnum;
-  difficultyLevel: DifficultyLevelEnum;
-  isFido: boolean;
-  intakeFormImagePath: string | null;
-  generalNotes: string;
+  breed?: string | null;
+  gender?: GenderEnum;
+  difficultyLevel?: DifficultyLevelEnum;
+  isFido?: boolean;
+  intakeFormImagePath?: string | null;
+  generalNotes?: string;
   approvedActivities: {
     activity: string;
     isApproved: boolean;
@@ -48,20 +53,66 @@ interface AnimalFormProps {
   initialData?: AnimalFormData;
 }
 
-export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
+function useDebounce<T>(callback: (value: T) => Promise<void>, delay: number) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(
+    (value: T) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        void callback(value);
+        timeoutRef.current = null;
+      }, delay);
+    },
+    [callback, delay],
+  );
+}
+
+export function AnimalForm({
+  kennelId,
+  shelterId,
+  roomId,
+  initialData,
+}: AnimalFormProps) {
+  const router = useRouter();
   const { execute, isPending, isSuccess } = useServerAction(
     createAnimalAction,
     {
       onError: (error) => {
-        console.error("Failed to add animal", error);
-        toast.error(`Failed to add animal: ${error.err.message}`);
+        console.error("Failed to add dog", error);
+        toast.error(`Failed to add dog: ${error.err.message}`);
       },
       onSuccess: () => {
-        toast.success("Animal added successfully");
+        void (async () => {
+          try {
+            // Clear both the upload and intake form from IndexedDB
+            if (currentFormIdRef.current) {
+              await db.removeIntakeForm(currentFormIdRef.current);
+            }
+            const existingUpload = await db.getUploadByKennelId(kennelId);
+            if (existingUpload) {
+              await db.removeUpload(existingUpload.id);
+            }
+            toast.success("Animal added successfully");
+            router.push(`/shelters/${shelterId}/rooms/${roomId}/kennels`);
+          } catch (error) {
+            console.error("Failed to clean up IndexedDB:", error);
+            // Still show success since the animal was created and redirect
+            toast.success("Animal added successfully, but cleanup failed");
+            router.push(`/shelters/${shelterId}/rooms/${roomId}/kennels`);
+          }
+        })();
       },
     },
   );
 
+  const { getFormByKennelId } = useIntakeForm();
+  const db = useIndexedDB();
+  const currentFormIdRef = useRef<string | null>(null);
+  const hasLoadedRef = useRef(false);
   const [formData, setFormData] = useState<AnimalFormData>(
     initialData ?? {
       animalId: "",
@@ -81,11 +132,120 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
     },
   );
 
+  const syncToIndexedDB = useCallback(
+    async (data: AnimalFormData) => {
+      if (currentFormIdRef.current) {
+        // Update existing form
+        const intakeForm = await db.getIntakeFormById(currentFormIdRef.current);
+        if (intakeForm) {
+          const updatedForm: IntakeFormAnalysis = {
+            ...intakeForm,
+            analyzedData: {
+              approvedActivities: data.approvedActivities,
+              breed: data.breed ?? "",
+              difficultyLevel: data.difficultyLevel ?? "Yellow",
+              equipmentNotes: data.equipmentNotes,
+              externalId: data.externalId ?? "",
+              gender: data.gender ?? "male",
+              generalNotes: data.generalNotes ?? "",
+              isFido: data.isFido ?? false,
+              name: data.name,
+            },
+            status: "editing" as const,
+          };
+          await db.saveIntakeForm(updatedForm);
+        }
+      } else {
+        // Create new form
+        const newForm: IntakeFormAnalysis = {
+          analyzedData: {
+            approvedActivities: data.approvedActivities,
+            breed: data.breed ?? "",
+            difficultyLevel: data.difficultyLevel ?? "Yellow",
+            equipmentNotes: data.equipmentNotes,
+            externalId: data.externalId ?? "",
+            gender: data.gender ?? "male",
+            generalNotes: data.generalNotes ?? "",
+            isFido: data.isFido ?? false,
+            name: data.name,
+          },
+          animalId: data.animalId,
+          createdAt: new Date(),
+          id: createId(),
+          kennelId,
+          previewUrl: "",
+          roomId,
+          shelterId,
+          status: "editing" as const,
+          uploadedUrl: data.intakeFormImagePath ?? "",
+        };
+        currentFormIdRef.current = newForm.id;
+        await db.saveIntakeForm(newForm);
+      }
+    },
+    [db, kennelId, roomId, shelterId],
+  );
+
+  const debouncedSync = useDebounce(syncToIndexedDB, 1000);
+
+  // Load initial data from IndexedDB only once
+  useEffect(() => {
+    async function loadIntakeFormData() {
+      // If we've already loaded the data, don't load it again
+      if (hasLoadedRef.current) return;
+
+      const intakeForm = await getFormByKennelId(kennelId);
+
+      if (intakeForm?.analyzedData) {
+        currentFormIdRef.current = intakeForm.id;
+        const { analyzedData } = intakeForm;
+        setFormData({
+          animalId: analyzedData.externalId,
+          approvedActivities: analyzedData.approvedActivities.map(
+            (activity) => ({
+              activity: activity.activity,
+              isApproved: activity.isApproved,
+            }),
+          ),
+          breed: analyzedData.breed,
+          difficultyLevel: analyzedData.difficultyLevel,
+          equipmentNotes: analyzedData.equipmentNotes,
+          externalId: analyzedData.externalId,
+          gender: analyzedData.gender,
+          generalNotes: analyzedData.generalNotes,
+          intakeFormImagePath: intakeForm.uploadedUrl,
+          isFido: analyzedData.isFido,
+          name: analyzedData.name,
+        });
+
+        // Update the form status to editing
+        await db.saveIntakeForm({
+          ...intakeForm,
+          status: "editing" as const,
+        });
+
+        hasLoadedRef.current = true;
+      }
+    }
+
+    void loadIntakeFormData();
+  }, [kennelId, getFormByKennelId, db]);
+
+  const handleFormChange = (newData: AnimalFormData) => {
+    setFormData(newData);
+    debouncedSync(newData);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    formData.append("kennelId", kennelId);
-    await execute(formData);
+    await execute({
+      ...formData,
+      breed: formData.breed ?? "",
+      difficultyLevel: formData.difficultyLevel ?? "Yellow",
+      gender: formData.gender ?? "male",
+      intakeFormImagePath: formData.intakeFormImagePath ?? undefined,
+      kennelId,
+    });
   };
 
   return (
@@ -98,10 +258,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="id"
           value={formData.externalId}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               externalId: event.target.value,
-            }))
+            })
           }
         />
       </div>
@@ -113,10 +273,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="name"
           value={formData.name}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               name: event.target.value,
-            }))
+            })
           }
         />
       </div>
@@ -126,12 +286,12 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
         <Input
           id="breed"
           name="breed"
-          value={formData.breed}
+          value={formData.breed ?? ""}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               breed: event.target.value,
-            }))
+            })
           }
         />
       </div>
@@ -142,10 +302,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="gender"
           value={formData.gender}
           onValueChange={(value) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               gender: value as GenderEnum,
-            }))
+            })
           }
         >
           <SelectTrigger id="gender">
@@ -164,10 +324,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="difficultyLevel"
           value={formData.difficultyLevel}
           onValueChange={(value) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               difficultyLevel: value as DifficultyLevelEnum,
-            }))
+            })
           }
         >
           <SelectTrigger id="difficulty">
@@ -187,10 +347,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="isFido"
           checked={formData.isFido}
           onCheckedChange={(checked) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               isFido: Boolean(checked),
-            }))
+            })
           }
         />
         <Label htmlFor="fido">FIDO Certified</Label>
@@ -203,10 +363,10 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="generalNotes"
           value={formData.generalNotes}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               generalNotes: event.target.value,
-            }))
+            })
           }
           className="min-h-[100px]"
         />
@@ -219,13 +379,13 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="equipmentNotes.inKennel"
           value={formData.equipmentNotes.inKennel ?? ""}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               equipmentNotes: {
-                ...previous.equipmentNotes,
+                ...formData.equipmentNotes,
                 inKennel: event.target.value,
               },
-            }))
+            })
           }
         />
       </div>
@@ -237,13 +397,13 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           name="equipmentNotes.outOfKennel"
           value={formData.equipmentNotes.outOfKennel ?? ""}
           onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               equipmentNotes: {
-                ...previous.equipmentNotes,
+                ...formData.equipmentNotes,
                 outOfKennel: event.target.value,
               },
-            }))
+            })
           }
         />
       </div>
@@ -256,28 +416,28 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
               name={`approvedActivities.${index}.activity`}
               value={activity.activity}
               onChange={(event) =>
-                setFormData((previous) => ({
-                  ...previous,
-                  approvedActivities: previous.approvedActivities.map(
+                handleFormChange({
+                  ...formData,
+                  approvedActivities: formData.approvedActivities.map(
                     (a, index_) =>
                       index_ === index
                         ? { ...a, activity: event.target.value }
                         : a,
                   ),
-                }))
+                })
               }
             />
             <Switch
               name={`approvedActivities.${index}.isApproved`}
               checked={activity.isApproved}
               onCheckedChange={(checked) =>
-                setFormData((previous) => ({
-                  ...previous,
-                  approvedActivities: previous.approvedActivities.map(
+                handleFormChange({
+                  ...formData,
+                  approvedActivities: formData.approvedActivities.map(
                     (a, index_) =>
                       index_ === index ? { ...a, isApproved: checked } : a,
                   ),
-                }))
+                })
               }
             />
           </div>
@@ -286,13 +446,13 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
           type="button"
           variant="outline"
           onClick={() =>
-            setFormData((previous) => ({
-              ...previous,
+            handleFormChange({
+              ...formData,
               approvedActivities: [
-                ...previous.approvedActivities,
+                ...formData.approvedActivities,
                 { activity: "", isApproved: false },
               ],
-            }))
+            })
           }
         >
           Add Activity
@@ -320,11 +480,11 @@ export function AnimalForm({ kennelId, initialData }: AnimalFormProps) {
         {isPending && (
           <>
             <Icons.Spinner className="mr-2" />
-            Adding Animal...
+            Adding Dog...
           </>
         )}
-        {isSuccess && "Animal Added"}
-        {!isPending && !isSuccess && "Add Animal"}
+        {isSuccess && "Dog Added"}
+        {!isPending && !isSuccess && "Add Dog"}
       </Button>
     </form>
   );
