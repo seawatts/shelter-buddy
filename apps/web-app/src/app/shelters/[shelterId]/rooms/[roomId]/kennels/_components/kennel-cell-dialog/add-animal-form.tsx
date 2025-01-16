@@ -86,7 +86,7 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
         // No default
       }
     }
-  }, [form, onOpenChange]);
+  }, [form, onOpenChange, setActiveSnapPoint, setSnapPoints]);
 
   const handleFileChange = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,8 +110,8 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
       try {
         // Convert file to base64
         const processedImage = await ImageProcessor.processImage(file);
-        setSnapPoints(["670px"]);
-        setActiveSnapPoint("670px"); // Set to larger snap point when preview is added
+        setSnapPoints([1]);
+        setActiveSnapPoint(1); // Set to larger snap point when preview is added
 
         const animalId = createId({ prefix: "animal" });
         await addToQueue([
@@ -150,7 +150,7 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-8">
       <div className="flex flex-col gap-4">
         <div className="grid gap-4">
           <Alert>
@@ -195,6 +195,7 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
                     variant="destructive"
                     className="w-full"
                     onClick={async () => {
+                      setError(null);
                       const existingUpload =
                         await db.getUploadByKennelId(kennelId);
                       if (existingUpload) {
@@ -205,6 +206,8 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
                       if (existingForm) {
                         await db.removeIntakeForm(existingForm.id);
                       }
+                      setSnapPoints(["445px"]);
+                      setActiveSnapPoint("445px");
                     }}
                   >
                     <Icons.X className="mr-2 size-4" />
@@ -255,6 +258,8 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
                       if (existingForm) {
                         await db.removeIntakeForm(existingForm.id);
                       }
+                      setSnapPoints(["445px"]);
+                      setActiveSnapPoint("445px");
                     }}
                   >
                     <Icons.X className="mr-2 size-4" />
