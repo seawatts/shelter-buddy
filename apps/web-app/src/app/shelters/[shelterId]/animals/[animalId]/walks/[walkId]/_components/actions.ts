@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { db } from "@acme/db/client";
@@ -237,11 +237,16 @@ export const endWalkAction = authenticatedAction
   .input(endWalkSchema)
   .handler(async ({ input }) => {
     const walk = await db.query.Walks.findFirst({
-      where: and(eq(Walks.id, input.walkId), isNull(Walks.endedAt)),
+      where: and(eq(Walks.id, input.walkId)),
     });
 
     if (!walk) {
-      throw new Error("Walk not found or already finished");
+      throw new Error("Walk not found");
+    }
+    if (walk.endedAt) {
+      redirect(
+        `/shelters/${walk.shelterId}/animals/${walk.animalId}/walks/${walk.id}/finished`,
+      );
     }
 
     // Update walk with end time and status
@@ -257,5 +262,4 @@ export const endWalkAction = authenticatedAction
     redirect(
       `/shelters/${walk.shelterId}/animals/${walk.animalId}/walks/${walk.id}/finished`,
     );
-    return { success: true };
   });

@@ -46,7 +46,9 @@ const DrawerContent = React.forwardRef<
     snapPoints?: (number | string)[];
   }
 >(({ className, children, activeSnapPoint, snapPoints, ...props }, ref) => {
-  const isFullHeight = activeSnapPoint === snapPoints?.[snapPoints.length - 1];
+  const isFullHeight =
+    activeSnapPoint === 1 ||
+    activeSnapPoint === snapPoints?.[snapPoints.length - 1];
 
   return (
     <DrawerPortal>
@@ -54,16 +56,16 @@ const DrawerContent = React.forwardRef<
       <DrawerPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 mx-[-1px] flex h-full max-h-[97%] flex-col rounded-t-[10px] border border-b-0 bg-background",
+          "fixed inset-x-0 bottom-0 z-50 mx-[-1px] flex h-full max-h-[90%] flex-col rounded-t-[10px] border border-b-0 bg-background",
           className,
         )}
         {...props}
       >
         <div className="mx-auto mb-4 mt-4 h-2 w-[100px] rounded-full bg-muted" />
         <div
-          className={cn("relative flex flex-col", {
-            "overflow-y-auto overscroll-contain": isFullHeight,
-            "overflow-y-hidden": !isFullHeight,
+          className={cn("flex w-full flex-col", {
+            "overflow-hidden": !isFullHeight,
+            "overflow-y-auto": isFullHeight,
           })}
         >
           {children}

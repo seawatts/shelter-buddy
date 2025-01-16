@@ -51,7 +51,7 @@ export function KennelCellDialogDrawer({
             />
           </DrawerHeader>
 
-          <div className="px-4">
+          <div className="px-4 pb-4">
             <KennelCellDialogContent
               animal={animal}
               roomId={kennel.room.id}

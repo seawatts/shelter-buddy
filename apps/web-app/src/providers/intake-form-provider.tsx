@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 
 import type { DifficultyLevelEnum } from "@acme/db/schema";
+import { toast } from "@acme/ui/toast";
 
 import type { IntakeFormAnalysis } from "./indexed-db-provider";
 import { analyzeIntakeFormAction } from "./actions/intake-form-actions";
@@ -120,8 +121,10 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
             analyzedData,
             status: "analyzed",
           });
+          toast.success("Form analyzed");
         } catch (error) {
           console.error("Error starting analysis:", error);
+          toast.error("Error analyzing form");
           const errorMessage =
             error instanceof Error ? error.message : "Failed to analyze form";
           await db.saveIntakeForm({

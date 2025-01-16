@@ -26,7 +26,7 @@ export function KennelCellDialog({
 
   return (
     <DrawerProvider
-      snapPoints={[animal ? 0.9 : "395px"]}
+      snapPoints={[animal ? 1 : "395px"]}
       open={open}
       onOpenChange={onOpenChange}
     >

@@ -41,7 +41,7 @@ export function KennelCellDialogHeader({
         <span className="flex flex-col gap-1 text-xs text-muted-foreground">
           <span>
             Last walk{" "}
-            {formatDistance(new Date(), lastWalk.endedAt, {
+            {formatDistance(lastWalk.endedAt, new Date(), {
               addSuffix: true,
             })}
           </span>
@@ -53,7 +53,7 @@ export function KennelCellDialogHeader({
       );
     }
 
-    return `Last walk: ${formatDistance(new Date(), lastWalk.endedAt, {
+    return `Last walk: ${formatDistance(lastWalk.endedAt, new Date(), {
       addSuffix: true,
     })} (${lastWalk.duration} min)`;
   }, [lastWalk, variant]);

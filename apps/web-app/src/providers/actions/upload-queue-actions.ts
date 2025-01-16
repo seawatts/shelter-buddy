@@ -42,12 +42,18 @@ export const uploadPhotoAction = authenticatedAction
       width: input.width,
     });
 
-    revalidatePath("/animals");
+    revalidatePath(`/shelters/${input.shelterId}/rooms/0bubjwF/kennels`);
 
     if (input.walkId) {
-      revalidatePath(`/animals/walks/${input.walkId}/in-progress`);
-      revalidatePath(`/animals/walks/${input.walkId}/finished`);
-      revalidatePath(`/animals/walks/${input.walkId}`);
+      revalidatePath(
+        `/shelters/${input.shelterId}/animals/${input.animalId}/walks/${input.walkId}/in-progress`,
+      );
+      revalidatePath(
+        `/shelters/${input.shelterId}/animals/${input.animalId}/walks/${input.walkId}/finished`,
+      );
+      revalidatePath(
+        `/shelters/${input.shelterId}/animals/${input.animalId}/walks/${input.walkId}`,
+      );
     }
   });
 

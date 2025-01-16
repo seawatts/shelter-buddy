@@ -345,7 +345,7 @@ export function WalkSessionReadOnly({ walk }: WalkSessionReadOnlyProps) {
                     <Icons.Calendar className="size-4" />
                     <span>
                       {walk.endedAt
-                        ? formatDistance(new Date(), walk.endedAt, {
+                        ? formatDistance(walk.endedAt, new Date(), {
                             addSuffix: true,
                           })
                         : "In Progress"}

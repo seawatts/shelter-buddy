@@ -8,7 +8,6 @@ import type { ButtonProps } from "@acme/ui/button";
 import { Button } from "@acme/ui/button";
 import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
-import { toast } from "@acme/ui/toast";
 
 import type { UploadItem } from "~/types/upload";
 import { useUploadQueue } from "~/providers/upload-queue-provider";
@@ -73,12 +72,14 @@ export function PhotoUpload({
           uploadItems.push({
             animalId,
             file: processedImage.file,
+            height: processedImage.dimensions.height,
             isIntakeForm,
             kennelId,
             previewUrl: processedImage.preview,
             roomId: roomId,
             shelterId: shelterId,
             walkId: walkId,
+            width: processedImage.dimensions.width,
           });
         }
 
@@ -86,10 +87,8 @@ export function PhotoUpload({
         await addToQueue(uploadItems);
 
         setPreviewUrls((previous) => [...previous, ...newPreviewUrls]);
-        toast.success("Photos queued for upload");
       } catch (error) {
         console.error("Error processing photos:", error);
-        toast.error("Error processing photos");
       } finally {
         setIsUploading(false);
         if (fileInputRef.current) {
@@ -172,7 +171,7 @@ export function PhotoUpload({
               className="relative"
               data-testid={`preview-item-${index}`}
             >
-              <div className="relative aspect-square w-full">
+              <div className="relative aspect-square w-full rounded bg-muted">
                 <Image
                   src={url}
                   alt={`Photo ${index + 1}`}

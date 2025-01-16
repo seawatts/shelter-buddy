@@ -15,17 +15,7 @@ import { useIndexedDB } from "~/providers/indexed-db-provider";
 import { useIntakeForm } from "~/providers/intake-form-provider";
 import { useShelterContext } from "~/providers/shelter-provider";
 import { useUploadQueue } from "~/providers/upload-queue-provider";
-
-function getBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.addEventListener("load", () => resolve(reader.result as string));
-    reader.addEventListener("error", () =>
-      reject(new Error("Failed to read file")),
-    );
-  });
-}
+import { ImageProcessor } from "~/utils/image-processor";
 
 interface Props {
   kennelId: string;
@@ -119,7 +109,7 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
 
       try {
         // Convert file to base64
-        const base64Preview = await getBase64(file);
+        const processedImage = await ImageProcessor.processImage(file);
         setSnapPoints(["670px"]);
         setActiveSnapPoint("670px"); // Set to larger snap point when preview is added
 
@@ -127,12 +117,14 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
         await addToQueue([
           {
             animalId,
-            file,
+            file: processedImage.file,
+            height: processedImage.dimensions.height,
             isIntakeForm: true,
             kennelId,
-            previewUrl: base64Preview,
+            previewUrl: processedImage.previewBase64,
             roomId,
             shelterId: shelter.id,
+            width: processedImage.dimensions.width,
           },
         ]);
       } catch (error) {

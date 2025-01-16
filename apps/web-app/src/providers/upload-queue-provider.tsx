@@ -6,9 +6,11 @@ import { useAuth } from "@clerk/clerk-react";
 import { Upload } from "tus-js-client";
 
 import { createId } from "@acme/id";
+import { toast } from "@acme/ui/toast";
 
 import type { UploadItem } from "~/types/upload";
 import { env } from "~/env.client";
+import { uploadPhotoAction } from "./actions/upload-queue-actions";
 import { useIndexedDB } from "./indexed-db-provider";
 
 interface UploadQueueContextValue {
@@ -98,8 +100,25 @@ export function UploadQueueProvider({ children }: UploadQueueProviderProps) {
           status: "success",
           uploadedUrl,
         });
+        await uploadPhotoAction({
+          animalId: item.animalId,
+          filePath: filePath,
+          height: item.height,
+          shelterId: item.shelterId,
+          size: item.file.size,
+          type: item.file.type || "image/png",
+          walkId: item.walkId,
+          width: item.width,
+        });
+
+        if (!item.isIntakeForm) {
+          await db.removeUpload(item.id);
+        }
+
+        toast.success("Photos uploaded");
       } catch (error) {
         console.error("Upload error:", error);
+        toast.error("Upload failed");
         const errorMessage =
           error instanceof Error ? error.message : "Upload failed";
         await db.updateUpload(item.id, {

@@ -15,8 +15,8 @@ import { cn } from "@acme/ui/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import { Textarea } from "@acme/ui/textarea";
 
+import { AnimalImages } from "~/components/animal-images";
 import { NumberInput } from "~/components/number-input";
-import { PhotoUpload } from "~/components/photo-upload";
 import { formatDuration } from "~/utils/date-time-helpers";
 import { finishWalkAction } from "./actions";
 import {
@@ -419,38 +419,20 @@ export function WalkSession({ walk }: WalkSessionProps) {
 
       <div className="container flex max-w-3xl flex-col gap-8 pb-24 pt-4">
         {/* Walk Photos Section */}
-        {/* <div className="space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Walk Photos</h2>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Camera className="size-4" />
-              <span>Add Photo</span>
-            </Button>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {walkData.media?.length === 0 ? (
-              <div className="col-span-full flex h-24 items-center justify-center rounded-md border text-sm text-muted-foreground">
-                No photos added yet
-              </div>
-            ) : (
-              walkData.media?.map((media, index) => (
-                <div
-                  key={media.id}
-                  className="relative aspect-square overflow-hidden rounded-md border"
-                >
-                  <Image
-                    src={media.url}
-                    alt={`Walk photo ${index + 1}`}
-                    className="object-cover"
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                  />
-                </div>
-              ))
-            )}
-          </div>
-        </div> */}
+          <AnimalImages
+            animalId={animal.id}
+            shelterId={animal.shelterId}
+            name={animal.name}
+            roomId={animal.kennelOccupants[0]?.kennel.roomId ?? ""}
+            walkId={walk.id}
+            kennelId={animal.kennelOccupants[0]?.kennelId ?? ""}
+            media={walk.media}
+          />
+        </div>
 
         {/* Notes Section */}
         <div className="space-y-2">
@@ -489,14 +471,6 @@ export function WalkSession({ walk }: WalkSessionProps) {
               </span>
             )}
           </div>
-          <PhotoUpload
-            label="Add Walk Photos"
-            roomId={animal.kennelOccupants[0]?.kennel.roomId ?? ""}
-            kennelId={animal.kennelOccupants[0]?.kennelId ?? ""}
-            animalId={animal.id}
-            walkId={walk.id}
-            shelterId={animal.shelterId}
-          />
         </div>
 
         {/* Walk Date/Time Controls */}
@@ -588,7 +562,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
 
       {/* Sticky Submit Walk Button */}
       <div className="fixed bottom-0 left-0 w-full border-t bg-background p-4">
-        <div className="container max-w-3xl">
+        <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
           <Button
             variant="default"
             size="lg"

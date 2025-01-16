@@ -73,9 +73,12 @@ describe("UploadQueueProvider", () => {
       {
         animalId: "test-animal",
         file: mockFile,
+        height: 100,
         isIntakeForm: false,
         kennelId: "test-kennel",
         previewUrl: "test-preview",
+        shelterId: "test-shelter",
+        width: 100,
       },
     ];
 

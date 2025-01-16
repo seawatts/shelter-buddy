@@ -61,7 +61,7 @@ export function KennelUploadStatus({
         <>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <AlertCircle className="size-4 text-destructive" />
-            Upload Error. Try again.
+            Upload Error
           </span>
         </>
       )}
@@ -104,7 +104,7 @@ export function KennelUploadStatus({
         <>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <AlertCircle className="size-4 text-destructive" />
-            Error Analyzing. Try again.
+            Error Analyzing
           </span>
         </>
       )}

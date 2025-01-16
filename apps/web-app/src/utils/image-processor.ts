@@ -1,12 +1,24 @@
-interface ImageDimensions {
+export interface ImageDimensions {
   width: number;
   height: number;
 }
 
-interface ProcessedImage {
+export interface ProcessedImage {
   file: File;
   dimensions: ImageDimensions;
   preview: string;
+  previewBase64: string;
+}
+
+function getBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.addEventListener("load", () => resolve(reader.result as string));
+    reader.addEventListener("error", () =>
+      reject(new Error("Failed to read file")),
+    );
+  });
 }
 
 export class ImageProcessor {
@@ -71,11 +83,13 @@ export class ImageProcessor {
 
       // Create preview URL
       const previewUrl = URL.createObjectURL(processedFile);
+      const base64Preview = await getBase64(processedFile);
 
       return {
         dimensions,
         file: processedFile,
         preview: previewUrl,
+        previewBase64: base64Preview,
       };
     } finally {
       // Clean up the original object URL

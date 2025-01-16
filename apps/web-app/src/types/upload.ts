@@ -5,6 +5,8 @@ export interface UploadItem {
   kennelId: string;
   previewUrl: string;
   isIntakeForm: boolean;
+  width: number;
+  height: number;
   status: "pending" | "uploading" | "success" | "error";
   progress: number;
   retryCount: number;
@@ -12,6 +14,6 @@ export interface UploadItem {
   uploadedUrl?: string;
   error?: string;
   walkId?: string;
-  shelterId?: string;
+  shelterId: string;
   roomId?: string;
 }
