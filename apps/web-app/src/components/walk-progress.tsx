@@ -56,15 +56,20 @@ export function WalkProgress({ animals }: WalkProgressProps) {
     const level = animal.difficultyLevel;
     const todayWalks = animal.walks.filter((walk) => isToday(walk.startedAt));
 
-    const completedCount = todayWalks.filter(
+    // Check if animal has any completed or in-progress walks today
+    const hasCompletedWalk = todayWalks.some(
       (walk) => walk.status === "completed",
-    ).length;
-    const inProgressCount = todayWalks.filter(
+    );
+    const hasInProgressWalk = todayWalks.some(
       (walk) => walk.status === "in_progress",
-    ).length;
+    );
 
-    difficultyStats[level].completed += completedCount;
-    difficultyStats[level].inProgress += inProgressCount;
+    if (hasCompletedWalk) {
+      difficultyStats[level].completed += 1;
+    }
+    if (hasInProgressWalk) {
+      difficultyStats[level].inProgress += 1;
+    }
   }
 
   const toggleFilter = (level: DifficultyLevel) => {

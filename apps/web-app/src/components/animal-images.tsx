@@ -105,7 +105,7 @@ function VideoPlayer({ url, thumbnailUrl, onPlay }: VideoPlayerProps) {
   }, [isMuted]);
 
   return (
-    <div className="relative aspect-square w-full">
+    <div className="relative aspect-[16/9] w-full">
       <video
         ref={videoRef}
         src={url}
@@ -295,7 +295,7 @@ export function AnimalImages({
       <div className="flex flex-col gap-2">
         <div
           className={cn(
-            "relative aspect-square w-full bg-muted",
+            "relative aspect-[16/9] w-full bg-muted",
             isMobile && "mt-2",
           )}
         >
@@ -353,7 +353,7 @@ export function AnimalImages({
               })
               .map((item, index) => (
                 <CarouselItem key={index}>
-                  <div className="relative aspect-square w-full rounded bg-muted">
+                  <div className="relative aspect-[16/9] w-full rounded bg-muted">
                     {item.type.includes("image") ? (
                       <Image
                         src={item.url}

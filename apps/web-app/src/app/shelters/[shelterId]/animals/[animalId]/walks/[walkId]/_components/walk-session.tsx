@@ -22,12 +22,10 @@ import { finishWalkAction } from "./actions";
 import {
   BackIcon,
   BallIcon,
-  DogsIcon,
   FetchIcon,
   GoodBehaviorIcon,
   LimpingIcon,
   PeeIcon,
-  PeopleIcon,
   ReactiveIcon,
 } from "./icons";
 import { useAudioRecorder } from "./use-audio-recorder";
@@ -35,9 +33,10 @@ import { useAudioRecorder } from "./use-audio-recorder";
 type ActivityKey = ActivityTypeEnum;
 
 interface ActivityButton {
-  key: ActivityKey;
+  key?: ActivityKey;
   label: string;
   icon: React.ReactNode;
+  children?: (ActivityButton | ActivitySubSection)[];
 }
 
 interface ActivitySection {
@@ -46,187 +45,302 @@ interface ActivitySection {
   type?: "basic" | "behavioral" | "medical";
 }
 
+interface ActivitySubSection {
+  label: string;
+  items: {
+    key: ActivityKey;
+    label: string;
+    icon: React.ReactNode;
+  }[];
+  isSubSection: true;
+}
+
 const ACTIVITY_SECTIONS: ActivitySection[] = [
   {
     buttons: [
-      { icon: <PeeIcon />, key: "pee", label: "Peed" },
-      { icon: <PeeIcon />, key: "poop", label: "Pooped" },
-    ],
-    title: "Bathroom Breaks",
-    type: "basic",
-  },
-  {
-    buttons: [
-      { icon: <BallIcon />, key: "played_ball", label: "Ball" },
-      { icon: <FetchIcon />, key: "played_fetch", label: "Fetch" },
-    ],
-    title: "Activities",
-    type: "basic",
-  },
-  {
-    buttons: [
-      { icon: <ReactiveIcon />, key: "dog_reactive", label: "Dog Reactive" },
       {
+        children: [
+          {
+            icon: <AlertTriangle className="size-4" />,
+            key: "frequent_urination",
+            label: "Frequent Urination",
+          },
+        ],
+        icon: <PeeIcon />,
+        key: "pee",
+        label: "Peed",
+      },
+      {
+        children: [
+          {
+            icon: <AlertTriangle className="size-4" />,
+            key: "loose_stool",
+            label: "Loose Stool",
+          },
+          {
+            icon: <AlertTriangle className="size-4" />,
+            key: "bloody_stool",
+            label: "Bloody Stool",
+          },
+          {
+            icon: <AlertTriangle className="size-4" />,
+            key: "diarrhea",
+            label: "Diarrhea",
+          },
+        ],
+        icon: <PeeIcon />,
+        key: "poop",
+        label: "Pooped",
+      },
+      {
+        children: [
+          { icon: <BallIcon />, key: "played_ball", label: "Ball" },
+          { icon: <FetchIcon />, key: "played_fetch", label: "Fetch" },
+          { icon: <BallIcon />, key: "played_tug", label: "Tug" },
+        ],
+        icon: <BallIcon />,
+        key: undefined,
+        label: "Play Activities",
+      },
+    ],
+    title: "Quick Actions",
+    type: "basic",
+  },
+  {
+    buttons: [
+      {
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <ReactiveIcon />,
+                key: "dog_reactive",
+                label: "Dog Reactive",
+              },
+              {
+                icon: <ReactiveIcon />,
+                key: "human_reactive",
+                label: "Human Reactive",
+              },
+              {
+                icon: <ReactiveIcon />,
+                key: "aggressive",
+                label: "Aggressive",
+              },
+            ],
+            label: "Types of Reactivity",
+          },
+        ],
         icon: <ReactiveIcon />,
-        key: "human_reactive",
-        label: "Human Reactive",
-      },
-    ],
-    title: "Reactivity",
-    type: "behavioral",
-  },
-  {
-    buttons: [
-      { icon: <DogsIcon />, key: "likes_sniffing", label: "Likes Sniffing" },
-      { icon: <PeopleIcon />, key: "likes_pets", label: "Likes Pets" },
-      {
-        icon: <GoodBehaviorIcon />,
-        key: "leash_trained",
-        label: "Leash Trained",
-      },
-      { icon: <GoodBehaviorIcon />, key: "checks_in", label: "Checks In" },
-      {
-        icon: <GoodBehaviorIcon />,
-        key: "easy_out",
-        label: "Easy Out",
+        key: "dog_reactive",
+        label: "Reactivity",
       },
       {
-        icon: <GoodBehaviorIcon />,
-        key: "easy_in",
-        label: "Easy In",
-      },
-      {
-        icon: <GoodBehaviorIcon />,
-        key: "takes_treats_gently",
-        label: "Gentle with Treats",
-      },
-      { icon: <GoodBehaviorIcon />, key: "knows_sit", label: "Knows Sit" },
-      {
-        icon: <GoodBehaviorIcon />,
-        key: "knows_123_treat",
-        label: "1,2,3 Treat",
-      },
-      {
-        icon: <GoodBehaviorIcon />,
-        key: "calm_in_new_places",
-        label: "Calm Outside",
-      },
-    ],
-    title: "Pawsitive",
-    type: "behavioral",
-  },
-  {
-    buttons: [
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "eats_everything",
-        label: "Eats Everything",
-      },
-      {
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "eats_everything",
+                label: "Eats Everything",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "pulls_hard",
+                label: "Pulls Hard",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "jumpy",
+                label: "Jumpy",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "mouthy",
+                label: "Mouthy",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "bolting_tendency",
+                label: "Bolting",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "resource_guarding",
+                label: "Guards Items",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "no_touches",
+                label: "No Touches",
+              },
+            ],
+            label: "Common Issues",
+          },
+        ],
         icon: <AlertTriangle className="size-4" />,
         key: "pulls_hard",
-        label: "Pulls Hard",
+        label: "Behavior Issues",
       },
       {
-        icon: <AlertTriangle className="size-4" />,
-        key: "jumpy",
-        label: "Jumpy",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "mouthy",
-        label: "Mouthy",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "bolting_tendency",
-        label: "Bolting",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "resource_guarding",
-        label: "Guards Items",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "no_touches",
-        label: "No Touches",
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "leash_trained",
+                label: "Leash Trained",
+              },
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "checks_in",
+                label: "Checks In",
+              },
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "calm_in_new_places",
+                label: "Calm Outside",
+              },
+            ],
+            label: "Leash Skills",
+          },
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "knows_sit",
+                label: "Knows Sit",
+              },
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "knows_123_treat",
+                label: "1,2,3 Treat",
+              },
+            ],
+            label: "Commands & Training",
+          },
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "easy_out",
+                label: "Easy Out",
+              },
+              { icon: <GoodBehaviorIcon />, key: "easy_in", label: "Easy In" },
+              {
+                icon: <GoodBehaviorIcon />,
+                key: "takes_treats_gently",
+                label: "Gentle with Treats",
+              },
+            ],
+            label: "Manners",
+          },
+        ],
+        icon: <GoodBehaviorIcon />,
+        key: "leash_trained",
+        label: "Good Behaviors",
       },
     ],
-    title: "Safety",
+    title: "Behavior",
     type: "behavioral",
   },
   {
-    buttons: [{ icon: <LimpingIcon />, key: "limping", label: "Limping" }],
-    title: "Movement",
-    type: "medical",
-  },
-  {
     buttons: [
       {
-        icon: <AlertTriangle className="size-4" />,
-        key: "frequent_urination",
-        label: "Frequent Urination",
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              { icon: <LimpingIcon />, key: "limping", label: "Limping" },
+            ],
+            label: "Physical Movement",
+          },
+        ],
+        icon: <LimpingIcon />,
+        key: "limping",
+        label: "Movement Issues",
       },
       {
-        icon: <AlertTriangle className="size-4" />,
-        key: "loose_stool",
-        label: "Loose Stool",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "bloody_stool",
-        label: "Bloody Stool",
-      },
-    ],
-    title: "Urinary & Digestive",
-    type: "medical",
-  },
-  {
-    buttons: [
-      {
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "scratching",
+                label: "Scratching",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "hot_spots",
+                label: "Hot Spots",
+              },
+            ],
+            label: "Skin Concerns",
+          },
+        ],
         icon: <AlertTriangle className="size-4" />,
         key: "scratching",
-        label: "Scratching",
+        label: "Skin & Coat Issues",
       },
       {
-        icon: <AlertTriangle className="size-4" />,
-        key: "hot_spots",
-        label: "Hot Spots",
-      },
-      {
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "shaking_head",
+                label: "Shaking Head",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "eye_discharge",
+                label: "Eye Discharge",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "nose_discharge",
+                label: "Nose Discharge",
+              },
+            ],
+            label: "Head Concerns",
+          },
+        ],
         icon: <AlertTriangle className="size-4" />,
         key: "shaking_head",
-        label: "Shaking Head",
+        label: "Head & Face Issues",
       },
       {
-        icon: <AlertTriangle className="size-4" />,
-        key: "eye_discharge",
-        label: "Eye Discharge",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "nose_discharge",
-        label: "Nose Discharge",
-      },
-    ],
-    title: "Skin & Head",
-    type: "medical",
-  },
-  {
-    buttons: [
-      {
+        children: [
+          {
+            isSubSection: true,
+            items: [
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "coughing",
+                label: "Coughing",
+              },
+              {
+                icon: <AlertTriangle className="size-4" />,
+                key: "sneezing",
+                label: "Sneezing",
+              },
+            ],
+            label: "Breathing Concerns",
+          },
+        ],
         icon: <AlertTriangle className="size-4" />,
         key: "coughing",
-        label: "Coughing",
-      },
-      {
-        icon: <AlertTriangle className="size-4" />,
-        key: "sneezing",
-        label: "Sneezing",
+        label: "Respiratory Issues",
       },
     ],
-    title: "Respiratory",
+    title: "Health Concerns",
     type: "medical",
   },
 ];
@@ -255,6 +369,9 @@ export function WalkSession({ walk }: WalkSessionProps) {
   const [startedAt, setStartedAt] = useState<Date>(walk.startedAt);
   const [endedAt, setEndedAt] = useState<Date>(walk.endedAt ?? new Date());
   const [noteText, setNoteText] = useState<string>("");
+  const [expandedActivities, setExpandedActivities] = useState<
+    Set<ActivityKey>
+  >(new Set());
 
   useEffect(() => {
     const notes = walk.notes.map((note) => note.notes);
@@ -290,50 +407,157 @@ export function WalkSession({ walk }: WalkSessionProps) {
     }));
   };
 
-  const renderSection = (section: ActivitySection) => {
+  const toggleExpanded = (activity: ActivityKey) => {
+    setExpandedActivities((previous) => {
+      const next = new Set(previous);
+      if (next.has(activity)) {
+        next.delete(activity);
+      } else {
+        next.add(activity);
+      }
+      return next;
+    });
+  };
+
+  const renderActivityButton = (button: ActivityButton, _depth = 0) => {
+    const isExpanded = button.key ? expandedActivities.has(button.key) : false;
+    const hasChildren = button.children && button.children.length > 0;
+    const isParentCategory =
+      hasChildren && button.key !== "pee" && button.key !== "poop";
+
+    const isQuickAction = !isParentCategory && hasChildren;
+
+    // Check if any children are active (including subsections)
+    const hasActiveChild =
+      (hasChildren &&
+        button.children?.some((child) => {
+          if ("isSubSection" in child && child.isSubSection) {
+            return child.items.some((item) => activities[item.key]);
+          }
+          return activities[(child as ActivityButton).key!];
+        })) ??
+      false;
+
+    const shouldStayExpanded = hasActiveChild;
+    const showQuickActionContent =
+      isQuickAction && button.key ? activities[button.key] : false;
+
     return (
-      <div key={section.title} className="space-y-2">
-        <h2 className="font-medium">{section.title}</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {section.buttons.map((button) => (
-            <div key={button.key} className="flex flex-col items-center gap-1">
-              <Button
-                variant={activities[button.key] ? "default" : "outline"}
-                className="h-16 w-full sm:h-20"
-                onClick={() => toggleActivity(button.key)}
-              >
-                <div className="flex flex-col items-center gap-2 sm:flex-row">
-                  {button.icon}
-                  <span className="text-sm">{button.label}</span>
-                </div>
-              </Button>
+      <div
+        key={button.key ?? button.label}
+        className="flex w-full flex-col gap-2"
+      >
+        <Button
+          variant={
+            isParentCategory
+              ? "outline"
+              : button.key && activities[button.key]
+                ? "default"
+                : "outline"
+          }
+          className={cn(
+            "relative h-16 w-full sm:h-20",
+            !isParentCategory &&
+              button.key &&
+              activities[button.key] &&
+              "bg-primary text-primary-foreground hover:bg-primary/90",
+            isParentCategory && "justify-between bg-muted/50 hover:bg-muted",
+          )}
+          onClick={() => {
+            if (!isParentCategory && button.key) {
+              toggleActivity(button.key);
+            }
+            if (
+              hasChildren &&
+              !isQuickAction &&
+              !shouldStayExpanded &&
+              button.key
+            ) {
+              toggleExpanded(button.key);
+            }
+          }}
+        >
+          <div className="flex items-center gap-2">
+            {button.icon}
+            <span className="text-sm">{button.label}</span>
+          </div>
+          {hasChildren && !isQuickAction && (
+            <Icons.ChevronDown
+              className={cn(
+                "size-4 transition-transform",
+                (isExpanded || shouldStayExpanded) && "rotate-180",
+              )}
+            />
+          )}
+        </Button>
+
+        {hasChildren &&
+          button.children &&
+          (isExpanded || shouldStayExpanded || showQuickActionContent) && (
+            <div
+              className={cn(
+                "grid gap-2 rounded-lg",
+                "grid-cols-1 bg-muted/30 p-4",
+              )}
+            >
+              {button.children.map((child) => {
+                if ("isSubSection" in child && child.isSubSection) {
+                  return (
+                    <div key={child.label} className="space-y-2">
+                      <div className="flex h-8 items-center px-2 text-xs font-medium text-muted-foreground">
+                        {child.label}
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                        {child.items.map((item) => (
+                          <Button
+                            key={item.key}
+                            variant={
+                              activities[item.key] ? "default" : "outline"
+                            }
+                            className={cn(
+                              "h-16 w-full sm:h-20",
+                              activities[item.key] &&
+                                "bg-primary text-primary-foreground hover:bg-primary/90",
+                            )}
+                            onClick={() => toggleActivity(item.key)}
+                          >
+                            <div className="flex flex-col items-center gap-2 sm:flex-row">
+                              {item.icon}
+                              <span className="text-sm">{item.label}</span>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return renderActivityButton(child as ActivityButton);
+              })}
             </div>
-          ))}
-        </div>
+          )}
       </div>
     );
   };
 
-  const renderSectionGroup = (title: string, sections: ActivitySection[]) => (
-    <div className="space-y-6">
-      <div className="sticky top-[56px] -mx-4 bg-background px-4 py-2 shadow-sm">
-        <h2 className="text-lg font-semibold text-muted-foreground">{title}</h2>
+  const renderSection = (section: ActivitySection) => {
+    return (
+      <div key={section.title} className="space-y-4">
+        <h2 className="text-lg font-medium text-muted-foreground">
+          {section.title}
+        </h2>
+        <div
+          className={cn(
+            "grid gap-4",
+            section.type === "basic"
+              ? "grid-cols-1 sm:grid-cols-3"
+              : "grid-cols-1",
+          )}
+        >
+          {section.buttons.map((button) => renderActivityButton(button))}
+        </div>
       </div>
-      <div className="space-y-6">
-        {sections.map((section) => renderSection(section))}
-      </div>
-    </div>
-  );
-
-  const basicSections = ACTIVITY_SECTIONS.filter(
-    (section) => section.type === "basic",
-  );
-  const behavioralSections = ACTIVITY_SECTIONS.filter(
-    (section) => section.type === "behavioral",
-  );
-  const medicalSections = ACTIVITY_SECTIONS.filter(
-    (section) => section.type === "medical",
-  );
+    );
+  };
 
   const handleSubmitWalk = async () => {
     try {
@@ -524,44 +748,58 @@ export function WalkSession({ walk }: WalkSessionProps) {
         {/* Walk Difficulty Score */}
         <div className="space-y-2">
           <h2 className="font-medium">Walk Difficulty Score</h2>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-5 gap-2">
             {[1, 2, 3, 4, 5].map((score) => (
-              <Button
-                key={score}
-                variant={walkDifficultyLevel === score ? "default" : "outline"}
-                className={cn(
-                  "flex-1 text-lg font-semibold",
-                  walkDifficultyLevel === score &&
-                    "bg-primary text-primary-foreground hover:bg-primary/90",
+              <div key={score} className="flex flex-col items-center gap-1">
+                <Button
+                  variant={
+                    walkDifficultyLevel === score ? "default" : "outline"
+                  }
+                  className={cn(
+                    "grid h-12 w-full place-content-center text-lg font-semibold",
+                    walkDifficultyLevel === score &&
+                      "bg-primary text-primary-foreground hover:bg-primary/90",
+                  )}
+                  onClick={() => setWalkDifficultyLevel(score)}
+                >
+                  {score}
+                </Button>
+                {score === 1 && (
+                  <span className="text-xs text-muted-foreground">Easy</span>
                 )}
-                onClick={() => setWalkDifficultyLevel(score)}
-              >
-                {score}
-              </Button>
+                {score === 5 && (
+                  <span className="text-xs text-muted-foreground">
+                    Very Difficult
+                  </span>
+                )}
+              </div>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">
-            (1 = Easy, 5 = Very Difficult)
-          </p>
         </div>
 
         {/* Activity Sections */}
         <div className="space-y-8">
           {/* Basic Activities */}
           <div className="space-y-6">
-            {basicSections.map((section) => renderSection(section))}
+            {ACTIVITY_SECTIONS.filter(
+              (section) => section.type === "basic",
+            ).map((section) => renderSection(section))}
           </div>
 
           {/* Behavioral Observations */}
-          {renderSectionGroup("Behavioral Observations", behavioralSections)}
+          {ACTIVITY_SECTIONS.filter(
+            (section) => section.type === "behavioral",
+          ).map((section) => renderSection(section))}
 
           {/* Medical Observations */}
-          {renderSectionGroup("Medical Observations", medicalSections)}
+          {ACTIVITY_SECTIONS.filter(
+            (section) => section.type === "medical",
+          ).map((section) => renderSection(section))}
         </div>
       </div>
 
       {/* Sticky Submit Walk Button */}
-      <div className="fixed bottom-0 left-0 w-full border-t bg-background p-4">
+      <div className="fixed inset-x-0 bottom-0 z-50 bg-background p-4 shadow-lg">
         <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
           <Button
             variant="default"
