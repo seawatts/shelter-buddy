@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
 
 import type { WalkTypeWithRelations } from "@acme/db/schema";
@@ -48,22 +47,13 @@ function ElapsedTimeDisplay({ startedAt }: { startedAt: Date | string }) {
 }
 
 export function WalkTimer({ walk }: WalkTimerProps) {
-  const router = useRouter();
   const endWalkServerAction = useServerAction(endWalkAction);
 
   const handleEndWalk = async () => {
     try {
-      const [data, error] = await endWalkServerAction.execute({
+      await endWalkServerAction.execute({
         walkId: walk.id,
       });
-
-      if (data?.success) {
-        router.push(
-          `/shelters/${walk.animal.shelterId}/animals/${walk.animal.id}/walks/${walk.id}/finished`,
-        );
-      } else if (error) {
-        console.error("Failed to end walk:", error.message);
-      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Failed to end walk:", error.message);

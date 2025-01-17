@@ -53,7 +53,6 @@ class AppDB extends Dexie {
 
 export interface IndexedDBContextValue {
   db: AppDB | null;
-  isInitialized: boolean;
   error: Error | null;
   // Upload Methods
   getAllUploads: () => Promise<UploadItem[]>;
@@ -84,20 +83,19 @@ interface IndexedDBProviderProps {
 }
 
 export function IndexedDBProvider({ children }: IndexedDBProviderProps) {
-  const [db, setDatabase] = useState<AppDB | null>(null);
+  const db = useMemo<AppDB>(() => new AppDB(), []);
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const initDB = async () => {
       try {
+        if (isInitialized) return;
         if (!isSupported()) {
           throw new Error("IndexedDB is not supported in this browser");
         }
 
-        const appDB = new AppDB();
-        await appDB.open();
-        setDatabase(appDB);
+        await db.open();
         setIsInitialized(true);
       } catch (error_) {
         console.error("Failed to initialize IndexedDB:", error_);
@@ -112,9 +110,9 @@ export function IndexedDBProvider({ children }: IndexedDBProviderProps) {
     void initDB();
 
     return () => {
-      if (db) {
-        // db.close();
-      }
+      // if (db) {
+      // db.close();
+      // }
     };
   }, [db]);
 
@@ -122,95 +120,74 @@ export function IndexedDBProvider({ children }: IndexedDBProviderProps) {
     () => ({
       // Upload Methods
       addUploads: async (items) => {
-        await db?.uploads.bulkPut(items);
+        await db.uploads.bulkPut(items);
       },
-
       // Intake Form Methods
       assignIntakeFormToKennel: async (formId, kennelId) => {
-        await db?.intakeForms.update(formId, { kennelId });
+        await db.intakeForms.update(formId, { kennelId });
       },
-
       clearUploads: async () => {
-        await db?.uploads.clear();
+        await db.uploads.clear();
       },
-
-      // Database state
       db,
-
       error,
-
       getAllUploads: async () => {
-        return (await db?.uploads.toArray()) ?? [];
+        return await db.uploads.toArray();
       },
-
       getIntakeFormByAnimalId: async (animalId) => {
-        const form = await db?.intakeForms
+        const form = await db.intakeForms
           .where("animalId")
           .equals(animalId)
           .first();
         return form ?? null;
       },
-
       getIntakeFormById: async (id) => {
-        const form = await db?.intakeForms.get(id);
+        const form = await db.intakeForms.get(id);
         return form ?? null;
       },
-
       getIntakeFormByKennelId: async (kennelId) => {
-        const form = await db?.intakeForms
+        const form = await db.intakeForms
           .where("kennelId")
           .equals(kennelId)
           .first();
         return form ?? null;
       },
-
       getPendingUploads: async () => {
         const [pending, errors] = await Promise.all([
-          db?.uploads.where("status").equals("pending").toArray(),
-          db?.uploads.where("status").equals("error").toArray(),
+          db.uploads.where("status").equals("pending").toArray(),
+          db.uploads.where("status").equals("error").toArray(),
         ]);
-        return [
-          ...(pending ?? []),
-          ...(errors ?? []).filter((item) => item.retryCount < 3),
-        ];
+        return [...pending, ...errors.filter((item) => item.retryCount < 3)];
       },
-
       getUpload: async (id) => {
-        return db?.uploads.get(id);
+        return db.uploads.get(id);
       },
-
       getUploadByKennelId: async (kennelId) => {
-        const upload = await db?.uploads
+        const upload = await db.uploads
           .where("kennelId")
           .equals(kennelId)
           .first();
         return upload ?? null;
       },
-
-      isInitialized,
-
       removeIntakeForm: async (id: string) => {
-        const form = await db?.intakeForms.get(id);
+        const form = await db.intakeForms.get(id);
         if (form) {
           // eslint-disable-next-line drizzle/enforce-delete-with-where -- Intentionally deleting a single record by ID
-          await db?.intakeForms.delete(id);
+          await db.intakeForms.delete(id);
         }
       },
-
       removeUpload: async (id) => {
         // eslint-disable-next-line drizzle/enforce-delete-with-where -- Intentionally deleting a single record by ID
-        await db?.uploads.delete(id);
+        await db.uploads.delete(id);
       },
-
       saveIntakeForm: async (form) => {
-        await db?.intakeForms.put(form);
+        await db.intakeForms.put(form);
       },
-
       updateUpload: async (id, updates) => {
-        await db?.uploads.update(id, updates);
+        await db.uploads.update(id, updates);
       },
     }),
-    [db, error, isInitialized],
+    [db, error],
   );
 
   return (

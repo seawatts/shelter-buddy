@@ -1,7 +1,10 @@
+/* eslint-disable unicorn/no-nested-ternary */
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useServerAction } from "zsa-react";
 
 import type { DifficultyLevelEnum, GenderEnum } from "@acme/db/schema";
@@ -113,6 +116,15 @@ export function AnimalForm({
   const db = useIndexedDB();
   const currentFormIdRef = useRef<string | null>(null);
   const hasLoadedRef = useRef(false);
+
+  const upload = useLiveQuery(
+    async () => {
+      return db.getUploadByKennelId(kennelId);
+    },
+    [kennelId],
+    null,
+  );
+
   const [formData, setFormData] = useState<AnimalFormData>(
     initialData ?? {
       animalId: "",
@@ -247,10 +259,31 @@ export function AnimalForm({
       kennelId,
     });
   };
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <input type="hidden" name="kennelId" value={kennelId} />
+
+      {/* Show either the upload preview or the intake form image */}
+      {upload?.previewUrl ? (
+        <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={upload.previewUrl}
+            alt="Intake form preview"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      ) : formData.intakeFormImagePath ? (
+        <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
+          <Image
+            src={formData.intakeFormImagePath}
+            alt="Intake form"
+            fill
+            className="object-cover"
+          />
+        </div>
+      ) : null}
+
       <div className="grid gap-2">
         <Label htmlFor="id">Animal ID</Label>
         <Input
@@ -458,14 +491,6 @@ export function AnimalForm({
           Add Activity
         </Button>
       </div>
-
-      {formData.intakeFormImagePath && (
-        <input
-          type="hidden"
-          name="intakeFormImagePath"
-          value={formData.intakeFormImagePath}
-        />
-      )}
 
       <Button
         type="submit"

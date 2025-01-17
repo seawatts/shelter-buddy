@@ -21,19 +21,17 @@ export function KennelUploadStatus({
 
   const form = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return null;
       return db.getIntakeFormByKennelId(kennelId);
     },
-    [kennelId, db],
+    [kennelId],
     null,
   );
 
   const upload = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return null;
       return db.getUploadByKennelId(kennelId);
     },
-    [kennelId, db],
+    [kennelId],
     null,
   );
 

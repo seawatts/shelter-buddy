@@ -32,19 +32,17 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
 
   const upload = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return null;
       return db.getUploadByKennelId(kennelId);
     },
-    [kennelId, db],
+    [kennelId],
     null,
   );
 
   const form = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return null;
       return db.getIntakeFormByKennelId(kennelId);
     },
-    [kennelId, db],
+    [kennelId],
     null,
   );
 

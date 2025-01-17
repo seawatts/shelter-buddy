@@ -194,10 +194,9 @@ export function AnimalImages({
 
   const upload = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return null;
       return db.getUploadByKennelId(kennelId);
     },
-    [kennelId, db],
+    [kennelId],
     null,
   );
 

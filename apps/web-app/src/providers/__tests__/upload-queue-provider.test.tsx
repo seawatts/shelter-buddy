@@ -54,7 +54,6 @@ describe("UploadQueueProvider", () => {
       getPendingUploads: vi.fn(),
       getUpload: vi.fn(),
       getUploadByKennelId: vi.fn(),
-      isInitialized: true,
       removeIntakeForm: vi.fn(),
       removeUpload: vi.fn(),
       saveIntakeForm: vi.fn(),

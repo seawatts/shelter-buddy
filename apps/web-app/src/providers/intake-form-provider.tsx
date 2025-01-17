@@ -29,10 +29,9 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
   // Watch for successful uploads to process them
   const uploads = useLiveQuery(
     async () => {
-      if (!db.isInitialized) return [];
       return db.getAllUploads();
     },
-    [db],
+    [],
     [],
   );
 
@@ -56,6 +55,7 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
           existingForm?.status === "analyzing" ||
           existingForm?.status === "error"
         ) {
+          console.log("skipping", existingForm);
           continue;
         }
 
