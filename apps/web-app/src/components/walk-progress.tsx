@@ -20,6 +20,11 @@ export function WalkProgress({ animals }: WalkProgressProps) {
 
   const selectedFilters = difficultyFilter?.split(",").filter(Boolean) ?? [];
 
+  // Filter animals to only include those currently in kennels
+  const activeKennelAnimals = animals.filter((animal) =>
+    animal.kennelOccupants.some((occupant) => !occupant.endedAt),
+  );
+
   // Calculate stats for each difficulty level
   const difficultyStats: Record<
     DifficultyLevel,
@@ -38,7 +43,7 @@ export function WalkProgress({ animals }: WalkProgressProps) {
   };
 
   // Count dogs per difficulty
-  for (const animal of animals) {
+  for (const animal of activeKennelAnimals) {
     dogsByDifficulty[animal.difficultyLevel]++;
   }
 
@@ -52,7 +57,7 @@ export function WalkProgress({ animals }: WalkProgressProps) {
   }
 
   // Count completed and in-progress walks
-  for (const animal of animals) {
+  for (const animal of activeKennelAnimals) {
     const level = animal.difficultyLevel;
     const todayWalks = animal.walks.filter((walk) => isToday(walk.startedAt));
 

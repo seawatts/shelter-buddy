@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 
 import { db } from "@acme/db/client";
 
-export async function GET(request: Request, props: { params: Promise<{ code: string }> }) {
+export async function GET(
+  request: Request,
+  props: { params: Promise<{ code: string }> },
+) {
   const params = await props.params;
   const shortUrl = await db.query.ShortUrl.findFirst({
     where: (shortUrls, { eq }) => eq(shortUrls.code, params.code),

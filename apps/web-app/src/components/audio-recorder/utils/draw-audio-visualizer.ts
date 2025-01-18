@@ -53,8 +53,7 @@ export function createAudioVisualizer() {
     const currentTime = performance.now();
     if (currentTime - state.lastBarUpdateTime >= 75) {
       // 75ms interval
-      const average =
-        [...dataArray].reduce((a, b) => a + b) / bufferLength;
+      const average = [...dataArray].reduce((a, b) => a + b) / bufferLength;
       const newValue = average / 2;
 
       // Shift data and update received data flags
@@ -77,7 +76,9 @@ export function createAudioVisualizer() {
       const y = centerY - height;
 
       // Use gradient only for bars that have received data
-      canvasContext.fillStyle = state.hasReceivedData[index] ? gradient : "#d3d3d3";
+      canvasContext.fillStyle = state.hasReceivedData[index]
+        ? gradient
+        : "#d3d3d3";
 
       // Draw rounded rectangle
       canvasContext.beginPath();

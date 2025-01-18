@@ -280,7 +280,6 @@ export function AddAnimalForm({ kennelId, roomId, onOpenChange }: Props) {
         <input
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handleFileChange}
           className="hidden"
           ref={fileInputRef}

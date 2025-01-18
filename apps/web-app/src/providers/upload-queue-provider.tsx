@@ -45,7 +45,8 @@ export function UploadQueueProvider({ children }: UploadQueueProviderProps) {
 
         const fileExtension = item.file.name.split(".").pop() ?? "png";
         const fileBaseName = item.file.name.split(".")[0] ?? "unknown";
-        const filePath = `${item.animalId}/${fileBaseName}.${fileExtension}`;
+        const id = createId({ prefix: "upload_" });
+        const filePath = `${item.animalId}/${id}_${fileBaseName}.${fileExtension}`;
 
         await new Promise<void>((resolve, reject) => {
           const upload = new Upload(item.file, {
