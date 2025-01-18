@@ -99,7 +99,7 @@ const ACTIVITY_SECTIONS: ActivitySection[] = [
           { icon: <BallIcon />, key: "played_tug", label: "Tug" },
         ],
         icon: <BallIcon />,
-        key: undefined,
+        key: "play_activities" as any,
         label: "Play Activities",
       },
     ],
@@ -364,7 +364,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
     return initialActivities;
   });
   const [walkDifficultyLevel, setWalkDifficultyLevel] = useState<number>(
-    walk.walkDifficultyLevel > 0 ? walk.walkDifficultyLevel : 1,
+    walk.walkDifficultyLevel > 0 ? walk.walkDifficultyLevel : 3,
   );
   const [startedAt, setStartedAt] = useState<Date>(walk.startedAt);
   const [endedAt, setEndedAt] = useState<Date>(walk.endedAt ?? new Date());
@@ -427,18 +427,6 @@ export function WalkSession({ walk }: WalkSessionProps) {
 
     const isQuickAction = !isParentCategory && hasChildren;
 
-    // Check if any children are active (including subsections)
-    const hasActiveChild =
-      (hasChildren &&
-        button.children?.some((child) => {
-          if ("isSubSection" in child && child.isSubSection) {
-            return child.items.some((item) => activities[item.key]);
-          }
-          return activities[(child as ActivityButton).key!];
-        })) ??
-      false;
-
-    const shouldStayExpanded = hasActiveChild;
     const showQuickActionContent =
       isQuickAction && button.key ? activities[button.key] : false;
 
@@ -467,12 +455,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
             if (!isParentCategory && button.key) {
               toggleActivity(button.key);
             }
-            if (
-              hasChildren &&
-              !isQuickAction &&
-              !shouldStayExpanded &&
-              button.key
-            ) {
+            if (hasChildren && !isQuickAction && button.key) {
               toggleExpanded(button.key);
             }
           }}
@@ -485,7 +468,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
             <Icons.ChevronDown
               className={cn(
                 "size-4 transition-transform",
-                (isExpanded || shouldStayExpanded) && "rotate-180",
+                isExpanded && "rotate-180",
               )}
             />
           )}
@@ -493,7 +476,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
 
         {hasChildren &&
           button.children &&
-          (isExpanded || shouldStayExpanded || showQuickActionContent) && (
+          (isExpanded || showQuickActionContent) && (
             <div
               className={cn(
                 "grid gap-2 rounded-lg",
