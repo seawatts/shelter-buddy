@@ -13,6 +13,7 @@ import {
   PostHogProvider,
   PosthogWebVitals,
 } from "./posthog/client";
+import { SentryIdentifyUser } from "./sentry/identify-user";
 
 const isProduction = env.NEXT_PUBLIC_APP_ENV === "production";
 
@@ -33,7 +34,12 @@ export function AnalyticsProviders(
           <GoogleAnalytics trackPageViews />
           <PosthogWebVitals />
           <PostHogPageView />
-          {props.identifyUser && <PostHogIdentifyUser />}
+          {props.identifyUser && (
+            <>
+              <PostHogIdentifyUser />
+              <SentryIdentifyUser />
+            </>
+          )}
           <WebVitals />
           {props.children}
           <Analytics />

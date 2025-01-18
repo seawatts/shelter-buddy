@@ -85,7 +85,7 @@ export function KennelUploadStatus({
             href={`/shelters/${form.shelterId}/rooms/${form.roomId}/kennels/${form.kennelId}/intake`}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-muted-foreground/80"
           >
-            Complete Animal Details
+            Finish Intake
             <ArrowRight className="size-4" />
           </Link>
         </>
