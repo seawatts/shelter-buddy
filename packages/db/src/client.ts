@@ -1,14 +1,21 @@
 import { sql } from "@vercel/postgres";
+import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import { drizzle } from "drizzle-orm/vercel-postgres";
+import postgres from "postgres";
 
+import { env } from "./env";
 import * as schema from "./schema";
 
-// import postgres from "postgres";
+// Create the appropriate database client based on the environment
+let db: ReturnType<typeof drizzle> | ReturnType<typeof drizzlePostgres>;
 
-// For migrations
-// export const migrationClient = postgres(env.POSTGRES_URL, { max: 1 });
+if (process.env.VERCEL) {
+  // Use Vercel Postgres in production
+  db = drizzle(sql, { schema });
+} else {
+  // Use direct Postgres connection in development (Supabase)
+  const client = postgres(process.env.POSTGRES_URL!);
+  db = drizzlePostgres(client, { schema });
+}
 
-// For query purposes
-// export const queryClient = postgres(env.POSTGRES_URL);
-// export const db = drizzle(queryClient, { schema });
-export const db = drizzle(sql, { schema });
+export { db };

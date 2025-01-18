@@ -26,11 +26,13 @@
     "lint": "eslint",
     "push": "pnpm with-env drizzle-kit push",
     "migrate": "pnpm with-env drizzle-kit migrate",
+    "migrate:prod": "pnpm with-env-prod drizzle-kit migrate",
     "seed": "pnpm with-env tsx src/seed.ts",
     "gen-migration": "pnpm with-env drizzle-kit generate",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env --",
+    "with-env-prod": "dotenv -e ../../.env.production.local --"
   },
   "dependencies": {
     "@acme/id": "workspace:*",
