@@ -11,25 +11,25 @@ enum DifficultyLevel {
 }
 
 class IntakeForm {
-  id string @description("The animal ID number from the form")
-  name string @description("The animal's name from the form")
-  breed string @description("The breed listed on the form")
-  gender Gender @description("The gender of the animal")
-  difficultyLevel DifficultyLevel @description("The difficulty level indicated by the form's color coding")
-  isFido bool @description("Whether the animal is FIDO certified")
+  id string? @description("The animal ID number from the form")
+  name string? @description("The animal's name from the form")
+  breed string? @description("The breed listed on the form")
+  gender Gender? @description("The gender of the animal")
+  difficultyLevel DifficultyLevel? @description("The difficulty level indicated by the form's color coding")
+  isFido bool? @description("Whether the animal is FIDO certified")
   generalNotes string? @description("Any general notes from the form")
-  approvedActivities Activity[] @description("List of approved and non-approved activities")
-  equipmentNotes Equipment @description("Equipment and handling notes for in/out of kennel")
+  approvedActivities (Activity?)[]? @description("List of approved and non-approved activities")
+  equipmentNotes Equipment? @description("Equipment and handling notes for in/out of kennel")
 }
 
 class Activity {
-  activity string
-  isApproved bool
+  activity string?
+  isApproved bool?
 }
 
 class Equipment {
-  inKennel string[]
-  outOfKennel string[]
+  inKennel (string?)[]?
+  outOfKennel (string?)[]?
 }
 
 // Create a function to extract information from an animal shelter intake form image

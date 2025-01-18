@@ -47,26 +47,26 @@ export enum Gender {
 }
 
 export interface Activity {
-  activity: string
-  isApproved: boolean
+  activity?: string | null
+  isApproved?: boolean | null
   
 }
 
 export interface Equipment {
-  inKennel: string[]
-  outOfKennel: string[]
+  inKennel?: (string | null)[] | null
+  outOfKennel?: (string | null)[] | null
   
 }
 
 export interface IntakeForm {
-  id: string
-  name: string
-  breed: string
-  gender: Gender
-  difficultyLevel: DifficultyLevel
-  isFido: boolean
+  id?: string | null
+  name?: string | null
+  breed?: string | null
+  gender?: Gender | null
+  difficultyLevel?: DifficultyLevel | null
+  isFido?: boolean | null
   generalNotes?: string | null
-  approvedActivities: Activity[]
-  equipmentNotes: Equipment
+  approvedActivities?: (Activity | null)[] | null
+  equipmentNotes?: Equipment | null
   
 }
