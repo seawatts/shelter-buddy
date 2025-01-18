@@ -109,6 +109,18 @@ export default async function AnimalPage({
                 intakeFormImagePath: null,
                 isFido: animal.isFido,
                 name: animal.name,
+                staffLeashUp: animal.notes.some(
+                  (note) =>
+                    note.type === "staffRequirement" &&
+                    note.isActive &&
+                    note.notes === "Staff must leash up",
+                ),
+                staffReturn: animal.notes.some(
+                  (note) =>
+                    note.type === "staffRequirement" &&
+                    note.isActive &&
+                    note.notes === "Staff must return",
+                ),
               }}
             />
           </Suspense>

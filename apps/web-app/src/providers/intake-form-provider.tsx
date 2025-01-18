@@ -92,7 +92,7 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
 
           // Transform the BAML result into the expected format
           const analyzedData = result.data
-            ? {
+            ? ({
                 approvedActivities: result.data.approvedActivities.map(
                   (activity) => ({
                     activity: activity.activity,
@@ -112,7 +112,9 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
                 generalNotes: result.data.generalNotes ?? "",
                 isFido: result.data.isFido,
                 name: result.data.name,
-              }
+                staffLeashUp: false,
+                staffReturn: false,
+              } satisfies IntakeFormAnalysis["analyzedData"])
             : null;
 
           // Update the form with the analyzed data
