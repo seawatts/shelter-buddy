@@ -115,7 +115,7 @@ export const iconVariants = cva("shrink-0", {
     },
 
     variant: {
-      destructive: "text-destructive",
+      destructive: "stroke-destructive text-destructive",
       loading: "text-muted",
       muted: "text-muted-foreground",
       primary: "text-primary",
@@ -138,12 +138,6 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   AlertCircle: twx(AlertCircle).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
-  LogOut: twx(LogOut).transientProps(["size", "variant"])<IconProps>(
-    ({ size, variant }) => iconVariants({ size, variant }),
-  ),
-  Laptop: twx(Laptop).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   AlertTriangle: twx(AlertTriangle).transientProps([
@@ -341,6 +335,9 @@ export const Icons = {
   Info: twx(Info).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
+  Laptop: twx(Laptop).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
   ListFilter: twx(ListFilter).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
@@ -348,6 +345,9 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   ListPlus: twx(ListPlus).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  LogOut: twx(LogOut).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   Mail: twx(Mail).transientProps(["size", "variant"])<IconProps>(

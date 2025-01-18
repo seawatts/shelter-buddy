@@ -420,7 +420,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
   };
 
   const renderActivityButton = (button: ActivityButton, _depth = 0) => {
-    const isExpanded = button.key ? expandedActivities.has(button.key) : false;
+    const isExpanded = button.key ? expandedActivities.has(button.key) : true;
     const hasChildren = button.children && button.children.length > 0;
     const isParentCategory =
       hasChildren && button.key !== "pee" && button.key !== "poop";

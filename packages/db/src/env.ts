@@ -5,7 +5,7 @@ export const env = createEnv({
   runtimeEnv: process.env,
   server: {
     POSTGRES_URL: z.string().url(),
-    VERCEL: z.boolean(),
+    VERCEL: z.boolean().optional(),
   },
   skipValidation: !!process.env.CI,
 });

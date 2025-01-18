@@ -153,6 +153,7 @@ export const animalNoteTypeEnum = pgEnum("animalNoteType", [
   "inKennel",
   "outKennel",
   "approvedActivities",
+  "staffRequirement",
 ]);
 
 export const genderEnum = pgEnum("gender", ["male", "female"]);

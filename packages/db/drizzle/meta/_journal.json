@@ -15,6 +15,13 @@
       "when": 1736749849502,
       "tag": "0001_organic_wonder_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737233988041,
+      "tag": "0002_clever_shadow_king",
+      "breakpoints": true
     }
   ]
 }

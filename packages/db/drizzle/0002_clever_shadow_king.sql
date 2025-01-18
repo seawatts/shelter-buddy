@@ -1,0 +1,1 @@
+ALTER TYPE "public"."animalNoteType" ADD VALUE 'staffRequirement';

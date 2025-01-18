@@ -45,6 +45,9 @@ const createAnimalSchema = z.object({
   isFido: z.boolean().optional(),
   kennelId: z.string(),
   name: z.string(),
+  shelterId: z.string(),
+  staffLeashUp: z.boolean().optional(),
+  staffReturn: z.boolean().optional(),
   weight: z.number().optional(),
 });
 
@@ -74,7 +77,7 @@ export const createAnimalAction = authenticatedAction
         gender: input.gender,
         isFido: Boolean(input.isFido),
         name: input.name,
-        shelterId: shelterMember.shelterId,
+        shelterId: input.shelterId,
         weight: input.weight ?? null,
       })
       .returning();
@@ -159,6 +162,29 @@ export const createAnimalAction = authenticatedAction
         sizeBytes: input.intakeFormImageSize ?? 0,
         type: "image",
         width: input.intakeFormImageWidth ?? 0,
+      });
+    }
+
+    // Create staff requirement notes if needed
+    if (input.staffLeashUp) {
+      await db.insert(AnimalNotes).values({
+        animalId: animal.id,
+        createdByUserId: ctx.user.id,
+        isActive: true,
+        notes: "Staff required for leash up",
+        shelterId: shelterMember.shelterId,
+        type: "staffRequirement",
+      });
+    }
+
+    if (input.staffReturn) {
+      await db.insert(AnimalNotes).values({
+        animalId: animal.id,
+        createdByUserId: ctx.user.id,
+        isActive: true,
+        notes: "Staff required for return",
+        shelterId: shelterMember.shelterId,
+        type: "staffRequirement",
       });
     }
 

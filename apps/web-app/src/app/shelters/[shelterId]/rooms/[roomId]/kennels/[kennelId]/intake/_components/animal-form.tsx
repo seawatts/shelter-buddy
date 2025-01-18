@@ -47,6 +47,8 @@ interface AnimalFormData {
     inKennel?: string;
     outOfKennel?: string;
   };
+  staffLeashUp?: boolean;
+  staffReturn?: boolean;
 }
 
 interface AnimalFormProps {
@@ -128,7 +130,11 @@ export function AnimalForm({
   const [formData, setFormData] = useState<AnimalFormData>(
     initialData ?? {
       animalId: "",
-      approvedActivities: [],
+      approvedActivities: [
+        { activity: "FIDO", isApproved: false },
+        { activity: "Dog Playgroups", isApproved: false },
+        { activity: "Conference room play, quiet time", isApproved: false },
+      ],
       breed: "",
       difficultyLevel: "Yellow",
       equipmentNotes: {
@@ -252,19 +258,19 @@ export function AnimalForm({
     event.preventDefault();
     await execute({
       ...formData,
-      shelterId,
       breed: formData.breed ?? "",
       difficultyLevel: formData.difficultyLevel ?? "Yellow",
       gender: formData.gender ?? "male",
       intakeFormImagePath: formData.intakeFormImagePath ?? undefined,
       kennelId,
+      shelterId,
     });
   };
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <input type="hidden" name="kennelId" value={kennelId} />
 
-      {/* Show either the upload preview or the intake form image */}
+      {/* Image Preview Section */}
       {upload?.previewUrl ? (
         <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -285,182 +291,189 @@ export function AnimalForm({
         </div>
       ) : null}
 
-      <div className="grid gap-2">
-        <Label htmlFor="id">Animal ID</Label>
-        <Input
-          id="id"
-          name="id"
-          value={formData.externalId}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              externalId: event.target.value,
-            })
-          }
-        />
+      {/* Basic Information Section */}
+      <div className="flex flex-col gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="id">Animal ID</Label>
+          <Input
+            id="id"
+            name="id"
+            value={formData.externalId}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                externalId: event.target.value,
+              })
+            }
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                name: event.target.value,
+              })
+            }
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="breed">Breed</Label>
+          <Input
+            id="breed"
+            name="breed"
+            value={formData.breed ?? ""}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                breed: event.target.value,
+              })
+            }
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="gender">Gender</Label>
+          <Select
+            name="gender"
+            value={formData.gender}
+            onValueChange={(value) =>
+              handleFormChange({
+                ...formData,
+                gender: value as GenderEnum,
+              })
+            }
+          >
+            <SelectTrigger id="gender">
+              <SelectValue placeholder="Select gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="difficulty">Difficulty Level</Label>
+          <Select
+            name="difficultyLevel"
+            value={formData.difficultyLevel}
+            onValueChange={(value) =>
+              handleFormChange({
+                ...formData,
+                difficultyLevel: value as DifficultyLevelEnum,
+              })
+            }
+          >
+            <SelectTrigger id="difficulty">
+              <SelectValue placeholder="Select difficulty" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Yellow">Yellow</SelectItem>
+              <SelectItem value="Purple">Purple</SelectItem>
+              <SelectItem value="Red">Red</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              name: event.target.value,
-            })
-          }
-        />
+      {/* Notes Section */}
+      <div className="flex flex-col gap-6">
+        <div className="grid gap-2">
+          <Label htmlFor="generalNotes">General Notes</Label>
+          <Textarea
+            id="generalNotes"
+            name="generalNotes"
+            value={formData.generalNotes}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                generalNotes: event.target.value,
+              })
+            }
+            className="min-h-[100px]"
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="inKennelNotes">In-Kennel Equipment Notes</Label>
+          <Textarea
+            id="inKennelNotes"
+            name="equipmentNotes.inKennel"
+            value={formData.equipmentNotes.inKennel ?? ""}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                equipmentNotes: {
+                  ...formData.equipmentNotes,
+                  inKennel: event.target.value,
+                },
+              })
+            }
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor="outKennelNotes">Out-of-Kennel Equipment Notes</Label>
+          <Textarea
+            id="outKennelNotes"
+            name="equipmentNotes.outOfKennel"
+            value={formData.equipmentNotes.outOfKennel ?? ""}
+            onChange={(event) =>
+              handleFormChange({
+                ...formData,
+                equipmentNotes: {
+                  ...formData.equipmentNotes,
+                  outOfKennel: event.target.value,
+                },
+              })
+            }
+          />
+        </div>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="breed">Breed</Label>
-        <Input
-          id="breed"
-          name="breed"
-          value={formData.breed ?? ""}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              breed: event.target.value,
-            })
-          }
-        />
-      </div>
+      {/* Toggles Section */}
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="staffLeashUp"
+            name="staffLeashUp"
+            checked={formData.staffLeashUp ?? false}
+            onCheckedChange={(checked) =>
+              handleFormChange({
+                ...formData,
+                staffLeashUp: checked,
+              })
+            }
+          />
+          <Label htmlFor="staffLeashUp">Staff Required for Leash Up</Label>
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="gender">Gender</Label>
-        <Select
-          name="gender"
-          value={formData.gender}
-          onValueChange={(value) =>
-            handleFormChange({
-              ...formData,
-              gender: value as GenderEnum,
-            })
-          }
-        >
-          <SelectTrigger id="gender">
-            <SelectValue placeholder="Select gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="staffReturn"
+            name="staffReturn"
+            checked={formData.staffReturn ?? false}
+            onCheckedChange={(checked) =>
+              handleFormChange({
+                ...formData,
+                staffReturn: checked,
+              })
+            }
+          />
+          <Label htmlFor="staffReturn">Staff Required for Return</Label>
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="difficulty">Difficulty Level</Label>
-        <Select
-          name="difficultyLevel"
-          value={formData.difficultyLevel}
-          onValueChange={(value) =>
-            handleFormChange({
-              ...formData,
-              difficultyLevel: value as DifficultyLevelEnum,
-            })
-          }
-        >
-          <SelectTrigger id="difficulty">
-            <SelectValue placeholder="Select difficulty" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Yellow">Yellow</SelectItem>
-            <SelectItem value="Purple">Purple</SelectItem>
-            <SelectItem value="Red">Red</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Switch
-          id="fido"
-          name="isFido"
-          checked={formData.isFido}
-          onCheckedChange={(checked) =>
-            handleFormChange({
-              ...formData,
-              isFido: Boolean(checked),
-            })
-          }
-        />
-        <Label htmlFor="fido">FIDO Certified</Label>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="generalNotes">General Notes</Label>
-        <Textarea
-          id="generalNotes"
-          name="generalNotes"
-          value={formData.generalNotes}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              generalNotes: event.target.value,
-            })
-          }
-          className="min-h-[100px]"
-        />
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="inKennelNotes">In-Kennel Equipment Notes</Label>
-        <Textarea
-          id="inKennelNotes"
-          name="equipmentNotes.inKennel"
-          value={formData.equipmentNotes.inKennel ?? ""}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              equipmentNotes: {
-                ...formData.equipmentNotes,
-                inKennel: event.target.value,
-              },
-            })
-          }
-        />
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="outKennelNotes">Out-of-Kennel Equipment Notes</Label>
-        <Textarea
-          id="outKennelNotes"
-          name="equipmentNotes.outOfKennel"
-          value={formData.equipmentNotes.outOfKennel ?? ""}
-          onChange={(event) =>
-            handleFormChange({
-              ...formData,
-              equipmentNotes: {
-                ...formData.equipmentNotes,
-                outOfKennel: event.target.value,
-              },
-            })
-          }
-        />
-      </div>
-
-      <div className="grid gap-2">
         <Label>Approved Activities</Label>
         {formData.approvedActivities.map((activity, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <Input
-              name={`approvedActivities.${index}.activity`}
-              value={activity.activity}
-              onChange={(event) =>
-                handleFormChange({
-                  ...formData,
-                  approvedActivities: formData.approvedActivities.map(
-                    (a, index_) =>
-                      index_ === index
-                        ? { ...a, activity: event.target.value }
-                        : a,
-                  ),
-                })
-              }
-            />
+          <div key={index} className="flex items-center gap-4">
             <Switch
               name={`approvedActivities.${index}.isApproved`}
               checked={activity.isApproved}
@@ -474,23 +487,9 @@ export function AnimalForm({
                 })
               }
             />
+            <Label>{activity.activity}</Label>
           </div>
         ))}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() =>
-            handleFormChange({
-              ...formData,
-              approvedActivities: [
-                ...formData.approvedActivities,
-                { activity: "", isApproved: false },
-              ],
-            })
-          }
-        >
-          Add Activity
-        </Button>
       </div>
 
       <Button
