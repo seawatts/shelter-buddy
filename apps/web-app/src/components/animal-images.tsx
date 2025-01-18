@@ -105,7 +105,7 @@ function VideoPlayer({ url, thumbnailUrl, onPlay }: VideoPlayerProps) {
   }, [isMuted]);
 
   return (
-    <div className="relative aspect-[16/9] w-full">
+    <div className="relative aspect-auto w-full">
       <video
         ref={videoRef}
         src={url}
