@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@next/eslint-plugin-next": "15.1.4",
+    "@next/eslint-plugin-next": "15.1.5",
     "eslint-plugin-drizzle": "0.2.3",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-json": "4.0.1",

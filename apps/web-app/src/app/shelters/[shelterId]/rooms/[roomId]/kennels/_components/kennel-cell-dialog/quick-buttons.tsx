@@ -70,6 +70,7 @@ export function KennelCellDialogQuickButtons({
           await reassignKennelServerAction.execute({
             animalId: animal.id,
             newKennelId,
+            shelterId: animal.shelterId,
           });
 
           toast.success("Kennel reassigned successfully");
@@ -100,6 +101,7 @@ export function KennelCellDialogQuickButtons({
           const [result] = await toggleOutOfKennelServerAction.execute({
             animalId: animal.id,
             isOutOfKennel: !currentKennelOccupant.isOutOfKennel,
+            shelterId: animal.shelterId,
           });
 
           if (result?.success) {
@@ -130,6 +132,7 @@ export function KennelCellDialogQuickButtons({
         try {
           const [result] = await markAdoptedServerAction.execute({
             animalId: animal.id,
+            shelterId: animal.shelterId,
           });
 
           if (result?.success) {
@@ -154,6 +157,7 @@ export function KennelCellDialogQuickButtons({
         try {
           const [result] = await markInFosterServerAction.execute({
             animalId: animal.id,
+            shelterId: animal.shelterId,
           });
 
           if (result?.success) {
@@ -186,6 +190,7 @@ export function KennelCellDialogQuickButtons({
             startWalkServerAction.execute({
               animalId: animal.id,
               isNewWalk: false,
+              shelterId: animal.shelterId,
             })
           }
           disabled={startWalkServerAction.isPending}

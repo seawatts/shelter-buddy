@@ -252,6 +252,7 @@ export function AnimalForm({
     event.preventDefault();
     await execute({
       ...formData,
+      shelterId,
       breed: formData.breed ?? "",
       difficultyLevel: formData.difficultyLevel ?? "Yellow",
       gender: formData.gender ?? "male",

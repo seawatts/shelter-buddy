@@ -20,6 +20,15 @@ const nextConfig = {
     "@acme/ui",
     "@acme/validators",
   ],
+  async redirects() {
+    return [
+      {
+        source: "/animals",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

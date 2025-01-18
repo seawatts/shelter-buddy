@@ -53,6 +53,7 @@ export function WalkTimer({ walk }: WalkTimerProps) {
     try {
       await endWalkServerAction.execute({
         walkId: walk.id,
+        shelterId: walk.animal.shelterId,
       });
     } catch (error: unknown) {
       if (error instanceof Error) {

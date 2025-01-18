@@ -19,12 +19,12 @@ export const userRouter = {
         where: eq(Users.id, input.id),
       });
     }),
-  create: protectedProcedure
-    .input(CreateUserSchema)
-    .mutation(({ ctx, input }) => {
-      return ctx.db.insert(Users).values(input as any);
-    }),
-  delete: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
-    return ctx.db.delete(Users).where(eq(Users.id, input));
-  }),
+  // create: protectedProcedure
+  //   .input(CreateUserSchema)
+  //   .mutation(({ ctx, input }) => {
+  //     return ctx.db.insert(Users).values(input as any);
+  //   }),
+  // delete: publicProcedure.input(z.string()).mutation(({ input, ctx }) => {
+  //   return ctx.db.delete(Users).where(eq(Users.id, input));
+  // }),
 } satisfies TRPCRouterRecord;

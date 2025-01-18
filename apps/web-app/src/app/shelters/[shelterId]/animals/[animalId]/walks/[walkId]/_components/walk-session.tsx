@@ -548,6 +548,7 @@ export function WalkSession({ walk }: WalkSessionProps) {
         activities,
         endedAt,
         notes: noteText || undefined,
+        shelterId: walk.animal.shelterId,
         startedAt,
         walkDifficultyLevel,
         walkId: walk.id,

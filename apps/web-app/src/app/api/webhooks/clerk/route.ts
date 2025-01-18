@@ -101,9 +101,7 @@ export async function POST(request: Request) {
         },
         target: Users.email,
       })
-      .returning({
-        id: Users.id,
-      });
+      .returning();
 
     if (!user) {
       return new Response("User not found on user.created", { status: 400 });
@@ -148,10 +146,7 @@ export async function POST(request: Request) {
         lastName: event.data.last_name,
       })
       .where(eq(Users.clerkId, event.data.id))
-      .returning({
-        email: Users.email,
-        id: Users.id,
-      });
+      .returning();
 
     if (!user) {
       return new Response("User not found on user.update", { status: 400 });
@@ -182,10 +177,7 @@ export async function POST(request: Request) {
         lastLoggedInAt: new Date(),
       })
       .where(eq(Users.clerkId, event.data.user_id))
-      .returning({
-        email: Users.email,
-        id: Users.id,
-      });
+      .returning();
 
     if (!user) {
       return new Response("User not found on session.created", { status: 400 });

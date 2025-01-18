@@ -51,10 +51,12 @@ import {
   Heart,
   Home,
   Info,
+  Laptop,
   ListFilter,
   ListOrdered,
   ListPlus,
   Loader2,
+  LogOut,
   Mail,
   MapPin,
   Maximize,
@@ -136,6 +138,12 @@ export const Icons = {
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   AlertCircle: twx(AlertCircle).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  LogOut: twx(LogOut).transientProps(["size", "variant"])<IconProps>(
+    ({ size, variant }) => iconVariants({ size, variant }),
+  ),
+  Laptop: twx(Laptop).transientProps(["size", "variant"])<IconProps>(
     ({ size, variant }) => iconVariants({ size, variant }),
   ),
   AlertTriangle: twx(AlertTriangle).transientProps([

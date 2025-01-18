@@ -67,7 +67,7 @@ export function KennelActionConfirmationDialog({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange} snapPoints={["220px"]}>
+      <Drawer open={open} onOpenChange={onOpenChange} snapPoints={[0.4]}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>

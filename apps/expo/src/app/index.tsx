@@ -41,12 +41,12 @@ function CreateUser() {
 
   const [firstName, setFirstName] = useState("");
 
-  const { mutate, error } = api.user.create.useMutation({
-    async onSuccess() {
-      setFirstName("");
-      await utils.user.all.invalidate();
-    },
-  });
+  // const { mutate, error } = api.user.create.useMutation({
+  //   async onSuccess() {
+  //     setFirstName("");
+  //     await utils.user.all.invalidate();
+  //   },
+  // });
 
   return (
     <View className="mt-4 flex gap-2">
@@ -56,12 +56,12 @@ function CreateUser() {
         onChangeText={setFirstName}
         placeholder="Name"
       />
-      {error?.data?.zodError?.fieldErrors.title && (
+      {/* {error?.data?.zodError?.fieldErrors.title && (
         <Text className="mb-2 text-destructive">
           {error.data.zodError.fieldErrors.title}
         </Text>
-      )}
-      <Pressable
+      )} */}
+      {/* <Pressable
         className="flex items-center rounded bg-primary p-2"
         onPress={() => {
           mutate({
@@ -70,12 +70,12 @@ function CreateUser() {
         }}
       >
         <Text className="text-foreground">Create</Text>
-      </Pressable>
-      {error?.data?.code === "UNAUTHORIZED" && (
+      </Pressable> */}
+      {/* {error?.data?.code === "UNAUTHORIZED" && (
         <Text className="mt-2 text-destructive">
           You need to be logged in to create a post
         </Text>
-      )}
+      )} */}
     </View>
   );
 }
@@ -85,9 +85,9 @@ export default function Index() {
 
   const userQuery = api.user.all.useQuery();
 
-  const deleteUserMutation = api.user.delete.useMutation({
-    onSettled: () => utils.user.all.invalidate().then(),
-  });
+  // const deleteUserMutation = api.user.delete.useMutation({
+  //   onSettled: () => utils.user.all.invalidate().then(),
+  // });
 
   return (
     <SafeAreaView className="bg-background">
@@ -111,7 +111,7 @@ export default function Index() {
           </Text>
         </View>
 
-        <FlashList
+        {/* <FlashList
           data={userQuery.data}
           estimatedItemSize={20}
           ItemSeparatorComponent={() => <View className="h-2" />}
@@ -121,7 +121,7 @@ export default function Index() {
               onDelete={() => deleteUserMutation.mutate(p.item.id)}
             />
           )}
-        />
+        /> */}
 
         <CreateUser />
       </View>

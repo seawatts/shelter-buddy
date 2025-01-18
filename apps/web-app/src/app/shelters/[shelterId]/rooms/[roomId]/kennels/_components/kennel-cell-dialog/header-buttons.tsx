@@ -38,6 +38,7 @@ export function KennelCellDialogHeaderButtons({
     try {
       await stopWalkServerAction.execute({
         animalId: animal.id,
+        shelterId: animal.shelterId,
         walkId: walkInProgress.id,
       });
     } catch (error) {
@@ -56,6 +57,7 @@ export function KennelCellDialogHeaderButtons({
       const [result] = await toggleOutOfKennelServerAction.execute({
         animalId: animal.id,
         isOutOfKennel: !currentKennelOccupant.isOutOfKennel,
+        shelterId: animal.shelterId,
       });
 
       if (result?.success) {
@@ -97,7 +99,12 @@ export function KennelCellDialogHeaderButtons({
       <Button
         variant="default"
         className="gap-2"
-        onClick={() => startWalkServerAction.execute({ animalId: animal.id })}
+        onClick={() =>
+          startWalkServerAction.execute({
+            animalId: animal.id,
+            shelterId: animal.shelterId,
+          })
+        }
         disabled={startWalkServerAction.isPending}
       >
         {startWalkServerAction.isPending ? (

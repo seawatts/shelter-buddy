@@ -1,7 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useClerk, useUser } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Button } from "@acme/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@acme/ui/dropdown-menu";
+import { Icons } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 function getCurrentShift(hour: number): {
@@ -19,6 +35,10 @@ function getCurrentShift(hour: number): {
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { setTheme } = useTheme();
+  const { signOut } = useClerk();
+  const { user } = useUser();
+  const router = useRouter();
 
   const { currentShift, dayAndMonth, fullDate } = useMemo(() => {
     const now = new Date();
@@ -44,6 +64,10 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="flex items-start justify-between">
       <div>
@@ -60,6 +84,60 @@ export function Header() {
             {fullDate}
           </p>
         )}
+      </div>
+
+      <div className="flex items-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative size-8 rounded-full">
+              <Avatar className="size-8">
+                <AvatarImage
+                  src={user?.imageUrl}
+                  alt={user?.fullName ?? "User avatar"}
+                />
+                <AvatarFallback>
+                  {user?.firstName?.[0]}
+                  {user?.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuItem className="flex flex-col items-start">
+              <div className="text-sm font-medium">
+                {user?.firstName} {user?.lastName}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {user?.primaryEmailAddress?.emailAddress}
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Icons.SunMedium className="mr-2 size-4" />
+                <span>Theme</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Icons.SunMedium className="mr-2 size-4" />
+                  <span>Light</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Icons.Moon className="mr-2 size-4" />
+                  <span>Dark</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Icons.Laptop className="mr-2 size-4" />
+                  <span>System</span>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuItem onClick={handleSignOut}>
+              <Icons.LogOut className="mr-2 size-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
