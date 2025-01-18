@@ -47,8 +47,8 @@ interface AnimalFormData {
     inKennel?: string;
     outOfKennel?: string;
   };
-  staffLeashUp?: boolean;
-  staffReturn?: boolean;
+  staffLeashUp: boolean;
+  staffReturn: boolean;
 }
 
 interface AnimalFormProps {
@@ -147,6 +147,8 @@ export function AnimalForm({
       intakeFormImagePath: null,
       isFido: false,
       name: "",
+      staffLeashUp: false,
+      staffReturn: false,
     },
   );
 
@@ -168,6 +170,8 @@ export function AnimalForm({
               generalNotes: data.generalNotes ?? "",
               isFido: data.isFido ?? false,
               name: data.name,
+              staffLeashUp: data.staffLeashUp,
+              staffReturn: data.staffReturn,
             },
             status: "editing" as const,
           };
@@ -186,6 +190,8 @@ export function AnimalForm({
             generalNotes: data.generalNotes ?? "",
             isFido: data.isFido ?? false,
             name: data.name,
+            staffLeashUp: data.staffLeashUp,
+            staffReturn: data.staffReturn,
           },
           animalId: data.animalId,
           createdAt: new Date(),
@@ -234,6 +240,8 @@ export function AnimalForm({
           intakeFormImagePath: intakeForm.uploadedUrl,
           isFido: analyzedData.isFido,
           name: analyzedData.name,
+          staffLeashUp: analyzedData.staffLeashUp,
+          staffReturn: analyzedData.staffReturn,
         });
 
         // Update the form status to editing
@@ -445,7 +453,7 @@ export function AnimalForm({
           <Switch
             id="staffLeashUp"
             name="staffLeashUp"
-            checked={formData.staffLeashUp ?? false}
+            checked={formData.staffLeashUp}
             onCheckedChange={(checked) =>
               handleFormChange({
                 ...formData,
@@ -460,7 +468,7 @@ export function AnimalForm({
           <Switch
             id="staffReturn"
             name="staffReturn"
-            checked={formData.staffReturn ?? false}
+            checked={formData.staffReturn}
             onCheckedChange={(checked) =>
               handleFormChange({
                 ...formData,
@@ -475,6 +483,7 @@ export function AnimalForm({
         {formData.approvedActivities.map((activity, index) => (
           <div key={index} className="flex items-center gap-4">
             <Switch
+              id={`approvedActivities.${index}.isApproved`}
               name={`approvedActivities.${index}.isApproved`}
               checked={activity.isApproved}
               onCheckedChange={(checked) =>
@@ -487,7 +496,9 @@ export function AnimalForm({
                 })
               }
             />
-            <Label>{activity.activity}</Label>
+            <Label htmlFor={`approvedActivities.${index}.isApproved`}>
+              {activity.activity}
+            </Label>
           </div>
         ))}
       </div>
@@ -497,8 +508,8 @@ export function AnimalForm({
         disabled={
           isPending ||
           isSuccess ||
+          !formData.externalId ||
           !formData.name ||
-          !formData.breed ||
           !formData.difficultyLevel
         }
       >

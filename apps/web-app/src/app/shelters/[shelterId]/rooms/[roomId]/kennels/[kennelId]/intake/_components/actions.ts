@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+import type { AnimalNoteType } from "@acme/db/schema";
 import { db } from "@acme/db/client";
 import {
   AnimalMedia,
@@ -95,16 +96,38 @@ export const createAnimalAction = authenticatedAction
       startedAt: new Date(),
     });
 
-    // Create general notes if provided
-    if (input.generalNotes) {
-      await db.insert(AnimalNotes).values({
-        animalId: animal.id,
-        createdByUserId: ctx.user.id,
-        isActive: true,
-        notes: input.generalNotes,
-        shelterId: shelterMember.shelterId,
-        type: "general",
-      });
+    // Create staff requirement notes if needed
+    if (input.staffLeashUp || input.staffReturn) {
+      const staffRequirements: Omit<
+        AnimalNoteType,
+        "id" | "createdAt" | "updatedAt" | "summary" | "walkId"
+      >[] = [];
+
+      if (input.staffLeashUp) {
+        staffRequirements.push({
+          animalId: animal.id,
+          createdByUserId: ctx.user.id,
+          isActive: true,
+          notes: "Staff required for leash up",
+          shelterId: shelterMember.shelterId,
+          type: "staffRequirement",
+        });
+      }
+
+      if (input.staffReturn) {
+        staffRequirements.push({
+          animalId: animal.id,
+          createdByUserId: ctx.user.id,
+          isActive: true,
+          notes: "Staff required for return",
+          shelterId: shelterMember.shelterId,
+          type: "staffRequirement",
+        });
+      }
+
+      if (staffRequirements.length > 0) {
+        await db.insert(AnimalNotes).values(staffRequirements);
+      }
     }
 
     // Create equipment notes if provided
@@ -165,26 +188,15 @@ export const createAnimalAction = authenticatedAction
       });
     }
 
-    // Create staff requirement notes if needed
-    if (input.staffLeashUp) {
+    // Create general notes if provided
+    if (input.generalNotes) {
       await db.insert(AnimalNotes).values({
         animalId: animal.id,
         createdByUserId: ctx.user.id,
         isActive: true,
-        notes: "Staff required for leash up",
+        notes: input.generalNotes,
         shelterId: shelterMember.shelterId,
-        type: "staffRequirement",
-      });
-    }
-
-    if (input.staffReturn) {
-      await db.insert(AnimalNotes).values({
-        animalId: animal.id,
-        createdByUserId: ctx.user.id,
-        isActive: true,
-        notes: "Staff required for return",
-        shelterId: shelterMember.shelterId,
-        type: "staffRequirement",
+        type: "general",
       });
     }
 

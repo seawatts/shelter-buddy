@@ -32,6 +32,8 @@ export interface IntakeFormAnalysis {
       inKennel?: string;
       outOfKennel?: string;
     };
+    staffLeashUp: boolean;
+    staffReturn: boolean;
   } | null;
   status: "pending" | "analyzing" | "analyzed" | "error" | "editing";
   error?: string;
@@ -114,7 +116,7 @@ export function IndexedDBProvider({ children }: IndexedDBProviderProps) {
       // db.close();
       // }
     };
-  }, [db]);
+  }, [db, isInitialized]);
 
   const contextValue = useMemo<IndexedDBContextValue>(
     () => ({

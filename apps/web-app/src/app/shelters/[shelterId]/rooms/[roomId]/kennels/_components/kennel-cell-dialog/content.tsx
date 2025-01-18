@@ -163,6 +163,34 @@ export function KennelCellDialogContent({
         healthActivities.length > 0 ||
         behaviorActivities.length > 0) && (
         <div className="flex flex-col gap-2">
+          {/* Staff Walking Requirements Alert */}
+          {animal.notes.some(
+            (note: AnimalNoteType) =>
+              note.type === "staffRequirement" && note.isActive,
+          ) && (
+            <Alert>
+              {/* <Icons.AlertTriangle className="size-4" /> */}
+              <AlertTitle>
+                <div className="flex flex-col gap-2">
+                  {animal.notes
+                    .filter(
+                      (note) =>
+                        note.type === "staffRequirement" && note.isActive,
+                    )
+                    .map((note, index) => (
+                      <div
+                        key={`staff-req-${index}`}
+                        className="flex items-start gap-2"
+                      >
+                        <AlertTriangle className="size-4 shrink-0" />
+                        <span>{note.notes}</span>
+                      </div>
+                    ))}
+                </div>
+              </AlertTitle>
+            </Alert>
+          )}
+
           {/* Staff Alert */}
           {(animal.difficultyLevel === "Red" ||
             criticalActivities.some(
@@ -419,21 +447,51 @@ export function KennelCellDialogContent({
         </Alert>
       )}
 
-      {/* Quick Actions */}
-      <KennelCellDialogQuickButtons
-        animal={animal}
-        onOpenChange={onOpenChange}
-        kennels={kennels}
-      />
+      {/* Approved Activities */}
+      <div className="rounded-lg border bg-card p-4">
+        <h2 className="mb-3 text-lg font-semibold">Approved Activities</h2>
+        <div className="grid gap-2">
+          {animal.notes.some(
+            (note: AnimalNoteType) =>
+              note.type === "approvedActivities" && note.isActive,
+          ) ? (
+            animal.notes
+              .filter(
+                (note: AnimalNoteType) =>
+                  note.type === "approvedActivities" && note.isActive,
+              )
+              .map((note) => {
+                const activities = note.notes.split("\n").map((activity) => {
+                  const [name, status] = activity.split(": ");
+                  return { name, status };
+                });
 
-      <AnimalImages
-        name={animal.name}
-        roomId={roomId}
-        kennelId={kennelId}
-        media={animal.media}
-        animalId={animal.id}
-        shelterId={animal.shelterId}
-      />
+                return activities.map(({ name, status }, index) => (
+                  <div key={index} className="flex items-center gap-1.5">
+                    <span
+                      className={
+                        status === "Approved"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }
+                    >
+                      {status === "Approved" ? (
+                        <Check className="size-3" />
+                      ) : (
+                        <X className="size-3" />
+                      )}
+                    </span>
+                    <p className="text-sm">{name}</p>
+                  </div>
+                ));
+              })
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No approved activities listed
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* Additional Details */}
       <div className="grid gap-4">
@@ -485,49 +543,6 @@ export function KennelCellDialogContent({
           </div>
         </div>
 
-        {/* Approved Activities */}
-        <div className="rounded-lg border bg-card p-4">
-          <h2 className="mb-3 text-lg font-semibold">Approved Activities</h2>
-          <div className="grid gap-2">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={animal.isFido ? "text-green-600" : "text-red-600"}
-              >
-                {animal.isFido ? (
-                  <Check className="size-3" />
-                ) : (
-                  <X className="size-3" />
-                )}
-              </span>
-              <p className="text-sm">
-                {animal.isFido ? "FIDO Certified" : "Not FIDO Certified"}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {animal.notes.some(
-                (note: AnimalNoteType) =>
-                  note.type === "approvedActivities" && note.isActive,
-              ) ? (
-                animal.notes
-                  .filter(
-                    (note: AnimalNoteType) =>
-                      note.type === "approvedActivities" && note.isActive,
-                  )
-                  .map((note, index) => (
-                    <div key={index} className="flex items-center gap-1.5">
-                      <Check className="size-3 text-green-600" />
-                      <p className="text-sm">{note.notes}</p>
-                    </div>
-                  ))
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No approved activities listed
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Walking History */}
         <div className="rounded-lg border bg-card p-4">
           <h2 className="mb-3 text-lg font-semibold">Walking History</h2>
@@ -575,6 +590,21 @@ export function KennelCellDialogContent({
           </div>
         </div>
       </div>
+      {/* Quick Actions */}
+      <KennelCellDialogQuickButtons
+        animal={animal}
+        onOpenChange={onOpenChange}
+        kennels={kennels}
+      />
+
+      <AnimalImages
+        name={animal.name}
+        roomId={roomId}
+        kennelId={kennelId}
+        media={animal.media}
+        animalId={animal.id}
+        shelterId={animal.shelterId}
+      />
     </div>
   );
 }
