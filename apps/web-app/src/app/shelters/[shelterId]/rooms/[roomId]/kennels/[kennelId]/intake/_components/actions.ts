@@ -22,13 +22,13 @@ const createAnimalSchema = z.object({
   approvedActivities: z
     .array(
       z.object({
-        activity: z.string(),
-        isApproved: z.boolean(),
+        activity: z.string().optional(),
+        isApproved: z.boolean().optional(),
       }),
     )
     .optional(),
   birthDate: z.date().optional(),
-  breed: z.string(),
+  breed: z.string().optional(),
   difficultyLevel: z.enum(["Yellow", "Purple", "Red"]),
   equipmentNotes: z
     .object({

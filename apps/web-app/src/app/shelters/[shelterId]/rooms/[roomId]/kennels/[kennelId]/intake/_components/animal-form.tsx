@@ -30,7 +30,6 @@ import { useIntakeForm } from "~/providers/intake-form-provider";
 import { createAnimalAction } from "./actions";
 
 interface AnimalFormData {
-  animalId: string;
   externalId?: string;
   name: string;
   breed?: string | null;
@@ -39,16 +38,16 @@ interface AnimalFormData {
   isFido?: boolean;
   intakeFormImagePath?: string | null;
   generalNotes?: string;
-  approvedActivities: {
-    activity: string;
-    isApproved: boolean;
+  approvedActivities?: {
+    activity?: string;
+    isApproved?: boolean;
   }[];
-  equipmentNotes: {
+  equipmentNotes?: {
     inKennel?: string;
     outOfKennel?: string;
   };
-  staffLeashUp: boolean;
-  staffReturn: boolean;
+  staffLeashUp?: boolean;
+  staffReturn?: boolean;
 }
 
 interface AnimalFormProps {
@@ -129,7 +128,6 @@ export function AnimalForm({
 
   const [formData, setFormData] = useState<AnimalFormData>(
     initialData ?? {
-      animalId: "",
       approvedActivities: [
         { activity: "FIDO", isApproved: false },
         { activity: "Dog Playgroups", isApproved: false },
@@ -193,7 +191,6 @@ export function AnimalForm({
             staffLeashUp: data.staffLeashUp,
             staffReturn: data.staffReturn,
           },
-          animalId: data.animalId,
           createdAt: new Date(),
           id: createId(),
           kennelId,
@@ -224,8 +221,7 @@ export function AnimalForm({
         currentFormIdRef.current = intakeForm.id;
         const { analyzedData } = intakeForm;
         setFormData({
-          animalId: analyzedData.externalId,
-          approvedActivities: analyzedData.approvedActivities.map(
+          approvedActivities: analyzedData.approvedActivities?.map(
             (activity) => ({
               activity: activity.activity,
               isApproved: activity.isApproved,
@@ -239,7 +235,7 @@ export function AnimalForm({
           generalNotes: analyzedData.generalNotes,
           intakeFormImagePath: intakeForm.uploadedUrl,
           isFido: analyzedData.isFido,
-          name: analyzedData.name,
+          name: analyzedData.name ?? "Unknown",
           staffLeashUp: analyzedData.staffLeashUp,
           staffReturn: analyzedData.staffReturn,
         });
@@ -415,7 +411,7 @@ export function AnimalForm({
           <Textarea
             id="inKennelNotes"
             name="equipmentNotes.inKennel"
-            value={formData.equipmentNotes.inKennel ?? ""}
+            value={formData.equipmentNotes?.inKennel ?? ""}
             onChange={(event) =>
               handleFormChange({
                 ...formData,
@@ -433,7 +429,7 @@ export function AnimalForm({
           <Textarea
             id="outKennelNotes"
             name="equipmentNotes.outOfKennel"
-            value={formData.equipmentNotes.outOfKennel ?? ""}
+            value={formData.equipmentNotes?.outOfKennel ?? ""}
             onChange={(event) =>
               handleFormChange({
                 ...formData,
@@ -480,7 +476,7 @@ export function AnimalForm({
         </div>
 
         <Label>Approved Activities</Label>
-        {formData.approvedActivities.map((activity, index) => (
+        {formData.approvedActivities?.map((activity, index) => (
           <div key={index} className="flex items-center gap-4">
             <Switch
               id={`approvedActivities.${index}.isApproved`}
@@ -489,7 +485,7 @@ export function AnimalForm({
               onCheckedChange={(checked) =>
                 handleFormChange({
                   ...formData,
-                  approvedActivities: formData.approvedActivities.map(
+                  approvedActivities: formData.approvedActivities?.map(
                     (a, index_) =>
                       index_ === index ? { ...a, isApproved: checked } : a,
                   ),
@@ -506,11 +502,7 @@ export function AnimalForm({
       <Button
         type="submit"
         disabled={
-          isPending ||
-          isSuccess ||
-          !formData.externalId ||
-          !formData.name ||
-          !formData.difficultyLevel
+          isPending || isSuccess || !formData.name || !formData.difficultyLevel
         }
       >
         {isPending && (

@@ -11,29 +11,28 @@ import type { UploadItem } from "~/types/upload";
 export interface IntakeFormAnalysis {
   id: string;
   kennelId: string | null;
-  animalId: string;
   uploadedUrl: string;
   previewUrl: string;
   shelterId: string;
   roomId: string;
   analyzedData: {
-    externalId: string;
-    name: string;
-    breed: string;
-    gender: "male" | "female";
-    difficultyLevel: DifficultyLevelEnum;
-    isFido: boolean;
-    generalNotes: string;
-    approvedActivities: {
-      activity: string;
-      isApproved: boolean;
+    externalId?: string;
+    name?: string;
+    breed?: string;
+    gender?: "male" | "female";
+    difficultyLevel?: DifficultyLevelEnum;
+    isFido?: boolean;
+    generalNotes?: string;
+    approvedActivities?: {
+      activity?: string;
+      isApproved?: boolean;
     }[];
-    equipmentNotes: {
+    equipmentNotes?: {
       inKennel?: string;
       outOfKennel?: string;
     };
-    staffLeashUp: boolean;
-    staffReturn: boolean;
+    staffLeashUp?: boolean;
+    staffReturn?: boolean;
   } | null;
   status: "pending" | "analyzing" | "analyzed" | "error" | "editing";
   error?: string;

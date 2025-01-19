@@ -13,10 +13,12 @@ import { AnimalDetails } from "./_components/animal-details";
 export default async function AnimalPage({
   params,
 }: {
-  params: { animalId: string; shelterId: string };
+  params: Promise<{ animalId: string; shelterId: string }>;
 }) {
+  const { animalId, shelterId } = await params;
+
   const animal = await db.query.Animals.findFirst({
-    where: (animal, { eq }) => eq(animal.id, params.animalId),
+    where: (animal, { eq }) => eq(animal.id, animalId),
     with: {
       activities: true,
       kennelOccupants: {
@@ -47,7 +49,7 @@ export default async function AnimalPage({
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Animal Details</h1>
         <Button variant="outline" asChild>
-          <a href={`/shelters/${params.shelterId}/rooms`}>
+          <a href={`/shelters/${shelterId}/rooms`}>
             <Icons.ChevronLeft className="mr-2 size-4" />
             Back to Rooms
           </a>
@@ -72,9 +74,8 @@ export default async function AnimalPage({
             <AnimalForm
               kennelId={animal.kennelOccupants[0]?.kennel.id ?? ""}
               roomId={animal.kennelOccupants[0]?.kennel.room.id ?? ""}
-              shelterId={params.shelterId}
+              shelterId={shelterId}
               initialData={{
-                animalId: animal.id,
                 ...(animal.externalId !== null && {
                   externalId: animal.externalId,
                 }),

@@ -62,7 +62,6 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
         // Create a new form analysis entry
         const form: IntakeFormAnalysis = {
           analyzedData: null,
-          animalId: upload.animalId,
           createdAt: new Date(),
           error: undefined,
           id: upload.id,
@@ -93,25 +92,26 @@ export function IntakeFormProvider({ children }: IntakeFormProviderProps) {
           // Transform the BAML result into the expected format
           const analyzedData = result.data
             ? ({
-                approvedActivities: result.data.approvedActivities.map(
+                approvedActivities: result.data.approvedActivities?.map(
                   (activity) => ({
-                    activity: activity.activity,
-                    isApproved: activity.isApproved,
+                    activity: activity?.activity ?? "",
+                    isApproved: activity?.isApproved ?? false,
                   }),
                 ),
-                breed: result.data.breed,
+                breed: result.data.breed ?? "Unknown",
                 difficultyLevel: result.data
                   .difficultyLevel as DifficultyLevelEnum,
                 equipmentNotes: {
-                  inKennel: result.data.equipmentNotes.inKennel.join("\n"),
+                  inKennel:
+                    result.data.equipmentNotes?.inKennel?.join("\n") ?? "",
                   outOfKennel:
-                    result.data.equipmentNotes.outOfKennel.join("\n"),
+                    result.data.equipmentNotes?.outOfKennel?.join("\n") ?? "",
                 },
-                externalId: result.data.id,
-                gender: result.data.gender.toLowerCase() as "male" | "female",
+                externalId: result.data.id ?? "",
+                gender: result.data.gender?.toLowerCase() as "male" | "female",
                 generalNotes: result.data.generalNotes ?? "",
-                isFido: result.data.isFido,
-                name: result.data.name,
+                isFido: result.data.isFido ?? false,
+                name: result.data.name ?? "",
                 staffLeashUp: false,
                 staffReturn: false,
               } satisfies IntakeFormAnalysis["analyzedData"])
